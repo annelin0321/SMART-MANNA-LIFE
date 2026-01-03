@@ -149,7 +149,7 @@
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
                     <span>備份</span>
                 </button>
-                <input type="date" id="date-picker" class="bg-[#F9F7F5] border border-[#EBE6DE] rounded-full px-3 py-1 text-xs font-mono outline-none cursor-pointer text-[#5E5A54]" onchange="handleDateChange(this.value)">
+                <input type="date" id="date-picker" class="bg-[#F9F7F5] border border-[#EBE6DE] rounded-full px-3 py-1 text-xs font-mono outline-none cursor-pointer text-[#5E5A54]" onchange="window.handleDateChange(this.value)">
             </div>
         </div>
     </header>
@@ -170,7 +170,7 @@
                     資料 / 備份
                 </button>
                 <div class="flex items-center bg-white rounded-xl px-3 py-2 border border-[#EBE6DE] shadow-sm">
-                     <input type="date" id="home-date-picker" class="bg-transparent border-none text-sm font-medium focus:ring-0 outline-none cursor-pointer text-[#5E5A54] font-mono" onchange="handleDateChange(this.value)">
+                     <input type="date" id="home-date-picker" class="bg-transparent border-none text-sm font-medium focus:ring-0 outline-none cursor-pointer text-[#5E5A54] font-mono" onchange="window.handleDateChange(this.value)">
                 </div>
             </div>
         </div>
@@ -199,9 +199,9 @@
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-bold text-[#5E5A54] flex items-center gap-2">❤️ 累積生命值 <div id="streak-badge" class="hidden items-center gap-1 px-2 py-0.5 rounded-full bg-[#FFF5EB] text-[#A68C76] text-[10px] border border-[#F2EBE5]">🔥 <span id="streak-count">0</span> 天</div></h3>
                     <div class="flex items-center gap-2">
-                        <button onclick="changeCalendarMonth(-1)" class="p-1 text-[#94908A] hover:text-[#5E5A54]">◀</button>
+                        <button onclick="window.changeCalendarMonth(-1)" class="p-1 text-[#94908A] hover:text-[#5E5A54]">◀</button>
                         <div class="text-xs font-bold w-20 text-center" id="calendar-month-label"></div>
-                        <button onclick="changeCalendarMonth(1)" class="p-1 text-[#94908A] hover:text-[#5E5A54]">▶</button>
+                        <button onclick="window.changeCalendarMonth(1)" class="p-1 text-[#94908A] hover:text-[#5E5A54]">▶</button>
                     </div>
                 </div>
                 <div class="grid grid-cols-7 gap-1 text-center text-[10px] text-[#A68C76] mb-2 font-bold uppercase">
@@ -258,7 +258,7 @@
                 
                 <!-- Bible 模式下的側邊欄切換 -->
                 <div id="bible-nav-header" class="hidden px-4 py-2 bg-[#F9F7F5] border-b border-[#EBE6DE] shrink-0 flex items-center justify-between">
-                    <button onclick="toggleBibleSidebar()" class="text-xs font-bold text-[#A68C76] flex items-center gap-1 border border-[#A68C76] px-3 py-1.5 rounded-lg">
+                    <button onclick="window.toggleBibleSidebar()" class="text-xs font-bold text-[#A68C76] flex items-center gap-1 border border-[#A68C76] px-3 py-1.5 rounded-lg">
                         <span>📚 切換卷章</span>
                     </button>
                     <span id="bible-current-loc" class="text-xs font-bold text-[#5E5A54]"></span>
@@ -268,18 +268,18 @@
                 <div id="bible-sidebar-overlay" class="hidden absolute inset-0 bg-white z-20 flex flex-col">
                     <div class="p-4 border-b flex justify-between items-center bg-[#FAF9F6]">
                         <h3 class="font-bold text-[#5E5A54]">選擇書卷</h3>
-                        <button onclick="toggleBibleSidebar()" class="text-2xl text-[#94908A]">&times;</button>
+                        <button onclick="window.toggleBibleSidebar()" class="text-2xl text-[#94908A]">&times;</button>
                     </div>
                     <div id="sidebar-bible" class="flex-1 flex flex-col overflow-hidden">
                         <div id="bible-level-books" class="flex flex-col h-full p-4">
                             <div class="flex gap-2 mb-4 shrink-0">
-                                <button onclick="renderBibleBooks('old')" id="btn-old" class="flex-1 py-2 text-xs font-bold rounded-lg bg-[#A68C76] text-white">舊約</button>
-                                <button onclick="renderBibleBooks('new')" id="btn-new" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white border text-[#A68C76]">新約</button>
+                                <button onclick="window.renderBibleBooks('old')" id="btn-old" class="flex-1 py-2 text-xs font-bold rounded-lg bg-[#A68C76] text-white">舊約</button>
+                                <button onclick="window.renderBibleBooks('new')" id="btn-new" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white border text-[#A68C76]">新約</button>
                             </div>
                             <div id="bible-book-list" class="flex-1 overflow-y-auto pr-2 grid grid-cols-2 gap-2 content-start no-scrollbar pb-20"></div>
                         </div>
                         <div id="bible-level-chapters" class="hidden flex-col h-full p-4">
-                            <button onclick="backToBooks()" class="mb-4 text-xs font-bold text-[#94908A] flex items-center">◀ 返回目錄</button>
+                            <button onclick="window.backToBooks()" class="mb-4 text-xs font-bold text-[#94908A] flex items-center">◀ 返回目錄</button>
                             <h3 id="sidebar-chapter-title" class="text-lg font-bold text-[#5E5A54] mb-4 border-b pb-2"></h3>
                             <div id="sidebar-chapter-grid" class="flex-1 overflow-y-auto pr-2 grid grid-cols-5 gap-3 content-start no-scrollbar pb-20"></div>
                         </div>
@@ -300,8 +300,9 @@
                     <!-- 搜尋欄 -->
                     <div class="flex items-center gap-2" id="reader-search-container">
                         <div class="relative group">
-                            <input type="text" id="inline-search" placeholder="如: 創 1:1" class="pl-3 pr-8 py-1 rounded-full bg-[#F9F7F5] border-none text-xs focus:ring-1 focus:ring-[#7E9B92] w-32 transition-all focus:w-48 outline-none text-[#5E5A54]">
-                            <button onclick="performSearch()" class="absolute right-2 top-1.5 text-[#94908A] hover:text-[#7E9B92]"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></button>
+                            <!-- 修改：加入 onkeyup 支援 Enter 鍵搜尋 -->
+                            <input type="text" id="inline-search" placeholder="系統啟動中..." disabled class="pl-3 pr-8 py-1 rounded-full bg-[#F9F7F5] border-none text-xs focus:ring-1 focus:ring-[#7E9B92] w-32 transition-all focus:w-48 outline-none text-[#5E5A54] disabled:opacity-50 disabled:cursor-not-allowed" onkeyup="if(event.key === 'Enter') window.performSearch()">
+                            <button onclick="window.performSearch()" class="absolute right-2 top-1.5 text-[#94908A] hover:text-[#7E9B92]"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></button>
                         </div>
                     </div>
                 </div>
@@ -311,11 +312,11 @@
             <!-- 筆記區塊 (預設隱藏) -->
             <section id="section-journal" class="flex-1 flex flex-col bg-white overflow-hidden absolute inset-0 z-0 opacity-0 pointer-events-none transition-opacity duration-300">
                 <div class="bg-[#FAF9F6] px-6 py-3 border-b flex gap-3 overflow-x-auto no-scrollbar items-center shrink-0" id="active-mood-list">
-                    <button class="mood-sticker" onclick="selectMood(this, '☀️')">☀️</button>
-                    <button class="mood-sticker" onclick="selectMood(this, '☁️')">☁️</button>
-                    <button class="mood-sticker" onclick="selectMood(this, '🌧️')">🌧️</button>
-                    <button class="mood-sticker" onclick="selectMood(this, '🔥')">🔥</button>
-                    <button class="mood-sticker" onclick="selectMood(this, '🌱')">🌱</button>
+                    <button class="mood-sticker" onclick="window.selectMood(this, '☀️')">☀️</button>
+                    <button class="mood-sticker" onclick="window.selectMood(this, '☁️')">☁️</button>
+                    <button class="mood-sticker" onclick="window.selectMood(this, '🌧️')">🌧️</button>
+                    <button class="mood-sticker" onclick="window.selectMood(this, '🔥')">🔥</button>
+                    <button class="mood-sticker" onclick="window.selectMood(this, '🌱')">🌱</button>
                     <input type="hidden" id="note-mood">
                 </div>
                 <div class="flex-1 overflow-y-auto p-6 space-y-6 pb-24">
@@ -336,7 +337,7 @@
                         </div>
                         <!-- 匯出按鈕 -->
                         <div class="pt-6 mt-2">
-                            <button onclick="backupData()" class="w-full py-3 rounded-xl bg-[#F9F7F5] border border-[#EBE6DE] text-[#94908A] text-xs font-bold hover:bg-[#A68C76] hover:text-white hover:border-[#A68C76] transition-all flex items-center justify-center gap-2 group">
+                            <button onclick="window.backupData()" class="w-full py-3 rounded-xl bg-[#F9F7F5] border border-[#EBE6DE] text-[#94908A] text-xs font-bold hover:bg-[#A68C76] hover:text-white hover:border-[#A68C76] transition-all flex items-center justify-center gap-2 group">
                                 <span class="group-hover:scale-110 transition-transform">💾</span> 
                                 <span>寫完了嗎？記得匯出備份喔！</span>
                             </button>
@@ -359,7 +360,7 @@
                         </div>
                         <!-- 匯出按鈕 -->
                         <div class="pt-6 mt-2">
-                            <button onclick="backupData()" class="w-full py-3 rounded-xl bg-[#F9F7F5] border border-[#EBE6DE] text-[#94908A] text-xs font-bold hover:bg-[#A68C76] hover:text-white hover:border-[#A68C76] transition-all flex items-center justify-center gap-2 group">
+                            <button onclick="window.backupData()" class="w-full py-3 rounded-xl bg-[#F9F7F5] border border-[#EBE6DE] text-[#94908A] text-xs font-bold hover:bg-[#A68C76] hover:text-white hover:border-[#A68C76] transition-all flex items-center justify-center gap-2 group">
                                 <span class="group-hover:scale-110 transition-transform">💾</span> 
                                 <span>聊完了嗎？記得匯出備份喔！</span>
                             </button>
@@ -382,7 +383,7 @@
                         </div>
                         <!-- 匯出按鈕 -->
                         <div class="pt-6 mt-2">
-                            <button onclick="backupData()" class="w-full py-3 rounded-xl bg-[#F9F7F5] border border-[#EBE6DE] text-[#94908A] text-xs font-bold hover:bg-[#A68C76] hover:text-white hover:border-[#A68C76] transition-all flex items-center justify-center gap-2 group">
+                            <button onclick="window.backupData()" class="w-full py-3 rounded-xl bg-[#F9F7F5] border border-[#EBE6DE] text-[#94908A] text-xs font-bold hover:bg-[#A68C76] hover:text-white hover:border-[#A68C76] transition-all flex items-center justify-center gap-2 group">
                                 <span class="group-hover:scale-110 transition-transform">💾</span> 
                                 <span>記錄完了嗎？記得匯出備份喔！</span>
                             </button>
@@ -422,58 +423,10 @@
                         
                         <!-- 匯出按鈕 -->
                         <div class="pt-4 mt-2">
-                            <button onclick="backupData()" class="w-full py-3 rounded-xl bg-[#F9F7F5] border border-[#EBE6DE] text-[#94908A] text-xs font-bold hover:bg-[#A68C76] hover:text-white hover:border-[#A68C76] transition-all flex items-center justify-center gap-2 group">
+                            <button onclick="window.backupData()" class="w-full py-3 rounded-xl bg-[#F9F7F5] border border-[#EBE6DE] text-[#94908A] text-xs font-bold hover:bg-[#A68C76] hover:text-white hover:border-[#A68C76] transition-all flex items-center justify-center gap-2 group">
                                 <span class="group-hover:scale-110 transition-transform">💾</span> 
                                 <span>整理好了嗎？記得匯出備份喔！</span>
                             </button>
-                        </div>
-                    </div>
-
-                    <!-- 感恩日記欄位 (Gratitude Mode) -->
-                    <div id="journal-gratitude-fields" class="space-y-6 hidden">
-                        <div>
-                            <label class="block text-xs font-bold text-[#A68C76] mb-2 uppercase tracking-widest">💖 感恩事項</label>
-                            <textarea id="note-thanks" placeholder="今天發生了什麼好事？..." class="w-full bg-transparent border-b border-dashed border-[#EBE6DE] focus:border-[#A68C76] outline-none min-h-[80px] resize-none p-1 text-lg"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-[#7E9B92] mb-2 uppercase tracking-widest">✨ 恩典記號</label>
-                            <textarea id="note-grace" placeholder="哪裡看見神的作為？..." class="w-full bg-transparent border-b border-dashed border-[#EBE6DE] focus:border-[#7E9B92] outline-none min-h-[80px] resize-none p-1 text-lg"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-[#A68C76] mb-2 uppercase tracking-widest">📝 生活隨筆</label>
-                            <textarea id="note-diary" placeholder="隨手記下此刻的心情..." class="w-full bg-transparent border-b border-dashed border-[#EBE6DE] focus:border-[#A68C76] outline-none min-h-[100px] resize-none p-1 text-lg"></textarea>
-                        </div>
-                    </div>
-
-                    <!-- 內心戲時間欄位 (Mood Mode - 情緒日記) -->
-                    <div id="journal-mood-fields" class="space-y-6 hidden">
-                         <div class="p-3 bg-[#F9F7F5] rounded-xl border border-[#EBE6DE]">
-                            <label class="block text-xs font-bold text-[#5E5A54] mb-2">🎬 發生了什麼事？</label>
-                            <textarea id="note-mood-event" placeholder="客觀記錄事件..." class="w-full bg-white border border-[#EBE6DE] rounded-lg p-2 text-sm outline-none resize-none h-20 focus:border-[#A68C76]"></textarea>
-                            <div class="mt-2 flex items-center gap-2">
-                                <label class="text-xs font-bold text-[#94908A]">🏷️ 情緒標籤:</label>
-                                <input type="text" id="note-mood-tag" placeholder="如: 委屈、焦慮" class="bg-white border border-[#EBE6DE] rounded-lg px-2 py-1 text-sm outline-none flex-1 focus:border-[#A68C76]">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-[#A68C76] mb-1">🤥 我是否相信了什麼謊言？</label>
-                                <textarea id="note-mood-lie" placeholder="ex: 神不愛我、我不夠好..." class="w-full bg-transparent border-b border-dashed border-[#EBE6DE] focus:border-[#A68C76] outline-none min-h-[50px] resize-none p-1 text-base"></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-[#7E9B92] mb-1">👓 神怎麼看這件事？</label>
-                                <textarea id="note-mood-god-view" placeholder="在禱告中領受神的眼光..." class="w-full bg-transparent border-b border-dashed border-[#EBE6DE] focus:border-[#7E9B92] outline-none min-h-[50px] resize-none p-1 text-base"></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-[#A68C76] mb-1">💡 我現在怎麼看？</label>
-                                <textarea id="note-mood-my-view" placeholder="對齊真理後的新看見..." class="w-full bg-transparent border-b border-dashed border-[#EBE6DE] focus:border-[#A68C76] outline-none min-h-[50px] resize-none p-1 text-base"></textarea>
-                            </div>
-                        </div>
-
-                        <div class="pt-2 border-t border-[#EBE6DE]/50">
-                             <label class="block text-xs font-bold text-[#5E5A54] mb-2">🙏 禱告 & 🎁 領受</label>
-                             <textarea id="note-mood-prayer" placeholder="最後的交託與領受..." class="w-full bg-transparent border border-[#EBE6DE] rounded-xl p-3 focus:border-[#A68C76] outline-none min-h-[80px] resize-none text-base"></textarea>
                         </div>
                     </div>
 
@@ -483,7 +436,7 @@
     </main>
 
     <!-- Data Modal -->
-    <div id="export-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden" onclick="if(event.target===this)closeExportModal()">
+    <div id="export-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden" onclick="if(event.target===this)window.closeExportModal()">
         <div class="bg-white w-full max-w-md p-6 rounded-2xl shadow-xl m-4" onclick="event.stopPropagation()">
             <h3 class="text-lg font-bold mb-4">資料管理</h3>
             <div class="space-y-4">
@@ -491,7 +444,7 @@
                     <p class="text-xs text-[#94908A]">您的靈修筆記儲存在瀏覽器中。<br>建議定期備份以免遺失。</p>
                 </div>
                 <div class="flex gap-3">
-                     <button onclick="backupData()" class="flex-1 p-4 rounded-xl border border-[#EBE6DE] hover:border-[#A68C76] bg-white transition-all text-sm font-bold text-[#5E5A54] flex flex-col items-center gap-2">
+                     <button onclick="window.backupData()" class="flex-1 p-4 rounded-xl border border-[#EBE6DE] hover:border-[#A68C76] bg-white transition-all text-sm font-bold text-[#5E5A54] flex flex-col items-center gap-2">
                         <span class="text-2xl">💾</span>
                         <span>下載備份</span>
                      </button>
@@ -499,20 +452,22 @@
                         <span class="text-2xl">🔄</span>
                         <span>還原資料</span>
                      </button>
-                     <input type="file" id="restore-input" class="hidden" accept=".json" onchange="restoreData(this)">
+                     <input type="file" id="restore-input" class="hidden" accept=".json" onchange="window.restoreData(this)">
                 </div>
             </div>
-            <button onclick="closeExportModal()" class="mt-6 text-xs text-[#94908A] underline w-full text-center">關閉</button>
+            <button onclick="window.closeExportModal()" class="mt-6 text-xs text-[#94908A] underline w-full text-center">關閉</button>
         </div>
     </div>
 
     <script>
+        // Constants & Global Variables
         const REMOTE_DB_URL = "https://raw.githubusercontent.com/annelin0321/bible-zh/main/bible_complete.db";
         let sqlDb = null, sqlDbLoaded = false, SQL = null, els = {};
         let currentMode = 'home';
         let calendarDate = new Date();
         let currentFontSize = 18;
-
+        
+        // Data Definitions
         const mannaVerses = [
             { t: "「敬畏耶和華是智慧的開端。」", r: "— 箴言 9:10" },
             { t: "「耶和華是我的牧者，我必不致缺乏。」", r: "— 詩篇 23:1" },
@@ -543,6 +498,8 @@
             bookMap[b.n] = b.n; 
             bookMap[b.n.replace("書","")] = b.n;
         });
+
+        // --- Core Functions (Globally Exposed) ---
 
         function generateReadingUnits(trackData, trackIndex) {
             let units = [];
@@ -645,17 +602,38 @@
         }
 
         async function setupSqlite() {
+            const searchInput = document.getElementById('inline-search');
             try {
-                if (typeof window.initSqlJs === 'undefined') return;
+                if (typeof window.initSqlJs === 'undefined') {
+                    console.error("SQL.js not loaded");
+                    if (searchInput) searchInput.placeholder = "⚠️ 元件載入失敗";
+                    return;
+                }
+                
+                if (searchInput) searchInput.placeholder = "📥 下載資料庫...";
+                
                 SQL = await window.initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${f}` });
+                
                 if (REMOTE_DB_URL) {
                     const res = await fetch(REMOTE_DB_URL);
-                    sqlDb = new SQL.Database(new Uint8Array(await res.arrayBuffer()));
+                    if (!res.ok) throw new Error("Network response was not ok");
+                    const buffer = await res.arrayBuffer();
+                    sqlDb = new SQL.Database(new Uint8Array(buffer));
                     sqlDbLoaded = true;
                     detectTableStructure();
-                    els.inlineSearch.placeholder = "🔍 搜尋 (如: 創 1:1)...";
+                    if (searchInput) {
+                        searchInput.disabled = false;
+                        searchInput.placeholder = "🔍 搜尋 (如: 創 1:1)...";
+                    }
+                    console.log("Database loaded successfully");
                 }
-            } catch(e) { console.error(e); }
+            } catch(e) { 
+                console.error("Database load error:", e);
+                if (searchInput) {
+                    searchInput.disabled = false;
+                    searchInput.placeholder = "⚠️ 離線庫失敗，使用API";
+                }
+            }
         }
 
         let dbTable = "verses", dbCols = { book: "book", chapter: "chapter", verse: "verse", text: "text" };
@@ -686,15 +664,16 @@
             if(els.datePicker) els.datePicker.value = dKey;
             if(els.homeDatePicker) els.homeDatePicker.value = dKey;
             const randomVerse = mannaVerses[Math.abs(dKey.split('').reduce((a, b) => a + b.charCodeAt(0), 0)) % mannaVerses.length];
-            document.getElementById('manna-text').innerText = randomVerse.t;
-            document.getElementById('manna-ref').innerText = randomVerse.r;
+            if(document.getElementById('manna-text')) {
+                document.getElementById('manna-text').innerText = randomVerse.t;
+                document.getElementById('manna-ref').innerText = randomVerse.r;
+            }
             
-            // 讀取所有筆記欄位 (包含新舊與內心戲)
             const fields = [
                 'note-rhema', 'note-reflection', 'note-prayer-devotion', 
                 'note-topic', 'note-content', 'note-tracking', 
                 'note-thanks', 'note-grace', 'note-diary', 'note-mood',
-                'note-mood-event', 'note-mood-tag', 'note-mood-lie', 'note-mood-god-view', 'note-mood-my-view', 'note-mood-prayer', 'note-mood-receive'
+                'note-mood-event', 'note-mood-tag', 'note-mood-lie', 'note-mood-god-view', 'note-mood-my-view', 'note-mood-prayer'
             ];
             fields.forEach(id => {
                 const el = document.getElementById(id);
@@ -711,7 +690,7 @@
             const container = document.getElementById('devotion-tabs');
             window.currentDailyPlan = plan; 
             container.innerHTML = plan.map((item, idx) => `
-                <button class="devotion-track-btn ${idx===0?'active':''}" onclick="loadTrack(${idx}, this)">
+                <button class="devotion-track-btn ${idx===0?'active':''}" onclick="window.loadTrack(${idx}, this)">
                     <span class="track-tag">${item.t}</span>
                     <span class="track-ref">${item.r}</span>
                 </button>
@@ -801,7 +780,7 @@
                                 return { ref: `${r[dbCols.chapter]}:${r[dbCols.verse]}`, text: r[dbCols.text] };
                             });
                             allHtml += list.map(v => `
-                                <div class="mb-4 group cursor-pointer" onclick="addToNote('${v.text.replace(/'/g, "\\'")}')">
+                                <div class="mb-4 group cursor-pointer" onclick="window.addToNote('${v.text.replace(/'/g, "\\'")}')">
                                     <span class="text-xs font-bold text-[#A68C76] align-top mr-1 select-none">${v.ref}</span>
                                     <span class="group-hover:bg-[#F2EBE5] transition-colors rounded px-1">${v.text}</span>
                                 </div>
@@ -817,7 +796,7 @@
                         const data = await res.json();
                         if(data.length > 0) {
                             allHtml += data.map(v => `
-                                <div class="mb-4 group cursor-pointer" onclick="addToNote('${v.text.replace(/'/g, "\\'")} (${v.chapter}:${v.verse})')">
+                                <div class="mb-4 group cursor-pointer" onclick="window.addToNote('${v.text.replace(/'/g, "\\'")} (${v.chapter}:${v.verse})')">
                                     <span class="text-xs font-bold text-[#A68C76] align-top mr-1 select-none">${v.chapter}:${v.verse}</span>
                                     <span class="group-hover:bg-[#F2EBE5] transition-colors rounded px-1">${v.text}</span>
                                 </div>
@@ -833,11 +812,9 @@
         }
 
         function addToNote(text) {
-            // 根據模式決定寫入哪個筆記欄位
-            let targetId = 'note-rhema'; // 預設靈修模式
-            if (currentMode === 'journal-prayer') targetId = 'note-content'; // 聊天模式
-            else if (currentMode === 'journal-gratitude') targetId = 'note-thanks'; // 感恩模式
-            // 內心戲模式不自動填入，因為沒有明確對應欄位，或者可以填入 "Event"
+            let targetId = 'note-rhema'; 
+            if (currentMode === 'journal-prayer') targetId = 'note-content'; 
+            else if (currentMode === 'journal-gratitude') targetId = 'note-thanks'; 
             else if (currentMode === 'journal-mood') targetId = 'note-mood-event'; 
 
             const target = document.getElementById(targetId);
@@ -855,7 +832,6 @@
             els.viewWorkspace.classList.toggle('hidden', m === 'home');
             els.mainHeader.classList.toggle('hidden', m === 'home');
             
-            // 設定標題
             let title = m.toUpperCase();
             if (m === 'journal-prayer') title = '跟神聊聊';
             else if (m === 'journal-gratitude') title = '感恩日記';
@@ -867,13 +843,11 @@
                 document.getElementById('devotion-tabs').classList.toggle('hidden', !isDevotion);
                 document.getElementById('reader-search-container').classList.toggle('hidden', isDevotion);
                 
-                // 控制筆記欄位顯示
                 document.getElementById('journal-devotion-fields').classList.toggle('hidden', m !== 'devotion' && m !== 'bible');
                 document.getElementById('journal-prayer-fields').classList.toggle('hidden', m !== 'journal-prayer');
                 document.getElementById('journal-gratitude-fields').classList.toggle('hidden', m !== 'journal-gratitude');
                 document.getElementById('journal-mood-fields').classList.toggle('hidden', m !== 'journal-mood');
                 
-                // 更新分頁文字
                 let tabText = '靈修筆記';
                 let tabIcon = '✍🏻';
                 if (m === 'journal-prayer') { tabText = '跟神聊聊'; tabIcon = '💬'; }
@@ -883,7 +857,6 @@
                 document.getElementById('tab-journal-text').innerText = tabText;
                 document.getElementById('tab-journal-icon').innerText = tabIcon;
 
-                // 切換分頁
                 if(m.startsWith('journal-')) {
                     switchWorkspaceTab('journal');
                 } else {
@@ -936,14 +909,14 @@
         }
 
         function renderBibleBooks(t) {
-            document.getElementById('bible-book-list').innerHTML = bibleBooks[t].map(b => `<button class="text-left px-3 py-2 rounded-lg hover:bg-[#F2EBE5] text-sm" onclick='showChapters(${JSON.stringify(b)})'>${b.n}</button>`).join('');
+            document.getElementById('bible-book-list').innerHTML = bibleBooks[t].map(b => `<button class="text-left px-3 py-2 rounded-lg hover:bg-[#F2EBE5] text-sm" onclick='window.showChapters(${JSON.stringify(b)})'>${b.n}</button>`).join('');
             document.getElementById('btn-old').className = t==='old'?"flex-1 py-2 text-xs font-bold rounded-lg bg-[#A68C76] text-white":"flex-1 py-2 text-xs font-bold rounded-lg bg-white border text-[#A68C76]";
             document.getElementById('btn-new').className = t==='new'?"flex-1 py-2 text-xs font-bold rounded-lg bg-[#A68C76] text-white":"flex-1 py-2 text-xs font-bold rounded-lg bg-white border text-[#A68C76]";
         }
 
         function showChapters(b) {
             document.getElementById('sidebar-chapter-title').innerText = b.n;
-            document.getElementById('sidebar-chapter-grid').innerHTML = Array.from({length:b.c}, (_,i)=> `<button class="aspect-square border rounded-lg hover:bg-[#A68C76] hover:text-white transition-colors" onclick="fetchBibleRef('${b.abbr}${i+1}'); toggleBibleSidebar()">${i+1}</button>`).join('');
+            document.getElementById('sidebar-chapter-grid').innerHTML = Array.from({length:b.c}, (_,i)=> `<button class="aspect-square border rounded-lg hover:bg-[#A68C76] hover:text-white transition-colors" onclick="window.fetchBibleRef('${b.abbr}${i+1}'); window.toggleBibleSidebar()">${i+1}</button>`).join('');
             document.getElementById('bible-level-books').classList.add('hidden'); 
             document.getElementById('bible-level-chapters').classList.remove('hidden');
         }
@@ -963,7 +936,6 @@
                 const div = document.createElement('div'); div.className = "calendar-day"; div.innerText = i;
                 const key = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
                 
-                // 檢查是否有任何筆記
                 let hasEntry = false;
                 const checkFields = ['note-rhema','note-content','note-thanks','note-mood-event'];
                 for (let f of checkFields) {
@@ -974,14 +946,13 @@
                 if(key === els.datePicker.value) div.classList.add('selected-day');
                 const isToday = key === new Date().toISOString().split('T')[0];
                 if(isToday) div.classList.add('today');
-                div.onclick = () => handleDateChange(key); 
+                div.onclick = () => window.handleDateChange(key); 
                 els.calendarGrid.appendChild(div);
             }
         }
 
         function calculateStreak() {
             let s = 0, d = new Date();
-            // 檢查任意筆記欄位
             while(true) {
                 const key = d.toISOString().split('T')[0];
                 let hasEntry = false;
@@ -1042,7 +1013,27 @@
             reader.readAsText(input.files[0]);
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        // Bind global functions to window
+        window.handleDateChange = handleDateChange;
+        window.switchMode = switchMode;
+        window.switchWorkspaceTab = switchWorkspaceTab;
+        window.fetchBibleRef = fetchBibleRef;
+        window.performSearch = performSearch;
+        window.selectMood = selectMood;
+        window.renderBibleBooks = renderBibleBooks;
+        window.showChapters = showChapters;
+        window.backToBooks = backToBooks;
+        window.toggleBibleSidebar = toggleBibleSidebar;
+        window.addToNote = addToNote;
+        window.changeCalendarMonth = changeCalendarMonth;
+        window.openExportModal = openExportModal;
+        window.closeExportModal = closeExportModal;
+        window.backupData = backupData;
+        window.restoreData = restoreData;
+        window.loadTrack = loadTrack;
+        window.goHome = goHome;
+
+        function initApp() {
             els = {
                 viewHome: document.getElementById('view-home'), viewWorkspace: document.getElementById('view-workspace'), mainHeader: document.getElementById('main-header'),
                 bibleContent: document.getElementById('bible-content'), readerTitle: document.getElementById('reader-title'), headerTitle: document.getElementById('header-title'),
@@ -1054,7 +1045,9 @@
             const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
             handleDateChange(today);
             setupSqlite();
-        });
+        }
+
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
