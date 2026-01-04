@@ -174,7 +174,7 @@
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
                     <span>備份</span>
                 </button>
-                <input type="date" id="date-picker" class="bg-[#F9F7F5] border border-[#EBE6DE] rounded-full px-3 py-1 text-xs font-mono outline-none cursor-pointer text-[#5E5A54]" onchange="window.handleDateChange(this.value)">
+                <input type="date" id="date-picker" class="bg-[#F9F7F5] border border-[#EBE6DE] rounded-full px-3 py-1 text-base font-mono outline-none cursor-pointer text-[#5E5A54]" onchange="window.handleDateChange(this.value)">
             </div>
         </div>
     </header>
@@ -202,7 +202,7 @@
                     資料 / 備份
                 </button>
                 <div class="flex items-center bg-white rounded-xl px-3 py-2 border border-[#EBE6DE] shadow-sm">
-                     <input type="date" id="home-date-picker" class="bg-transparent border-none text-sm font-medium focus:ring-0 outline-none cursor-pointer text-[#5E5A54] font-mono" onchange="window.handleDateChange(this.value)">
+                     <input type="date" id="home-date-picker" class="bg-transparent border-none text-base font-medium focus:ring-0 outline-none cursor-pointer text-[#5E5A54] font-mono" onchange="window.handleDateChange(this.value)">
                 </div>
             </div>
         </div>
@@ -366,7 +366,7 @@
                     <div class="flex items-center gap-2 shrink-0">
                         <!-- 搜尋欄 (在 Devotion 模式下會被隱藏) -->
                         <div class="relative group" id="reader-search-container">
-                            <input type="text" id="inline-search" placeholder="系統啟動中..." disabled class="pl-3 pr-8 py-1 rounded-full bg-[#F9F7F5] border-none text-xs focus:ring-1 focus:ring-[#7E9B92] w-24 sm:w-32 transition-all focus:w-48 outline-none text-[#5E5A54] disabled:opacity-50 disabled:cursor-not-allowed" onkeyup="if(event.key === 'Enter') window.performSearch()">
+                            <input type="text" id="inline-search" placeholder="系統啟動中..." disabled class="pl-3 pr-8 py-1 rounded-full bg-[#F9F7F5] border-none text-base focus:ring-1 focus:ring-[#7E9B92] w-24 sm:w-32 transition-all focus:w-48 outline-none text-[#5E5A54] disabled:opacity-50 disabled:cursor-not-allowed" onkeyup="if(event.key === 'Enter') window.performSearch()">
                             <button onclick="window.performSearch()" class="absolute right-2 top-1.5 text-[#94908A] hover:text-[#7E9B92]"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></button>
                         </div>
                         
@@ -552,16 +552,6 @@
             old: [{n:"創世記",abbr:"創",c:50},{n:"出埃及記",abbr:"出",c:40},{n:"利未記",abbr:"利",c:27},{n:"民數記",abbr:"民",c:36},{n:"申命記",abbr:"申",c:34},{n:"約書亞記",abbr:"書",c:24},{n:"士師記",abbr:"士",c:21},{n:"路得記",abbr:"得",c:4},{n:"撒母耳記上",abbr:"撒上",c:31},{n:"撒母耳記下",abbr:"撒下",c:24},{n:"列王紀上",abbr:"王上",c:22},{n:"列王紀下",abbr:"王下",c:25},{n:"歷代志上",abbr:"代上",c:29},{n:"歷代志下",abbr:"代下",c:36},{n:"以斯拉記",abbr:"拉",c:10},{n:"尼希米記",abbr:"尼",c:13},{n:"以斯帖記",abbr:"斯",c:10},{n:"約伯記",abbr:"伯",c:42},{n:"詩篇",abbr:"詩",c:150},{n:"箴言",abbr:"箴",c:31},{n:"傳道書",abbr:"傳",c:12},{n:"雅歌",abbr:"歌",c:8},{n:"以賽亞書",abbr:"賽",c:66},{n:"耶利米書",abbr:"耶",c:52},{n:"耶利米哀歌",abbr:"哀",c:5},{n:"以西結書",abbr:"結",c:48},{n:"但以理書",abbr:"但",c:12},{n:"何西阿書",abbr:"何",c:14},{n:"約珥書",abbr:"珥",c:3},{n:"阿摩司書",abbr:"摩",c:9},{n:"俄巴底亞書",abbr:"俄",c:1},{n:"約拿書",abbr:"拿",c:4},{n:"彌迦書",abbr:"彌",c:7},{n:"那鴻書",abbr:"鴻",c:3},{n:"哈巴谷書",abbr:"哈",c:3},{n:"西番雅書",abbr:"番",c:3},{n:"哈該書",abbr:"該",c:2},{n:"撒迦利亞書",abbr:"亞",c:14},{n:"瑪拉基書",abbr:"瑪",c:4}],
             new: [{n:"馬太福音",abbr:"太",c:28},{n:"馬可福音",abbr:"可",c:16},{n:"路加福音",abbr:"路",c:24},{n:"約翰福音",abbr:"約",c:21},{n:"使徒行傳",abbr:"徒",c:28},{n:"羅馬書",abbr:"羅",c:16},{n:"哥林多前書",abbr:"林前",c:16},{n:"哥林多後書",abbr:"林後",c:13},{n:"加拉太書",abbr:"加",c:6},{n:"以弗所書",abbr:"弗",c:6},{n:"腓立比書",abbr:"腓",c:4},{n:"歌羅西書",abbr:"西",c:4},{n:"帖撒羅尼迦前書",abbr:"帖前",c:5},{n:"帖撒羅尼迦後書",abbr:"帖後",c:3},{n:"提摩太前書",abbr:"提前",c:6},{n:"提摩太後書",abbr:"提後",c:4},{n:"提多書",abbr:"多",c:3},{n:"腓利門書",abbr:"門",c:1},{n:"希伯來書",abbr:"來",c:13},{n:"雅各書",abbr:"雅",c:5},{n:"彼得前書",abbr:"彼前",c:5},{n:"彼得後書",abbr:"彼後",c:3},{n:"約翰一書",abbr:"約一",c:5},{n:"約翰二書",abbr:"約二",c:1},{n:"約翰三書",abbr:"約三",c:1},{n:"猶大書",abbr:"猶",c:1},{n:"啟示錄",abbr:"啟",c:22}]
         };
-
-        const psmVerses = [6,12,8,8,12,10,17,9,20,18,7,8,6,7,5,11,15,50,14,9,13,31,6,10,22,12,14,9,11,12,24,11,22,22,28,12,40,22,13,17,13,11,5,26,17,11,9,14,20,23,19,9,6,7,23,13,11,11,17,12,8,12,11,10,13,20,7,35,36,5,24,20,28,23,10,12,20,72,13,19,16,8,18,12,13,17,7,18,52,17,16,15,5,23,11,13,12,9,9,5,8,28,22,35,45,48,43,13,31,7,10,10,9,8,18,19,2,29,176,7,8,9,4,8,5,6,5,6,8,8,3,18,3,3,21,26,9,8,24,13,10,7,12,15,21,10,20,14,9,6];
-        const proVerses = [33,22,35,27,23,35,27,36,18,32,31,28,25,35,33,33,28,24,29,30,31,29,35,34,28,28,27,28,27,33,31];
-
-        const planTracks = [
-            [{n:"創世記",abbr:"創",c:50},{n:"出埃及記",abbr:"出",c:40},{n:"利未記",abbr:"利",c:27},{n:"民數記",abbr:"民",c:36},{n:"申命記",abbr:"申",c:34},{n:"約書亞記",abbr:"書",c:24},{n:"士師記",abbr:"士",c:21},{n:"路得記",abbr:"得",c:4},{n:"撒母耳記上",abbr:"撒上",c:31},{n:"撒母耳記下",abbr:"撒下",c:24},{n:"列王紀上",abbr:"王上",c:22},{n:"列王紀下",abbr:"王下",c:25},{n:"歷代志上",abbr:"代上",c:29},{n:"歷代志下",abbr:"代下",c:36},{n:"以斯拉記",abbr:"拉",c:10},{n:"尼希米記",abbr:"尼",c:13},{n:"以斯帖記",abbr:"斯",c:10},{n:"約伯記",abbr:"伯",c:42},{n:"傳道書",abbr:"傳",c:12},{n:"雅歌",abbr:"歌",c:8},{n:"以賽亞書",abbr:"賽",c:66},{n:"耶利米書",abbr:"耶",c:52},{n:"耶利米哀歌",abbr:"哀",c:5},{n:"以西結書",abbr:"結",c:48},{n:"但以理書",abbr:"但",c:12},{n:"何西阿書",abbr:"何",c:14},{n:"約珥書",abbr:"珥",c:3},{n:"阿摩司書",abbr:"摩",c:9},{n:"俄巴底亞書",abbr:"俄",c:1},{n:"約拿書",abbr:"拿",c:4},{n:"彌迦書",abbr:"彌",c:7},{n:"那鴻書",abbr:"鴻",c:3},{n:"哈巴谷書",abbr:"哈",c:3},{n:"西番雅書",abbr:"番",c:3},{n:"哈該書",abbr:"該",c:2},{n:"撒迦利亞書",abbr:"亞",c:14},{n:"瑪拉基書",abbr:"瑪",c:4}],
-            [{n:"馬太福音",abbr:"太",c:28},{n:"馬可福音",abbr:"可",c:16},{n:"路加福音",abbr:"路",c:24},{n:"約翰福音",abbr:"約",c:21},{n:"使徒行傳",abbr:"徒",c:28},{n:"羅馬書",abbr:"羅",c:16},{n:"哥林多前書",abbr:"林前",c:16},{n:"哥林多後書",abbr:"林後",c:13},{n:"加拉太書",abbr:"加",c:6},{n:"以弗所書",abbr:"弗",c:6},{n:"腓立比書",abbr:"腓",c:4},{n:"歌羅西書",abbr:"西",c:4},{n:"帖撒羅尼迦前書",abbr:"帖前",c:5},{n:"帖撒羅尼迦後書",abbr:"帖後",c:3},{n:"提摩太前書",abbr:"提前",c:6},{n:"提摩太後書",abbr:"提後",c:4},{n:"提多書",abbr:"多",c:3},{n:"腓利門書",abbr:"門",c:1},{n:"希伯來書",abbr:"來",c:13},{n:"雅各書",abbr:"雅",c:5},{n:"彼得前書",abbr:"彼前",c:5},{n:"彼得後書",abbr:"彼後",c:3},{n:"約翰一書",abbr:"約一",c:5},{n:"約翰二書",abbr:"約二",c:1},{n:"約翰三書",abbr:"約三",c:1},{n:"猶大書",abbr:"猶",c:1},{n:"啟示錄",abbr:"啟",c:22}],
-            [{n:"詩篇",abbr:"詩",c:150}],
-            [{n:"箴言",abbr:"箴",c:31}]
-        ];
 
         const bookMap = {};
         [...bibleBooks.old, ...bibleBooks.new].forEach(b => {
@@ -1190,6 +1180,8 @@
         }
 
         window.performSearch = function() {
+            // Close keyboard and reset focus to prevent stuck zoom state
+            els.inlineSearch.blur(); 
             const kw = els.inlineSearch.value;
             if(kw) {
                 window.fetchBibleRef(kw);
