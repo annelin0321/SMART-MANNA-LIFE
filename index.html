@@ -306,9 +306,39 @@
                 <div id="devotion-tabs" class="hidden grid grid-cols-4 gap-2 p-3 bg-white border-b border-[#EBE6DE] shrink-0 z-20 relative">
                     <!-- JS 生成 -->
                 </div>
+
+                <!-- 標題與搜尋欄 (移到這裡，確保在內容上方) -->
+                <div class="px-4 py-3 border-b flex justify-between items-center bg-white shrink-0" id="reader-header">
+                    <!-- 標題區 (整合按鈕與標題，解決擠壓問題) -->
+                    <div class="flex items-center gap-3 overflow-hidden flex-1" id="reader-title-wrapper">
+                        <!-- 切換卷章按鈕 (Bible 模式顯示) -->
+                        <button id="btn-switch-chapter" onclick="window.goBackToMainBooks()" class="hidden shrink-0 px-3 py-1.5 rounded-lg border border-[#A68C76] text-[#A68C76] text-xs font-bold hover:bg-[#A68C76] hover:text-white transition-colors">
+                            📚 目錄
+                        </button>
+                        
+                        <div class="min-w-0 flex-1">
+                            <span class="text-[10px] font-bold text-[#7E9B92] uppercase tracking-widest block" id="reader-tag">SCRIPTURE</span>
+                            <h2 id="reader-title" class="text-lg text-[#5E5A54] font-bold leading-tight truncate">請選擇經文</h2>
+                        </div>
+                    </div>
+                    
+                    <!-- 功能按鈕區 (搜尋 & 複製) -->
+                    <div class="flex items-center gap-2 shrink-0">
+                        <!-- 搜尋欄 (在 Devotion 模式下會被隱藏) -->
+                        <div class="relative group" id="reader-search-container">
+                            <input type="text" id="inline-search" placeholder="系統啟動中..." disabled class="pl-3 pr-8 py-1 rounded-full bg-[#F9F7F5] border-none text-base focus:ring-1 focus:ring-[#7E9B92] w-24 sm:w-32 transition-all focus:w-48 outline-none text-[#5E5A54] disabled:opacity-50 disabled:cursor-not-allowed" onkeyup="if(event.key === 'Enter') window.performSearch()">
+                            <button onclick="window.performSearch()" class="absolute right-2 top-1.5 text-[#94908A] hover:text-[#7E9B92]"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></button>
+                        </div>
+                        
+                        <!-- 複製按鈕 -->
+                        <button id="btn-copy-verses" onclick="window.copySelectedVerses()" class="p-1.5 rounded-full bg-[#F9F7F5] text-[#94908A] hover:bg-[#A68C76] hover:text-white transition-colors border border-[#EBE6DE]" title="複製選取經文">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                        </button>
+                    </div>
+                </div>
                 
-                <!-- 書卷庫 (Bible 模式首頁) - 主畫面顯示 -->
-                <div id="view-bible-books" class="hidden flex-col h-full p-4 overflow-y-auto">
+                <!-- 書卷庫 (Bible 模式首頁) - 主畫面顯示 (修改 class: h-full -> flex-1) -->
+                <div id="view-bible-books" class="hidden flex-col flex-1 p-4 overflow-y-auto">
                      <div class="flex gap-2 mb-4 shrink-0">
                         <button onclick="window.renderMainBooks('old')" id="btn-old" class="flex-1 py-2 text-xs font-bold rounded-lg bg-[#A68C76] text-white">舊約</button>
                         <button onclick="window.renderMainBooks('new')" id="btn-new" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white border text-[#A68C76]">新約</button>
@@ -316,8 +346,8 @@
                     <div id="main-book-list" class="flex-1 grid grid-cols-3 sm:grid-cols-4 gap-3 content-start pb-20"></div>
                 </div>
 
-                <!-- 章節選擇 (Bible 模式) - 主畫面顯示 -->
-                <div id="view-bible-chapters" class="hidden flex-col h-full p-4 overflow-y-auto">
+                <!-- 章節選擇 (Bible 模式) - 主畫面顯示 (修改 class: h-full -> flex-1) -->
+                <div id="view-bible-chapters" class="hidden flex-col flex-1 p-4 overflow-y-auto">
                     <button onclick="window.goBackToMainBooks()" class="mb-4 text-xs font-bold text-[#94908A] flex items-center gap-1">
                         <span class="text-lg">◀</span> 返回書卷目錄
                     </button>
@@ -347,35 +377,6 @@
                     </div>
                 </div>
 
-                <!-- 標題與搜尋欄 -->
-                <div class="px-4 py-3 border-b flex justify-between items-center bg-white shrink-0" id="reader-header">
-                    <!-- 標題區 (整合按鈕與標題，解決擠壓問題) -->
-                    <div class="flex items-center gap-3 overflow-hidden flex-1" id="reader-title-wrapper">
-                        <!-- 切換卷章按鈕 (Bible 模式顯示) -->
-                        <button id="btn-switch-chapter" onclick="window.goBackToMainBooks()" class="hidden shrink-0 px-3 py-1.5 rounded-lg border border-[#A68C76] text-[#A68C76] text-xs font-bold hover:bg-[#A68C76] hover:text-white transition-colors">
-                            📚 目錄
-                        </button>
-                        
-                        <div class="min-w-0 flex-1">
-                            <span class="text-[10px] font-bold text-[#7E9B92] uppercase tracking-widest block" id="reader-tag">SCRIPTURE</span>
-                            <h2 id="reader-title" class="text-lg text-[#5E5A54] font-bold leading-tight truncate">請選擇經文</h2>
-                        </div>
-                    </div>
-                    
-                    <!-- 功能按鈕區 (搜尋 & 複製) -->
-                    <div class="flex items-center gap-2 shrink-0">
-                        <!-- 搜尋欄 (在 Devotion 模式下會被隱藏) -->
-                        <div class="relative group" id="reader-search-container">
-                            <input type="text" id="inline-search" placeholder="系統啟動中..." disabled class="pl-3 pr-8 py-1 rounded-full bg-[#F9F7F5] border-none text-base focus:ring-1 focus:ring-[#7E9B92] w-24 sm:w-32 transition-all focus:w-48 outline-none text-[#5E5A54] disabled:opacity-50 disabled:cursor-not-allowed" onkeyup="if(event.key === 'Enter') window.performSearch()">
-                            <button onclick="window.performSearch()" class="absolute right-2 top-1.5 text-[#94908A] hover:text-[#7E9B92]"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></button>
-                        </div>
-                        
-                        <!-- 複製按鈕 -->
-                        <button id="btn-copy-verses" onclick="window.copySelectedVerses()" class="p-1.5 rounded-full bg-[#F9F7F5] text-[#94908A] hover:bg-[#A68C76] hover:text-white transition-colors border border-[#EBE6DE]" title="複製選取經文">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                        </button>
-                    </div>
-                </div>
                 <div id="bible-content" class="flex-1 overflow-y-auto p-5 md:p-8 bible-text text-[#5E5A54] w-full pb-24"></div>
             </section>
 
