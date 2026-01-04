@@ -295,22 +295,44 @@
                     <!-- JS 生成 -->
                 </div>
                 
-                <!-- 書卷庫 (Bible 模式首頁) -->
+                <!-- 書卷庫 (Bible 模式首頁) - 主畫面顯示 -->
                 <div id="view-bible-books" class="hidden flex-col h-full p-4 overflow-y-auto">
                      <div class="flex gap-2 mb-4 shrink-0">
-                        <button onclick="window.renderBibleBooks('old')" id="btn-old" class="flex-1 py-2 text-xs font-bold rounded-lg bg-[#A68C76] text-white">舊約</button>
-                        <button onclick="window.renderBibleBooks('new')" id="btn-new" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white border text-[#A68C76]">新約</button>
+                        <button onclick="window.renderMainBooks('old')" id="btn-old" class="flex-1 py-2 text-xs font-bold rounded-lg bg-[#A68C76] text-white">舊約</button>
+                        <button onclick="window.renderMainBooks('new')" id="btn-new" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white border text-[#A68C76]">新約</button>
                     </div>
-                    <div id="bible-book-list" class="flex-1 grid grid-cols-3 sm:grid-cols-4 gap-3 content-start pb-20"></div>
+                    <div id="main-book-list" class="flex-1 grid grid-cols-3 sm:grid-cols-4 gap-3 content-start pb-20"></div>
                 </div>
 
-                <!-- 章節選擇 (Bible 模式) -->
+                <!-- 章節選擇 (Bible 模式) - 主畫面顯示 -->
                 <div id="view-bible-chapters" class="hidden flex-col h-full p-4 overflow-y-auto">
-                    <button onclick="window.goBackToBooks()" class="mb-4 text-xs font-bold text-[#94908A] flex items-center gap-1">
+                    <button onclick="window.goBackToMainBooks()" class="mb-4 text-xs font-bold text-[#94908A] flex items-center gap-1">
                         <span class="text-lg">◀</span> 返回書卷目錄
                     </button>
-                    <h3 id="sidebar-chapter-title" class="text-xl font-bold text-[#5E5A54] mb-6 border-b pb-2"></h3>
-                    <div id="sidebar-chapter-grid" class="grid grid-cols-5 sm:grid-cols-6 gap-3 content-start pb-20"></div>
+                    <h3 id="main-chapter-title" class="text-xl font-bold text-[#5E5A54] mb-6 border-b pb-2"></h3>
+                    <div id="main-chapter-grid" class="grid grid-cols-5 sm:grid-cols-6 gap-3 content-start pb-20"></div>
+                </div>
+
+                <!-- 側邊欄覆蓋層 (Bible模式用，作為獨立選單) -->
+                <div id="bible-sidebar-overlay" class="hidden absolute inset-0 bg-white z-30 flex flex-col">
+                    <div class="p-4 border-b flex justify-between items-center bg-[#FAF9F6]">
+                        <h3 class="font-bold text-[#5E5A54]">選擇書卷</h3>
+                        <button onclick="window.toggleBibleSidebar()" class="text-2xl text-[#94908A]">&times;</button>
+                    </div>
+                    <div id="sidebar-bible" class="flex-1 flex flex-col overflow-hidden">
+                        <div id="sidebar-book-list-container" class="flex flex-col h-full p-4">
+                            <div class="flex gap-2 mb-4 shrink-0">
+                                <button onclick="window.renderSidebarBooks('old')" id="btn-old-sidebar" class="flex-1 py-2 text-xs font-bold rounded-lg bg-[#A68C76] text-white">舊約</button>
+                                <button onclick="window.renderSidebarBooks('new')" id="btn-new-sidebar" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white border text-[#A68C76]">新約</button>
+                            </div>
+                            <div id="sidebar-book-list" class="flex-1 overflow-y-auto pr-2 grid grid-cols-2 gap-2 content-start no-scrollbar pb-20"></div>
+                        </div>
+                        <div id="sidebar-chapter-list-container" class="hidden flex-col h-full p-4">
+                            <button onclick="window.backToSidebarBooks()" class="mb-4 text-xs font-bold text-[#94908A] flex items-center">◀ 返回目錄</button>
+                            <h3 id="sidebar-chapter-title" class="text-lg font-bold text-[#5E5A54] mb-4 border-b pb-2"></h3>
+                            <div id="sidebar-chapter-grid" class="flex-1 overflow-y-auto pr-2 grid grid-cols-5 gap-3 content-start no-scrollbar pb-20"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- 標題與搜尋欄 -->
@@ -318,7 +340,7 @@
                     <!-- 標題區 (整合按鈕與標題，解決擠壓問題) -->
                     <div class="flex items-center gap-3 overflow-hidden flex-1" id="reader-title-wrapper">
                         <!-- 切換卷章按鈕 (Bible 模式顯示) -->
-                        <button id="btn-switch-chapter" onclick="window.goBackToBooks()" class="hidden shrink-0 px-3 py-1.5 rounded-lg border border-[#A68C76] text-[#A68C76] text-xs font-bold hover:bg-[#A68C76] hover:text-white transition-colors">
+                        <button id="btn-switch-chapter" onclick="window.goBackToMainBooks()" class="hidden shrink-0 px-3 py-1.5 rounded-lg border border-[#A68C76] text-[#A68C76] text-xs font-bold hover:bg-[#A68C76] hover:text-white transition-colors">
                             📚 目錄
                         </button>
                         
@@ -379,7 +401,8 @@
                             </button>
                         </div>
                     </div>
-
+                    
+                    <!-- 其他筆記欄位... -->
                     <!-- 跟神聊聊欄位 (Chat Mode - 鹹魚版) -->
                     <div id="journal-prayer-fields" class="space-y-6 hidden">
                         <div>
@@ -494,131 +517,16 @@
     </div>
 
     <script>
-        // --- 1. Global Utility Functions ---
-        window.toggleVerseSelection = function(el) {
-             el.classList.toggle('selected');
-             window.updateCopyButton();
-        }
-
-        window.updateCopyButton = function() {
-             const selectedCount = document.querySelectorAll('.verse-item.selected').length;
-             const btn = document.getElementById('btn-copy-verses');
-             if(btn) {
-                 const originalHtml = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>`;
-                 btn.innerHTML = selectedCount > 0 ? `📋 複製 (${selectedCount})` : originalHtml;
-                 btn.classList.toggle('bg-[#A68C76]', selectedCount > 0);
-                 btn.classList.toggle('text-white', selectedCount > 0);
-             }
-        }
-
-        window.copySelectedVerses = function() {
-             const selected = document.querySelectorAll('.verse-item.selected');
-             if (selected.length === 0) return;
-             
-             let textToCopy = "";
-             selected.forEach(el => {
-                 const ref = el.getAttribute('data-ref');
-                 const text = el.getAttribute('data-text');
-                 textToCopy += `${ref} ${text}\n`;
-             });
-             
-             const ta = document.createElement('textarea');
-             ta.value = textToCopy;
-             document.body.appendChild(ta);
-             ta.select();
-             document.execCommand('copy');
-             document.body.removeChild(ta);
-             
-             const btn = document.getElementById('btn-copy-verses');
-             btn.innerHTML = "✅ 已複製";
-             setTimeout(() => {
-                 selected.forEach(el => el.classList.remove('selected'));
-                 window.updateCopyButton();
-                 btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>`;
-             }, 1000);
-        }
-
-        window.loadTrack = function(idx, btnEl) {
-            if(btnEl) window.highlightTrack(btnEl);
-            else {
-                const btns = document.querySelectorAll('.devotion-track-card');
-                if(btns[idx]) window.highlightTrack(btns[idx]);
-            }
-            const planItem = window.currentDailyPlan[idx];
-            if(planItem && planItem.raw) window.fetchBibleRef(planItem.raw); 
-        }
-
-        window.highlightTrack = function(el) {
-            document.querySelectorAll('.devotion-track-card').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
-        }
-        
-        let dbTable = "verses", dbCols = { book: "book", chapter: "chapter", verse: "verse", text: "text" };
-
-        window.detectTableStructure = function() {
-            if(!sqlDb) return;
-            try {
-                const tables = sqlDb.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
-                if(tables[0]) {
-                    const names = tables[0].values.flat();
-                    dbTable = names.includes('verses') ? 'verses' : (names.includes('bible') ? 'bible' : names[0]);
-                }
-                const cols = sqlDb.exec(`PRAGMA table_info(${dbTable})`);
-                if(cols.length > 0) {
-                    const colNames = cols[0].values.map(r => r[1]);
-                    if(colNames.includes('content')) dbCols.text = 'content';
-                    else if(colNames.includes('scripture')) dbCols.text = 'scripture';
-                    else if(colNames.includes('經文')) dbCols.text = '經文';
-
-                    if(colNames.includes('book_name')) dbCols.book = 'book_name';
-                    else if(colNames.includes('書卷')) dbCols.book = '書卷';
-                }
-            } catch(e) {}
-        }
-        
-        window.setupSqlite = async function() {
-            const searchInput = document.getElementById('inline-search');
-            try {
-                if (typeof window.initSqlJs === 'undefined') {
-                    console.error("SQL.js not loaded");
-                    if (searchInput) searchInput.placeholder = "⚠️ 元件載入失敗";
-                    return;
-                }
-                
-                if (searchInput) searchInput.placeholder = "📥 下載資料庫...";
-                
-                SQL = await window.initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${f}` });
-                
-                if (REMOTE_DB_URL) {
-                    const res = await fetch(REMOTE_DB_URL);
-                    if (!res.ok) throw new Error("Network response was not ok");
-                    const buffer = await res.arrayBuffer();
-                    sqlDb = new SQL.Database(new Uint8Array(buffer));
-                    sqlDbLoaded = true;
-                    window.detectTableStructure();
-                    if (searchInput) {
-                        searchInput.disabled = false;
-                        searchInput.placeholder = "🔍 搜尋 (如: 創 1:1)...";
-                    }
-                    console.log("Database loaded successfully");
-                }
-            } catch(e) { 
-                console.error("Database load error:", e);
-                if (searchInput) {
-                    searchInput.disabled = false;
-                    searchInput.placeholder = "⚠️ 離線庫失敗，使用API";
-                }
-            }
-        }
-        
-        // ... (data definitions) ...
+        // Constants & Global Variables
         const REMOTE_DB_URL = "https://raw.githubusercontent.com/annelin0321/bible-zh/main/bible_complete.db";
         let sqlDb = null, sqlDbLoaded = false, SQL = null, els = {};
+        let isDbLoading = false; // 新增：追蹤資料庫下載狀態
         let currentMode = 'home';
         let calendarDate = new Date();
         let currentFontSize = 18;
         let currentDailyPlan = []; 
 
+        // ... (Data Definitions: mannaVerses, bibleBooks, psmVerses, proVerses, planTracks, bookMap - 保持不變) ...
         const mannaVerses = [
             { t: "「敬畏耶和華是智慧的開端。」", r: "— 箴言 9:10" },
             { t: "「耶和華是我的牧者，我必不致缺乏。」", r: "— 詩篇 23:1" },
@@ -651,6 +559,7 @@
         });
 
         // --- Core Functions ---
+        // ... (generateReadingUnits, getDailyPlan unchanged) ...
         window.generateReadingUnits = function(trackData, trackIndex) {
             let units = [];
             if (trackIndex === 2) { 
@@ -753,90 +662,156 @@
 
         window.fetchBibleRef = async function(refInput) {
             if(!refInput) return;
+            
+            // UI Loading States
+            if (isDbLoading) {
+                els.bibleContent.innerHTML = '<div class="h-full flex flex-col items-center justify-center py-20 text-[#A68C76]"><span class="loader mb-4"></span><p>📥 聖經資料庫下載中 (5MB)...<br>請稍候</p></div>';
+                return;
+            }
+            
+            if (!sqlDbLoaded || !sqlDb) {
+                    els.bibleContent.innerHTML = '<div class="h-full flex flex-col items-center justify-center py-20 text-red-400"><p>⚠️ 資料庫尚未載入</p><button onclick="window.location.reload()" class="mt-4 px-4 py-2 bg-[#A68C76] text-white rounded-lg text-sm">重整頁面</button></div>';
+                    return;
+            }
+
             els.bibleContent.innerHTML = '<div class="h-full flex items-center justify-center py-20"><span class="loader"></span></div>';
+            
+            let isKeywordSearch = false;
             let queries = [];
+
+            // Determine if input is array (from daily plan) or string (manual search)
             if (Array.isArray(refInput)) {
                 queries = refInput.map(r => r.replace(/-end/g, "-176")); 
-                // Devotion Mode: Keep title hidden as per request
             } else {
                 els.readerTitle.innerText = refInput;
-                const cleanRef = refInput.replace(/-end/g, "-176");
-                if (cleanRef.includes(':') || (cleanRef.includes('-') && !cleanRef.includes(' - '))) {
-                     if(cleanRef.includes('-') && !cleanRef.includes(':')) {
-                         const parts = cleanRef.split(/[- ]+/);
-                         if(parts.length >= 2) {
-                             const book = parts[0];
-                             const start = parseInt(parts[1]);
-                             const end = parseInt(parts[parts.length-1]);
-                             for(let i=start; i<=end; i++) queries.push(`${book} ${i}`);
-                         } else queries.push(cleanRef);
-                     } else queries.push(cleanRef);
-                } else queries.push(cleanRef.split('-')[0].trim()); 
+                const cleanRef = refInput.replace(/-end/g, "-176").trim();
+                
+                // Regex to check if it looks like a Bible Reference (Book + Number)
+                // Checks for: (Chinese or English chars) + optional space + digits
+                // e.g. "創 1", "Gen 1", "創1"
+                const refRegex = /^([\u4e00-\u9fa5]+|[a-zA-Z]+)\s*\d+/;
+                
+                if (refRegex.test(cleanRef)) {
+                    // It's a reference
+                    if (cleanRef.includes(':') || (cleanRef.includes('-') && !cleanRef.includes(' - '))) {
+                            if(cleanRef.includes('-') && !cleanRef.includes(':')) {
+                                const parts = cleanRef.split(/[- ]+/);
+                                if(parts.length >= 2) {
+                                    const book = parts[0];
+                                    const start = parseInt(parts[1]);
+                                    const end = parseInt(parts[parts.length-1]);
+                                    for(let i=start; i<=end; i++) queries.push(`${book} ${i}`);
+                                } else queries.push(cleanRef);
+                            } else queries.push(cleanRef);
+                    } else queries.push(cleanRef.split('-')[0].trim()); 
+                } else {
+                    // It's a keyword
+                    isKeywordSearch = true;
+                    queries.push(cleanRef);
+                }
             }
 
             let allHtml = "";
-            for(let q of queries) {
-                const match = q.match(/^([\u4e00-\u9fa5]+|[a-zA-Z]+)\s*(\d+)(?::(\d+)(?:-(\d+))?)?$/);
-                let fetched = false;
-                if (sqlDbLoaded && sqlDb && match) {
-                    const bookAbbr = match[1];
-                    const chapter = parseInt(match[2]);
-                    const startVerse = match[3] ? parseInt(match[3]) : null;
-                    const endVerse = match[4] ? parseInt(match[4]) : (startVerse || null);
-                    const fullBookName = bookMap[bookAbbr] || bookAbbr;
+
+            if (sqlDbLoaded && sqlDb) {
+                if (isKeywordSearch) {
+                    // Keyword Search Logic
+                    const keyword = queries[0];
                     try {
-                        let query = `SELECT * FROM ${dbTable} WHERE ${dbCols.book} = ? AND ${dbCols.chapter} = ?`;
-                        let params = [fullBookName, chapter];
-                        if (startVerse !== null) {
-                            if (endVerse !== null) {
-                                query += ` AND ${dbCols.verse} >= ? AND ${dbCols.verse} <= ?`;
-                                params.push(startVerse, endVerse);
-                            } else {
-                                query += ` AND ${dbCols.verse} = ?`;
-                                params.push(startVerse);
-                            }
-                        }
+                        // Limit to 100 to prevent freezing
+                        const query = `SELECT * FROM ${dbTable} WHERE ${dbCols.text} LIKE ? LIMIT 100`; 
+                        const params = [`%${keyword}%`];
                         const res = sqlDb.exec(query, params);
+                        
                         if (res && res.length > 0) {
                             const list = res[0].values.map(row => {
                                 const colNames = res[0].columns;
                                 const r = {};
                                 colNames.forEach((c, i) => r[c] = row[i]);
-                                return { ref: `${r[dbCols.chapter]}:${r[dbCols.verse]}`, text: r[dbCols.text] };
+                                return { 
+                                    ref: `${r[dbCols.book]} ${r[dbCols.chapter]}:${r[dbCols.verse]}`, 
+                                    text: r[dbCols.text] 
+                                };
                             });
-                            // Modified here: use toggleVerseSelection instead of addToNote
-                            allHtml += list.map(v => `
-                                <div class="verse-item mb-2 p-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-all border-l-4 border-transparent" onclick="window.toggleVerseSelection(this)" data-ref="${v.ref}" data-text="${v.text.replace(/"/g, '&quot;')}">
-                                    <span class="text-xs font-bold text-[#A68C76] align-top mr-1 select-none">${v.ref}</span>
-                                    <span class="text-[#5E5A54]">${v.text}</span>
-                                </div>
-                            `).join('');
-                            fetched = true;
+                            
+                            allHtml += `<div class="p-3 mb-4 text-xs font-bold text-[#A68C76] bg-[#F9F7F5] rounded-lg border border-[#EBE6DE]">
+                                🔍 關鍵字搜尋：<span class="text-[#5E5A54] text-sm">"${keyword}"</span> (顯示前 100 筆)
+                            </div>`;
+
+                            allHtml += list.map(v => {
+                                // Highlight keyword
+                                const highlightedText = v.text.replace(new RegExp(keyword, 'g'), `<span class="bg-[#FFF5EB] text-[#A68C76] font-bold px-1 rounded">${keyword}</span>`);
+                                return `
+                                    <div class="verse-item mb-2 p-3 rounded-lg cursor-pointer hover:bg-gray-50 transition-all border-l-4 border-transparent bg-white border border-gray-50 shadow-sm" onclick="window.toggleVerseSelection(this)" data-ref="${v.ref}" data-text="${(v.text||'').replace(/"/g, '&quot;')}">
+                                        <div class="text-xs font-bold text-[#A68C76] mb-1">${v.ref}</div>
+                                        <div class="text-[#5E5A54] leading-relaxed">${highlightedText}</div>
+                                    </div>
+                                `;
+                            }).join('');
+                        } else {
+                            allHtml = '<div class="flex flex-col items-center justify-center py-20 text-[#94908A]"><span class="text-4xl mb-2">🤔</span><p>找不到包含該關鍵字的經文</p></div>';
                         }
-                    } catch(e) { console.error("SQL Error", e); }
-                }
-                if (!fetched) {
-                    try {
-                        const apiRef = q.replace(/\s/g, '');
-                        const res = await fetch(`https://bolls.life/search/CUV/?search=${encodeURIComponent(apiRef)}`);
-                        const data = await res.json();
-                        if(data.length > 0) {
-                            allHtml += data.map(v => `
-                                <div class="verse-item mb-2 p-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-all border-l-4 border-transparent" onclick="window.toggleVerseSelection(this)" data-ref="${v.chapter}:${v.verse}" data-text="${v.text.replace(/"/g, '&quot;')}">
-                                    <span class="text-xs font-bold text-[#A68C76] align-top mr-1 select-none">${v.chapter}:${v.verse}</span>
-                                    <span class="text-[#5E5A54]">${v.text}</span>
-                                </div>
-                            `).join('');
+                    } catch(e) { 
+                        console.error("Search Error", e);
+                        allHtml = '<p class="text-center py-10 text-red-400">搜尋發生錯誤</p>';
+                    }
+                } else {
+                    // Reference Search Logic (Existing)
+                    for(let q of queries) {
+                        const match = q.match(/^([\u4e00-\u9fa5]+|[a-zA-Z]+)\s*(\d+)(?::(\d+)(?:-(\d+))?)?$/);
+                        if (match) {
+                            const bookAbbr = match[1];
+                            const chapter = parseInt(match[2]);
+                            const startVerse = match[3] ? parseInt(match[3]) : null;
+                            const endVerse = match[4] ? parseInt(match[4]) : (startVerse || null);
+                            const fullBookName = bookMap[bookAbbr] || bookAbbr;
+                            
+                            try {
+                                let query = `SELECT * FROM ${dbTable} WHERE ${dbCols.book} = ? AND ${dbCols.chapter} = ?`;
+                                let params = [fullBookName, chapter];
+                                
+                                if (startVerse !== null) {
+                                    if (endVerse !== null) {
+                                        query += ` AND ${dbCols.verse} >= ? AND ${dbCols.verse} <= ?`;
+                                        params.push(startVerse, endVerse);
+                                    } else {
+                                        query += ` AND ${dbCols.verse} = ?`;
+                                        params.push(startVerse);
+                                    }
+                                }
+                                
+                                const res = sqlDb.exec(query, params);
+                                if (res && res.length > 0) {
+                                    const list = res[0].values.map(row => {
+                                        const colNames = res[0].columns;
+                                        const r = {};
+                                        colNames.forEach((c, i) => r[c] = row[i]);
+                                        return { ref: `${r[dbCols.chapter]}:${r[dbCols.verse]}`, text: r[dbCols.text] };
+                                    });
+                                    
+                                    allHtml += list.map(v => `
+                                        <div class="verse-item mb-2 p-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-all border-l-4 border-transparent" onclick="window.toggleVerseSelection(this)" data-ref="${v.ref}" data-text="${(v.text||'').replace(/"/g, '&quot;')}">
+                                            <span class="text-xs font-bold text-[#A68C76] align-top mr-1 select-none">${v.ref}</span>
+                                            <span class="text-[#5E5A54]">${v.text}</span>
+                                        </div>
+                                    `).join('');
+                                }
+                            } catch(e) { console.error("SQL Error", e); }
                         }
-                    } catch(e) { console.error("API Error", e); }
+                    }
                 }
             }
+            
             if(allHtml) {
                 els.bibleContent.innerHTML = allHtml;
                 els.bibleContent.scrollTop = 0;
-            } else els.bibleContent.innerHTML = '<p class="p-8 text-center text-gray-400 font-serif">如需精確節數查詢，請先確認資料庫已正確載入。</p>';
+            } else if (!isKeywordSearch) { // Only show this if not keyword search (keyword search handles its own empty state)
+                els.bibleContent.innerHTML = '<p class="p-8 text-center text-gray-400 font-serif">🔍 未找到相關經文<br><span class="text-xs">請確認書卷名稱或章節是否正確</span></p>';
+            }
         }
 
+        // ... (handleDateChange, updateDevotionUI, loadTrack, highlightTrack, toggleVerseSelection, updateCopyButton, copySelectedVerses, switchMode, switchWorkspaceTab, toggleBibleSidebar, renderBibleBooks, showChapters, backToBooks, renderCalendar, calculateStreak, selectMood, performSearch, openExportModal, closeExportModal, backupData, restoreData, handleManualSqliteUpload) ...
+        
         window.handleDateChange = function(dKey) {
             const parts = dKey.split('-');
             calendarDate = new Date(parts[0], parts[1]-1, parts[2]);
@@ -876,7 +851,7 @@
             `).join('');
             if(plan.length > 0) window.loadTrack(0);
         }
-        
+
         window.loadTrack = function(idx, btnEl) {
             if(btnEl) window.highlightTrack(btnEl);
             else {
@@ -966,7 +941,6 @@
                     // 1. 隱藏標題文字 (因為已經有進度卡片了)
                     titleWrapper.classList.add('invisible'); 
                     // 2. 隱藏搜尋框，但保留外層容器以便顯示複製按鈕
-                    //    注意：複製按鈕在 searchContainer 外面，所以隱藏 searchContainer 不會影響複製按鈕
                     searchContainer.classList.add('hidden');
                 }
                 
@@ -1023,15 +997,16 @@
                     switchBtn.classList.remove('hidden'); // 顯示切換按鈕
                     // 標題與搜尋都要保留
                     window.switchWorkspaceTab('reader');
-                    window.renderBibleBooks('old');
+                    window.renderMainBooks('old');
                     els.readerTitle.innerText = "請選擇書卷";
                     els.bibleContent.innerHTML = '<div class="h-full flex items-center justify-center text-gray-300 italic font-serif">請點擊上方按鈕選擇經文...</div>';
-                    document.getElementById('tab-reader-text').innerText = "閱讀經文";
                     // 隱藏章節/書卷視圖，重置為顯示書卷列表
                     document.getElementById('view-bible-chapters').classList.add('hidden');
                     document.getElementById('bible-content').classList.add('hidden');
                     document.getElementById('view-bible-books').classList.remove('hidden');
                     document.getElementById('view-bible-books').classList.add('flex');
+                    
+                    document.getElementById('tab-reader-text').innerText = "閱讀經文";
                 } else if (m === 'devotion') {
                     if(window.innerWidth < 1024) window.switchWorkspaceTab('reader');
                     document.getElementById('tab-reader-text').innerText = "讀經進度";
@@ -1097,45 +1072,64 @@
             sidebar.classList.toggle('hidden');
         }
 
-        window.renderBibleBooks = function(t) {
-            // 顯示書卷列表，隱藏其他
-            document.getElementById('bible-content').classList.add('hidden');
-            document.getElementById('view-bible-chapters').classList.add('hidden');
-            document.getElementById('view-bible-books').classList.remove('hidden');
-            document.getElementById('view-bible-books').classList.add('flex');
-            
-            document.getElementById('bible-book-list').innerHTML = bibleBooks[t].map(b => `<button class="text-left px-3 py-2 rounded-lg hover:bg-[#F2EBE5] text-sm border border-gray-100" onclick='window.showChapters(${JSON.stringify(b)})'>${b.n}</button>`).join('');
-            
+        window.renderSidebarBooks = function(t) {
+            document.getElementById('sidebar-book-list').innerHTML = bibleBooks[t].map(b => `<button class="text-left px-3 py-2 rounded-lg hover:bg-[#F2EBE5] text-sm border border-gray-100" onclick='window.showSidebarChapters(${JSON.stringify(b)})'>${b.n}</button>`).join('');
+            document.getElementById('btn-old-sidebar').className = t==='old'?"flex-1 py-2 text-xs font-bold rounded-lg bg-[#A68C76] text-white":"flex-1 py-2 text-xs font-bold rounded-lg bg-white border text-[#A68C76]";
+            document.getElementById('btn-new-sidebar').className = t==='new'?"flex-1 py-2 text-xs font-bold rounded-lg bg-[#A68C76] text-white":"flex-1 py-2 text-xs font-bold rounded-lg bg-white border text-[#A68C76]";
+        }
+        
+        window.renderMainBooks = function(t) {
+            document.getElementById('main-book-list').innerHTML = bibleBooks[t].map(b => `<button class="text-left px-3 py-2 rounded-lg hover:bg-[#F2EBE5] text-sm border border-gray-100" onclick='window.showMainChapters(${JSON.stringify(b)})'>${b.n}</button>`).join('');
             document.getElementById('btn-old').className = t==='old'?"flex-1 py-2 text-xs font-bold rounded-lg bg-[#A68C76] text-white":"flex-1 py-2 text-xs font-bold rounded-lg bg-white border text-[#A68C76]";
             document.getElementById('btn-new').className = t==='new'?"flex-1 py-2 text-xs font-bold rounded-lg bg-[#A68C76] text-white":"flex-1 py-2 text-xs font-bold rounded-lg bg-white border text-[#A68C76]";
         }
+        
+        window.renderBibleBooks = window.renderMainBooks; // Alias for compatibility
 
-        window.showChapters = function(b) {
-            // 顯示章節列表
+        window.showSidebarChapters = function(b) {
+            document.getElementById('sidebar-book-list-container').classList.add('hidden');
+            document.getElementById('sidebar-chapter-list-container').classList.remove('hidden');
+            document.getElementById('sidebar-chapter-list-container').classList.add('flex');
+            
+            document.getElementById('sidebar-chapter-title').innerText = b.n;
+            document.getElementById('sidebar-chapter-grid').innerHTML = Array.from({length:b.c}, (_,i)=> `<button class="aspect-square border rounded-lg hover:bg-[#A68C76] hover:text-white transition-colors flex items-center justify-center font-mono" onclick="window.fetchBibleRef('${b.abbr}${i+1}'); window.toggleBibleSidebar()">${i+1}</button>`).join('');
+        }
+        
+        window.showMainChapters = function(b) {
             document.getElementById('view-bible-books').classList.add('hidden');
             document.getElementById('view-bible-books').classList.remove('flex');
             document.getElementById('bible-content').classList.add('hidden');
             document.getElementById('view-bible-chapters').classList.remove('hidden');
             document.getElementById('view-bible-chapters').classList.add('flex');
             
-            document.getElementById('sidebar-chapter-title').innerText = b.n;
-            document.getElementById('sidebar-chapter-grid').innerHTML = Array.from({length:b.c}, (_,i)=> `<button class="aspect-square border rounded-lg hover:bg-[#A68C76] hover:text-white transition-colors flex items-center justify-center font-mono" onclick="window.fetchBibleRef('${b.abbr}${i+1}'); window.showBibleContent()">${i+1}</button>`).join('');
+            document.getElementById('main-chapter-title').innerText = b.n;
+            document.getElementById('main-chapter-grid').innerHTML = Array.from({length:b.c}, (_,i)=> `<button class="aspect-square border rounded-lg hover:bg-[#A68C76] hover:text-white transition-colors flex items-center justify-center font-mono" onclick="window.fetchBibleRef('${b.abbr}${i+1}'); window.showBibleContent()">${i+1}</button>`).join('');
         }
+        
+        window.showChapters = window.showSidebarChapters; // Alias
 
         window.showBibleContent = function() {
-            // 顯示經文內容
             document.getElementById('view-bible-books').classList.add('hidden');
             document.getElementById('view-bible-chapters').classList.add('hidden');
             document.getElementById('view-bible-chapters').classList.remove('flex');
             document.getElementById('bible-content').classList.remove('hidden');
         }
 
-        window.goBackToBooks = function() { 
-            // 返回書卷列表
-            window.renderBibleBooks('old');
+        window.backToSidebarBooks = function() { 
+            document.getElementById('sidebar-chapter-list-container').classList.add('hidden');
+            document.getElementById('sidebar-chapter-list-container').classList.remove('flex');
+            document.getElementById('sidebar-book-list-container').classList.remove('hidden');
         }
         
-        window.backToBooks = window.goBackToBooks; // Alias for compatibility
+        window.goBackToMainBooks = function() {
+             window.renderMainBooks('old');
+             document.getElementById('view-bible-chapters').classList.add('hidden');
+             document.getElementById('bible-content').classList.add('hidden');
+             document.getElementById('view-bible-books').classList.remove('hidden');
+             document.getElementById('view-bible-books').classList.add('flex');
+        }
+        
+        window.backToBooks = window.backToSidebarBooks; // Alias
 
         window.renderCalendar = function() {
             const y = calendarDate.getFullYear(), m = calendarDate.getMonth();
@@ -1187,7 +1181,8 @@
             const kw = els.inlineSearch.value;
             if(kw) {
                 window.fetchBibleRef(kw);
-                window.showBibleContent();
+                // If in bible mode, make sure content is shown
+                if (currentMode === 'bible') window.showBibleContent();
             }
         }
 
@@ -1236,6 +1231,70 @@
             };
             reader.readAsArrayBuffer(input.files[0]);
         }
+        
+        let dbTable = "verses", dbCols = { book: "book", chapter: "chapter", verse: "verse", text: "text" };
+
+        window.detectTableStructure = function() {
+            if(!sqlDb) return;
+            try {
+                const tables = sqlDb.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
+                if(tables[0]) {
+                    const names = tables[0].values.flat();
+                    dbTable = names.includes('verses') ? 'verses' : (names.includes('bible') ? 'bible' : names[0]);
+                }
+                const cols = sqlDb.exec(`PRAGMA table_info(${dbTable})`);
+                if(cols.length > 0) {
+                    const colNames = cols[0].values.map(r => r[1]);
+                    if(colNames.includes('content')) dbCols.text = 'content';
+                    else if(colNames.includes('scripture')) dbCols.text = 'scripture';
+                    else if(colNames.includes('經文')) dbCols.text = '經文';
+
+                    if(colNames.includes('book_name')) dbCols.book = 'book_name';
+                    else if(colNames.includes('書卷')) dbCols.book = '書卷';
+                }
+            } catch(e) {}
+        }
+        
+        window.setupSqlite = async function() {
+            const searchInput = document.getElementById('inline-search');
+            if (searchInput) {
+                // Initial placeholder state
+                if (typeof window.initSqlJs === 'undefined') {
+                    searchInput.placeholder = "⚠️ 元件載入失敗";
+                    return;
+                }
+                searchInput.placeholder = "📥 下載資料庫 (5MB)...";
+            }
+            
+            try {
+                // Initialize SQL.js
+                isDbLoading = true;
+                SQL = await window.initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${f}` });
+                
+                if (REMOTE_DB_URL) {
+                    const res = await fetch(REMOTE_DB_URL);
+                    if (!res.ok) throw new Error("Network response was not ok");
+                    const buffer = await res.arrayBuffer();
+                    sqlDb = new SQL.Database(new Uint8Array(buffer));
+                    sqlDbLoaded = true;
+                    window.detectTableStructure();
+                    
+                    if (searchInput) {
+                        searchInput.disabled = false;
+                        searchInput.placeholder = "🔍 搜尋 (如: 創 1:1)...";
+                    }
+                    console.log("Database loaded successfully");
+                }
+            } catch(e) { 
+                console.error("Database load error:", e);
+                if (searchInput) {
+                    searchInput.disabled = false;
+                    searchInput.placeholder = "⚠️ 載入失敗，請重整";
+                }
+            } finally {
+                isDbLoading = false;
+            }
+        }
 
         function initApp() {
             els = {
@@ -1250,6 +1309,8 @@
             const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
             window.handleDateChange(today);
             window.setupSqlite();
+            // Pre-render sidebar books to avoid empty state
+            window.renderSidebarBooks('old');
         }
         
         // Explicitly bind setupSqlite to window for safety
