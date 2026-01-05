@@ -341,7 +341,13 @@
                          
                          <!-- Title Info -->
                          <div class="min-w-0">
-                             <span id="header-subtitle" class="text-[12px] font-bold text-[#94A698] uppercase tracking-widest block hand-font">Scripture</span>
+                             <div class="flex items-center gap-2">
+                                <span id="header-subtitle" class="text-[12px] font-bold text-[#94A698] uppercase tracking-widest block hand-font">Scripture</span>
+                                <!-- Added Copy Progress Button -->
+                                <button id="btn-copy-progress" onclick="window.copyDevotionProgress()" class="hidden text-[10px] text-[#94A698] border border-[#94A698] rounded px-1 hover:bg-[#94A698] hover:text-white transition-colors leading-tight" title="複製今日進度">
+                                    複製今日進度
+                                </button>
+                             </div>
                              <h2 id="header-main-title" class="text-lg text-[#59544D] font-bold truncate font-serif">Bible Reading</h2>
                          </div>
                     </div>
@@ -559,6 +565,7 @@
                 readerSubtitle: document.getElementById('header-subtitle'),
                 backBtn: document.getElementById('btn-header-back'),
                 copyBtn: document.getElementById('btn-copy-verses'),
+                btnCopyProgress: document.getElementById('btn-copy-progress'),
                 
                 headerTitle: document.getElementById('header-title'),
                 datePicker: document.getElementById('date-picker'),
@@ -693,6 +700,11 @@
             // 重置 Header 狀態
             els.backBtn.classList.add('hidden');
             els.copyBtn.classList.add('hidden');
+
+            // 複製進度按鈕狀態：只在靈修模式顯示
+            if (els.btnCopyProgress) {
+                els.btnCopyProgress.classList.toggle('hidden', !isDevotion);
+            }
 
             if (isDevotion) {
                 // 靈修模式 (左右分欄)
@@ -963,6 +975,30 @@
                 els.readerSubtitle.innerText = "Select Book";
                 els.backBtn.classList.add('hidden');
             }
+        }
+
+        window.copyDevotionProgress = function() {
+            const progressText = document.getElementById('note-devotion-progress').value;
+            if(!progressText || progressText === "載入中...") return;
+            
+            const t = document.createElement('textarea'); 
+            t.value = progressText; 
+            document.body.appendChild(t); 
+            t.select(); 
+            document.execCommand('copy'); 
+            document.body.removeChild(t);
+            
+            const btn = document.getElementById('btn-copy-progress');
+            const originalText = btn.innerText;
+            const originalClass = btn.className;
+            
+            btn.innerText = "已複製!";
+            btn.classList.add('bg-[#94A698]', 'text-white', 'border-transparent');
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.className = originalClass;
+            }, 1500);
         }
 
         window.changeCalendarMonth = function(n) { calendarDate.setMonth(calendarDate.getMonth()+n); window.renderCalendar(); }
