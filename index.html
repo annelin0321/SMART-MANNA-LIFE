@@ -28,7 +28,7 @@
             --lego-dark-grey: #6D6E71;
             
             --bg-baseplate: #F4F6F8; /* 淺灰底板色 */
-            --stud-shadow: rgba(0,0,0,0.15);
+            --stud-shadow: rgba(0,0,0,0.1);
         }
 
         body { 
@@ -36,12 +36,12 @@
             background-color: var(--bg-baseplate);
             color: #333;
             -webkit-tap-highlight-color: transparent;
-            /* 樂高底板背景圖案 (Stud Pattern) */
+            /* 修改：背景圓點變小變密 (模擬 7 stud 寬度感) */
             background-image: 
-                radial-gradient(var(--stud-shadow) 15%, transparent 16%),
-                radial-gradient(var(--stud-shadow) 15%, transparent 16%);
-            background-size: 40px 40px;
-            background-position: 0 0, 20px 20px;
+                radial-gradient(var(--stud-shadow) 20%, transparent 22%),
+                radial-gradient(var(--stud-shadow) 20%, transparent 22%);
+            background-size: 20px 20px; /* 縮小尺寸 */
+            background-position: 0 0, 10px 10px;
         }
         
         .pixel-font { font-family: 'VT323', monospace; }
@@ -166,9 +166,9 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            /* 2x2 凸粒 */
+            /* 3x3 凸粒 (更密集) */
             background-image: radial-gradient(rgba(0,0,0,0.15) 25%, transparent 28%);
-            background-size: 20px 20px; 
+            background-size: 13.33px 13.33px; 
             background-position: 0 0;
         }
         .mini-brick::after {
@@ -733,6 +733,14 @@
             bookMap[b.n.replace("書","")] = b.n;
         });
 
+        // 模擬數據 (Fallback Mock Data)
+        const mockVerses = {
+            "創世記": {1: {1: "起初，神創造天地。", 2: "地是空虛混沌，淵面黑暗；神的靈運行在水面上。", 3: "神說：「要有光」，就有了光。"}},
+            "馬太福音": {1: {1: "亞伯拉罕的後裔，大衛的子孫，耶穌基督的家譜。", 18: "耶穌基督降生的事記在下面：他母親馬利亞已經許配了約瑟，還沒有迎娶，馬利亞就從聖靈懷了孕。"}},
+            "詩篇": {1: {1: "不從惡人的計謀，不站罪人的道路，不坐褻慢人的座位。", 2: "惟喜愛耶和華的律法，晝夜思想，這人便為有福！"}},
+            "箴言": {1: {7: "敬畏耶和華是知識的開端；愚妄人藐視智慧和訓誨。"}}
+        };
+
         // --- 核心功能 ---
 
         // 初始化
@@ -768,17 +776,22 @@
             window.setAppIcon();
 
             try {
-                SQL = await window.initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${f}` });
-                const res = await fetch(REMOTE_DB_URL);
-                if (!res.ok) throw new Error("Network Error");
-                const buffer = await res.arrayBuffer();
-                sqlDb = new SQL.Database(new Uint8Array(buffer));
-                sqlDbLoaded = true;
-                window.detectTableStructure();
-                els.inlineSearch.placeholder = "🔍 搜尋經文...";
+                // 嘗試載入 SQL
+                if (typeof window.initSqlJs === 'function') {
+                    SQL = await window.initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${f}` });
+                    const res = await fetch(REMOTE_DB_URL);
+                    if (!res.ok) throw new Error("Remote DB Fetch Failed");
+                    const buffer = await res.arrayBuffer();
+                    sqlDb = new SQL.Database(new Uint8Array(buffer));
+                    sqlDbLoaded = true;
+                    window.detectTableStructure();
+                    els.inlineSearch.placeholder = "🔍 搜尋經文...";
+                } else {
+                    throw new Error("SQL.js not loaded");
+                }
             } catch(e) {
-                console.error("DB Load Fail", e);
-                els.inlineSearch.placeholder = "⚠️ 資料載入失敗";
+                console.warn("DB Load Failed, using fallback mode.", e);
+                els.inlineSearch.placeholder = "⚠️ 連線失敗 (僅供試閱)";
             }
 
             window.renderCalendar();
@@ -796,75 +809,73 @@
             // 1. Base Block (Yellow)
             const baseColor = '#FFD500';
             const shadowColor = '#ccaa00';
-            const highlightColor = '#ffe666'; // lighter yellow
+            const highlightColor = '#ffe666'; 
             
             ctx.fillStyle = baseColor;
             ctx.fillRect(0, 0, 192, 192);
             
-            // Inner shadow/Highlight for plastic block edges
-            // Top/Left Highlight
+            // Inner shadow/Highlight
             ctx.strokeStyle = 'rgba(255,255,255,0.4)';
             ctx.lineWidth = 4;
             ctx.beginPath(); ctx.moveTo(0,192); ctx.lineTo(0,0); ctx.lineTo(192,0); ctx.stroke();
             
-            // Bottom/Right Shadow
             ctx.strokeStyle = 'rgba(0,0,0,0.1)';
             ctx.beginPath(); ctx.moveTo(0,192); ctx.lineTo(192,192); ctx.lineTo(192,0); ctx.stroke();
 
-            // 2. Draw 4 Studs (2x2)
-            const studs = [
-                {x: 48, y: 48}, {x: 144, y: 48},
-                {x: 48, y: 144}, {x: 144, y: 144}
-            ];
+            // 2. Draw Studs (3x3 Grid = 9 dots, smaller and cleaner)
+            const gridSize = 3;
+            const cellSize = 192 / gridSize; // 64
+            const studRadius = 22; // Smaller radius for 3x3 layout
             
-            studs.forEach(pos => {
-                const cx = pos.x;
-                const cy = pos.y;
-                const r = 36; 
+            for(let row=0; row<gridSize; row++) {
+                for(let col=0; col<gridSize; col++) {
+                    const cx = cellSize/2 + col*cellSize;
+                    const cy = cellSize/2 + row*cellSize;
+                    
+                    // A. Cast Shadow
+                    ctx.beginPath();
+                    ctx.arc(cx + 4, cy + 4, studRadius, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(0,0,0,0.1)'; 
+                    ctx.fill();
 
-                // A. Cast Shadow (Drop shadow on the block)
-                ctx.beginPath();
-                ctx.arc(cx + 6, cy + 6, r, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(0,0,0,0.1)'; // Soft shadow
-                ctx.fill();
+                    // B. Stud Side
+                    ctx.beginPath();
+                    ctx.arc(cx, cy + 2, studRadius, 0, Math.PI * 2);
+                    ctx.fillStyle = shadowColor; 
+                    ctx.fill();
 
-                // B. Stud Side (The height of the cylinder)
-                ctx.beginPath();
-                ctx.arc(cx, cy + 2, r, 0, Math.PI * 2);
-                ctx.fillStyle = shadowColor; 
-                ctx.fill();
+                    // C. Stud Top
+                    const grad = ctx.createLinearGradient(cx - studRadius, cy - studRadius, cx + studRadius, cy + studRadius);
+                    grad.addColorStop(0, highlightColor);
+                    grad.addColorStop(1, shadowColor);
+                    
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, studRadius, 0, Math.PI * 2);
+                    ctx.fillStyle = grad; 
+                    ctx.fill();
 
-                // C. Stud Top Surface
-                const grad = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
-                grad.addColorStop(0, highlightColor); // Highlight side
-                grad.addColorStop(1, shadowColor); // Shadow side
-                
-                ctx.beginPath();
-                ctx.arc(cx, cy, r, 0, Math.PI * 2);
-                ctx.fillStyle = grad; 
-                ctx.fill();
+                    // D. Highlight
+                    ctx.beginPath();
+                    ctx.ellipse(cx - 8, cy - 8, 7, 4, -Math.PI / 4, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                    ctx.fill();
+                    
+                    // E. Emboss
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, studRadius - 5, 0, Math.PI * 2);
+                    ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            }
 
-                // D. Plastic Highlight (Glossy reflection)
-                ctx.beginPath();
-                ctx.ellipse(cx - 12, cy - 12, 10, 6, -Math.PI / 4, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(255,255,255,0.6)';
-                ctx.fill();
-                
-                // E. Embossed logo text simulation
-                ctx.beginPath();
-                ctx.arc(cx, cy, r - 8, 0, Math.PI * 2);
-                ctx.strokeStyle = 'rgba(0,0,0,0.05)';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-            });
-
-            // 3. Icon Overlay (Toast/Manna)
-            // Scale and Translate context to draw SVG path easily
+            // 3. Icon Overlay (Toast/Manna) - Thicker Lines
             ctx.save();
-            ctx.translate(24, 24); // Center roughly (192 - 144)/2 = 24
-            ctx.scale(6, 6); // 24 * 6 = 144 size
+            ctx.translate(24, 24); 
+            ctx.scale(6, 6); 
             
-            ctx.lineWidth = 2.5 / 6; // Maintain relative thickness
+            // 關鍵修改：將線條加粗
+            ctx.lineWidth = 5.5 / 6; // Much bolder (was 2.5/6)
             ctx.strokeStyle = '#333333';
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
@@ -881,14 +892,18 @@
             ctx.lineTo(4, 14);
             ctx.closePath();
             
-            // White halo for visibility
-            ctx.shadowColor = "rgba(255,255,255,0.6)";
+            // White halo for visibility against studs
+            ctx.shadowColor = "rgba(255,255,255,0.8)";
             ctx.shadowBlur = 0;
-            ctx.shadowOffsetX = 1;
-            ctx.shadowOffsetY = 1;
+            ctx.shadowOffsetX = 1.5; // Slightly offset
+            ctx.shadowOffsetY = 1.5;
             ctx.stroke();
             
-            // Draw Line
+            // Reset shadow to draw the dark line clearly
+            ctx.shadowColor = "transparent"; 
+            ctx.stroke(); // Stroke again to be sharp
+
+            // Draw Line (Toast Crust)
             ctx.beginPath();
             ctx.moveTo(4, 14);
             ctx.lineTo(20, 14);
@@ -1006,8 +1021,10 @@
         }
 
         window.fetchBibleRef = async function(refInput) {
-            if (!sqlDbLoaded || !refInput) return;
-            const ref = refInput.trim();
+            const ref = refInput ? refInput.trim() : "";
+            if(!ref) return;
+
+            // UI 狀態切換
             els.viewBooks.classList.add('hidden');
             els.viewChapters.classList.add('hidden');
             els.viewText.classList.remove('hidden');
@@ -1016,57 +1033,106 @@
             
             els.viewText.innerHTML = '<div class="flex justify-center py-10"><div class="loader"></div></div>';
             
+            // 解析經文引用
             const match = ref.match(/^([\u4e00-\u9fa5]+|[a-zA-Z]+)\s*(\d+)(?::(\d+)(?:-(\d+))?)?$/);
             const bookKey = match ? match[1] : null;
             const isBookRef = bookKey && (bookMap[bookKey] || bookMap[bookKey.replace("書","")]);
 
+            // === 優先嘗試從 SQL 資料庫讀取 ===
+            if (sqlDbLoaded) {
+                if (match && isBookRef) {
+                    const book = bookMap[bookKey] || bookKey; 
+                    const chapter = parseInt(match[2]);
+                    const startV = match[3] ? parseInt(match[3]) : 1;
+                    const endV = match[4] ? parseInt(match[4]) : (match[3] ? parseInt(match[3]) : 200); 
+
+                    try {
+                        const query = `SELECT ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.book} = ? AND ${dbCols.chapter} = ? AND ${dbCols.verse} >= ? AND ${dbCols.verse} <= ?`;
+                        const res = sqlDb.exec(query, [book, chapter, startV, endV]);
+                        
+                        if (res.length > 0) {
+                            els.readerTitle.innerText = `${book} ${chapter}`;
+                            els.readerSubtitle.innerText = "Scripture";
+                            els.viewText.innerHTML = res[0].values.map(v => `
+                                <div class="verse-item mb-4" onclick="this.classList.toggle('selected'); window.updateCopyButton()">
+                                    <span class="text-xs font-bold text-white bg-[#333] mr-2 px-1 rounded-sm select-none inline-block">${v[1]}</span>
+                                    <span class="text-verse leading-loose">${v[2]}</span>
+                                </div>
+                            `).join('');
+                            return; // 成功讀取，結束
+                        } else {
+                            els.viewText.innerHTML = "<p class='p-8 opacity-50 text-center text-sm'>此章節查無內容。</p>";
+                            return;
+                        }
+                    } catch(e) { console.error(e); }
+                } else {
+                    // 關鍵字搜尋
+                    try {
+                        els.readerTitle.innerText = `搜尋: "${ref}"`;
+                        els.readerSubtitle.innerText = "Search Result";
+                        const query = `SELECT ${dbCols.book}, ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.text} LIKE ? LIMIT 50`;
+                        const res = sqlDb.exec(query, [`%${ref}%`]);
+
+                        if (res.length > 0) {
+                            const results = res[0].values;
+                            els.viewText.innerHTML = results.map(v => {
+                                const highlightedTxt = v[3].replace(new RegExp(ref, 'g'), `<span class="bg-[#FFD500] text-[#333] px-1 font-bold rounded">${ref}</span>`);
+                                return `
+                                    <div class="verse-item mb-4 p-4 border-2 border-transparent hover:border-gray-200 transition-all cursor-pointer" onclick="this.classList.toggle('selected'); window.updateCopyButton()">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="text-[10px] font-bold text-white bg-[#0055BF] px-2 py-1 tracking-wider rounded">${v[0]} ${v[1]}:${v[2]}</span>
+                                        </div>
+                                        <span class="text-verse text-[#333] leading-relaxed block">${highlightedTxt}</span>
+                                    </div>
+                                `;
+                            }).join('');
+                            return;
+                        } else {
+                            els.viewText.innerHTML = `<div class="flex flex-col items-center justify-center py-12"><span class="text-4xl mb-4">👾</span><p class="text-lg font-bold">找不到「${ref}」</p></div>`;
+                            return;
+                        }
+                    } catch(e) { console.error(e); }
+                }
+            }
+
+            // === 備用方案 (Fallback Mode) ===
+            // 當 SQL 資料庫載入失敗時，嘗試從內建的 Mock Data 尋找
             if (match && isBookRef) {
                 const book = bookMap[bookKey] || bookKey; 
                 const chapter = parseInt(match[2]);
-                const startV = match[3] ? parseInt(match[3]) : 1;
-                const endV = match[4] ? parseInt(match[4]) : (match[3] ? parseInt(match[3]) : 200); 
+                const verseData = mockVerses[book]?.[chapter];
 
-                try {
-                    const query = `SELECT ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.book} = ? AND ${dbCols.chapter} = ? AND ${dbCols.verse} >= ? AND ${dbCols.verse} <= ?`;
-                    const res = sqlDb.exec(query, [book, chapter, startV, endV]);
-                    
-                    if (res.length > 0) {
-                        els.readerTitle.innerText = `${book} ${chapter}`;
-                        els.readerSubtitle.innerText = "Scripture";
-                        els.viewText.innerHTML = res[0].values.map(v => `
-                            <div class="verse-item mb-4" onclick="this.classList.toggle('selected'); window.updateCopyButton()">
-                                <span class="text-xs font-bold text-white bg-[#333] mr-2 px-1 rounded-sm select-none inline-block">${v[1]}</span>
-                                <span class="text-verse leading-loose">${v[2]}</span>
-                            </div>
-                        `).join('');
-                    } else {
-                        els.viewText.innerHTML = "<p class='p-8 opacity-50 text-center text-sm'>此章節查無內容。</p>";
-                    }
-                } catch(e) { console.error(e); }
+                els.readerTitle.innerText = `${book} ${chapter}`;
+                els.readerSubtitle.innerText = "Fallback Mode";
+
+                if (verseData) {
+                    els.viewText.innerHTML = `
+                        <div class="p-3 bg-red-50 text-red-600 rounded mb-4 text-xs font-bold border border-red-200">
+                            ⚠️ 遠端資料庫未連線，僅顯示試閱內容。
+                        </div>
+                    ` + Object.keys(verseData).map(vNum => `
+                        <div class="verse-item mb-4" onclick="this.classList.toggle('selected'); window.updateCopyButton()">
+                            <span class="text-xs font-bold text-white bg-[#333] mr-2 px-1 rounded-sm select-none inline-block">${vNum}</span>
+                            <span class="text-verse leading-loose">${verseData[vNum]}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    els.viewText.innerHTML = `
+                        <div class="flex flex-col items-center justify-center py-12 text-center">
+                            <span class="text-4xl mb-4">🔌</span>
+                            <p class="text-lg font-bold text-[#333]">資料庫連線中斷</p>
+                            <p class="text-sm text-gray-500 mt-2">無法讀取 ${book} 第 ${chapter} 章。<br>請檢查網路連線或稍後再試。</p>
+                        </div>
+                    `;
+                }
             } else {
-                try {
-                    els.readerTitle.innerText = `搜尋: "${ref}"`;
-                    els.readerSubtitle.innerText = "Search Result";
-                    const query = `SELECT ${dbCols.book}, ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.text} LIKE ? LIMIT 50`;
-                    const res = sqlDb.exec(query, [`%${ref}%`]);
-
-                    if (res.length > 0) {
-                        const results = res[0].values;
-                        els.viewText.innerHTML = results.map(v => {
-                            const highlightedTxt = v[3].replace(new RegExp(ref, 'g'), `<span class="bg-[#FFD500] text-[#333] px-1 font-bold rounded">${ref}</span>`);
-                            return `
-                                <div class="verse-item mb-4 p-4 border-2 border-transparent hover:border-gray-200 transition-all cursor-pointer" onclick="this.classList.toggle('selected'); window.updateCopyButton()">
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <span class="text-[10px] font-bold text-white bg-[#0055BF] px-2 py-1 tracking-wider rounded">${v[0]} ${v[1]}:${v[2]}</span>
-                                    </div>
-                                    <span class="text-verse text-[#333] leading-relaxed block">${highlightedTxt}</span>
-                                </div>
-                            `;
-                        }).join('');
-                    } else {
-                        els.viewText.innerHTML = `<div class="flex flex-col items-center justify-center py-12"><span class="text-4xl mb-4">👾</span><p class="text-lg font-bold">找不到「${ref}」</p></div>`;
-                    }
-                } catch(e) { console.error(e); }
+                els.viewText.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-12 text-center">
+                        <span class="text-4xl mb-4">⚠️</span>
+                        <p class="text-lg font-bold text-[#333]">無法執行搜尋</p>
+                        <p class="text-sm text-gray-500 mt-2">資料庫未連線，搜尋功能暫時無法使用。</p>
+                    </div>
+                `;
             }
         }
 
@@ -1108,8 +1174,11 @@
                 progressField.value = progressTexts.join(' / ');
             }
 
-            const firstRef = container.querySelector('.track-ref').innerText;
-            window.fetchBibleRef(firstRef);
+            // 安全獲取第一個經文引用
+            const firstRefEl = container.querySelector('.track-ref');
+            if(firstRefEl) {
+                window.fetchBibleRef(firstRefEl.innerText);
+            }
         }
 
         window.handleDateChange = function(val) {
