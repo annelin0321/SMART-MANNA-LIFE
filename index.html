@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>機智的嗎哪生活 | Smart Manna Life</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -10,171 +10,186 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
     <!-- Google Fonts -->
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        /* 引入襯線體與手寫英文字體 */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&family=Caveat:wght@400;700&family=Zen+Maru+Gothic:wght@300;400;700&display=swap');
         
         :root {
-            --bg-cream: #FDFCF8;
-            --m-brown: #A68C76;
-            --m-brown-light: #F2EBE5;
-            --m-green: #7E9B92;
-            --m-text: #5E5A54;
-            --m-gray: #94908A;
+            /* 文青配色：宣紙白、炭筆灰、乾燥玫瑰、鼠尾草綠、陶土棕 */
+            --bg-paper: #F9F8F4;
+            --bg-card: #FFFEFA;
+            --ink-primary: #59544D;
+            --ink-secondary: #8C867D;
+            --accent-sage: #94A698;
+            --accent-clay: #C2A695;
+            --accent-rose: #D6C0BE;
+            --border-sketch: #E0DBD3;
         }
 
         body { 
-            font-family: 'Noto Sans TC', sans-serif; 
-            background-color: var(--bg-cream);
-            color: var(--m-text);
+            font-family: 'Zen Maru Gothic', 'Noto Serif TC', sans-serif; /* 圓體字更親和 */
+            background-color: var(--bg-paper);
+            color: var(--ink-primary);
+            -webkit-tap-highlight-color: transparent;
+            /* 模擬紙張紋理 */
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
         }
         
         .serif-font, .bible-text, h1, h2, h3 { 
             font-family: 'Noto Serif TC', serif; 
         }
 
+        .hand-font {
+            font-family: 'Caveat', cursive;
+        }
+
         .bible-text {
-            line-height: 2.2;
-            font-size: 1.25rem;
+            line-height: 2.4; /* 增加行距，呼吸感 */
+            font-size: 1.1rem;
             letter-spacing: 0.05em;
         }
 
-        /* 選取經文的樣式 */
-        .verse-item {
-            border-left: 4px solid transparent;
-            transition: all 0.2s;
+        /* 手繪感卡片 (不規則圓角) */
+        .sketch-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-sketch);
+            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px; /* 手繪風格邊框 */
+            box-shadow: 2px 3px 10px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
         }
-        .verse-item.selected {
-            background-color: #F2EBE5;
-            border-left-color: #A68C76;
-        }
-        .verse-item:hover {
-            background-color: #FAFAFA;
+        .sketch-card:hover {
+            transform: translateY(-3px) rotate(0.5deg);
+            box-shadow: 4px 6px 15px rgba(0,0,0,0.05);
+            border-color: var(--accent-clay);
         }
 
+        /* 經文選取樣式 - 像螢光筆劃線 */
+        .verse-item {
+            position: relative;
+            padding: 4px 8px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .verse-item.selected {
+            background: linear-gradient(120deg, #f6e6e6 0%, #f6e6e6 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 40%;
+            background-position: 0 88%;
+        }
+        .verse-item:hover {
+            background-color: rgba(0,0,0,0.02);
+        }
+
+        /* 隱藏卷軸 */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background-color: #D6D0C8; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background-color: #DCD6CC; border-radius: 10px; }
         ::-webkit-scrollbar-track { background: transparent; }
 
-        .hover-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .hover-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
-
-        .fade-in { animation: fadeIn 0.6s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* 四軌進度小卡樣式 */
+        /* 四軌進度 - 郵票風格 */
         .devotion-track-card {
-            background: white; 
+            background: #FFFEFA; 
             transition: all 0.2s; 
             cursor: pointer;
-            border: 1px solid #EBE6DE;
-            border-radius: 12px;
+            border: 1px dashed var(--border-sketch); /* 虛線邊框 */
+            border-radius: 8px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 8px 4px;
-            min-height: 60px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            padding: 10px 4px;
+            min-height: 65px;
             position: relative;
-            overflow: hidden;
         }
         .devotion-track-card:hover { 
-            border-color: #A68C76; 
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            border-color: var(--accent-clay); 
+            background: #FAF8F5;
         }
         .devotion-track-card.active {
-            background: #A68C76; 
+            background: var(--accent-sage); 
             color: white;
-            border-color: #A68C76;
-            box-shadow: 0 4px 10px rgba(166,140,118,0.3);
+            border: 1px solid var(--accent-sage);
+            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+            box-shadow: 2px 4px 8px rgba(148, 166, 152, 0.4);
         }
+        .devotion-track-card.active .track-tag { color: rgba(255,255,255,0.9); }
         
-        .devotion-track-card .track-tag {
-            font-size: 10px;
-            font-weight: 700;
-            color: #94908A;
-            text-transform: uppercase;
-            margin-bottom: 2px;
-        }
-        .devotion-track-card.active .track-tag { color: rgba(255,255,255,0.8); }
-        
-        .devotion-track-card .track-ref {
-            font-size: 13px;
-            font-weight: 800;
-            color: #5E5A54;
-            line-height: 1.2;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            width: 100%;
-            text-align: center;
-        }
-        .devotion-track-card.active .track-ref { color: white; }
+        .track-tag { font-size: 11px; font-weight: 700; color: var(--ink-secondary); margin-bottom: 2px; font-family: 'Caveat', cursive; letter-spacing: 1px; }
+        .track-ref { font-size: 13px; font-weight: 600; text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: 'Noto Serif TC'; }
 
-        /* 統一的分頁按鈕樣式 */
+        /* 分頁按鈕 - 紙膠帶風格 */
         .workspace-tab-btn {
-            flex: 1; 
-            text-align: center; 
-            padding: 14px; 
-            font-size: 15px; 
-            font-weight: bold; 
-            color: #94908A;
-            border-bottom: 3px solid transparent; 
-            transition: all 0.2s;
-            background: white;
+            flex: 1; text-align: center; padding: 14px 10px; font-size: 15px; font-weight: bold; 
+            color: var(--ink-secondary); border-bottom: 3px solid transparent; transition: all 0.2s;
         }
-        .workspace-tab-btn:hover { background-color: #FDFCF8; color: #5E5A54; }
         .workspace-tab-btn.active { 
-            color: #A68C76; 
-            border-bottom-color: #A68C76; 
-            background-color: #FAF9F6; 
+            color: var(--accent-clay); 
+            border-bottom-color: var(--accent-clay); 
+            background-color: rgba(194, 166, 149, 0.05);
+            font-family: 'Noto Serif TC';
         }
 
+        /* 心情貼紙 */
         .mood-sticker {
-            font-size: 1.5rem; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
-            border-radius: 12px; cursor: pointer; transition: all 0.2s; background-color: #fff; border: 1px solid #EBE6DE; flex-shrink: 0;
+            font-size: 1.4rem; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; cursor: pointer; transition: all 0.2s; background-color: #fff; border: 1px dashed var(--border-sketch);
         }
-        .mood-sticker.selected { background-color: #A68C76; color: white; border-color: #A68C76; transform: scale(1.1); }
+        .mood-sticker.selected { background-color: var(--accent-sage); color: white; border-style: solid; border-color: var(--accent-sage); transform: scale(1.1) rotate(10deg); }
 
+        /* 月曆樣式 */
         .calendar-day {
-            aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 9999px;
-            font-size: 0.8rem; cursor: pointer; transition: all 0.2s; position: relative;
+            aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 50%;
+            font-size: 0.85rem; cursor: pointer; transition: all 0.2s; position: relative; font-family: 'Caveat', cursive; font-size: 1.1rem;
         }
-        .calendar-day.has-entry { background-color: #7E9B92; color: white; }
-        .calendar-day.selected-day { background-color: #A68C76; color: white; }
-        .calendar-day.today { border: 2px solid #A68C76; font-weight: bold; }
+        .calendar-day.has-entry::after {
+            content: ''; position: absolute; bottom: 3px; width: 4px; height: 4px; background: var(--accent-sage); border-radius: 50%;
+        }
+        .calendar-day.selected-day { background-color: var(--accent-clay) !important; color: white !important; }
+        .calendar-day.today { border: 2px dashed var(--accent-clay); font-weight: bold; color: var(--accent-clay); }
 
         .loader {
-            width: 24px; height: 24px; border: 2px solid #EBE6DE; border-bottom-color: #A68C76;
+            width: 30px; height: 30px; border: 3px solid #EBE6DE; border-bottom-color: var(--accent-sage);
             border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite;
         }
         @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* 手繪圖示 SVG 通用樣式 */
+        .icon-sketch { stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+        
+        /* 輸入框手繪風 */
+        textarea, input[type="text"], input[type="date"] {
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+            font-family: 'Zen Maru Gothic', sans-serif;
+        }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden relative selection:bg-[#A68C76] selection:text-white">
+<body class="h-screen flex flex-col overflow-hidden selection:bg-[#D6C0BE] selection:text-[#59544D]">
 
     <!-- 頂部導覽列 -->
-    <header id="main-header" class="bg-white/80 backdrop-blur-md border-b border-[#EBE6DE] sticky top-0 z-30 shrink-0 hidden">
-        <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 flex justify-between items-center gap-4">
-            <div class="flex items-center gap-3 cursor-pointer group" onclick="window.goHome()">
-                <!-- 嗎哪圖示 SVG: 三顆如珍珠般的小圓物 -->
-                <svg class="w-8 h-8 text-[#A68C76] group-hover:scale-110 transition-transform drop-shadow-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <circle cx="12" cy="7" r="3.5" fill="#FDFCF8" />
-                    <circle cx="7" cy="16" r="3.5" fill="#FDFCF8" />
-                    <circle cx="17" cy="16" r="3.5" fill="#FDFCF8" />
+    <header id="main-header" class="bg-[#F9F8F4]/90 backdrop-blur-sm border-b border-[#E0DBD3] sticky top-0 z-30 shrink-0 hidden">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center gap-4">
+            <div class="flex items-center gap-2 cursor-pointer group" onclick="window.goHome()">
+                <!-- Logo 換成 SVG 吐司 -->
+                <svg class="w-7 h-7 text-[#C2A695] group-hover:rotate-12 transition-transform icon-sketch" viewBox="0 0 24 24" stroke="currentColor">
+                    <path d="M4 14C4 14 4 7 12 7C20 7 20 14 20 14V18C20 19.1 19.1 20 18 20H6C4.9 20 4 19.1 4 18V14Z"></path>
+                    <path d="M4 14H20"></path>
+                    <path d="M9 11C9 11 9.5 10 10.5 10C11.5 10 12 11 12 11"></path>
+                    <path d="M13 11C13 11 13.5 10 14.5 10C15.5 10 16 11 16 11"></path>
                 </svg>
-                <h1 class="hidden md:block text-lg font-bold tracking-widest text-[#5E5A54]">機智的嗎哪生活</h1>
+                <h1 class="hidden sm:block text-sm font-bold tracking-widest text-[#59544D] font-serif">機智的嗎哪生活</h1>
             </div>
-            <div id="header-title" class="flex-1 text-center font-serif text-[#7E9B92] font-bold tracking-widest text-lg uppercase">HOME</div>
-            <div class="flex items-center gap-3">
-                <button onclick="window.openExportModal()" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#A68C76] text-white text-xs font-bold shadow-md tracking-wider mr-2">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
-                    <span>備份</span>
+            <div id="header-title" class="flex-1 text-center font-family-caveat text-xl text-[#94A698] font-bold tracking-widest uppercase truncate hand-font">HOME</div>
+            <div class="flex items-center gap-2">
+                <button onclick="window.openExportModal()" class="p-2 text-[#8C867D] hover:text-[#C2A695]">
+                    <svg class="w-5 h-5 icon-sketch" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                 </button>
-                <input type="date" id="date-picker" class="bg-[#F9F7F5] border border-[#EBE6DE] rounded-full px-3 py-1 text-base font-mono outline-none cursor-pointer text-[#5E5A54]" onchange="window.handleDateChange(this.value)">
+                <input type="date" id="date-picker" class="bg-[#F0EFEB] border-none rounded-md px-3 py-1 text-xs font-mono outline-none text-[#59544D] cursor-pointer" onchange="window.handleDateChange(this.value)">
             </div>
         </div>
     </header>
@@ -182,212 +197,186 @@
     <!-- 1. 首頁視圖 -->
     <div id="view-home" class="flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-5xl mx-auto flex flex-col">
         
-        <div class="flex justify-between items-center mb-8 fade-in">
-            <div class="flex items-center gap-3">
-                 <div class="w-12 h-12 rounded-2xl bg-white border border-[#EBE6DE] flex items-center justify-center shadow-sm text-[#A68C76]">
-                    <!-- 嗎哪圖示 SVG -->
-                    <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <circle cx="12" cy="7" r="3.5" fill="#FDFCF8" />
-                        <circle cx="7" cy="16" r="3.5" fill="#FDFCF8" />
-                        <circle cx="17" cy="16" r="3.5" fill="#FDFCF8" />
+        <div class="flex justify-between items-end mb-10 fade-in pt-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-xs text-[#C2A695] tracking-[0.2em] font-bold uppercase hand-font text-lg">Smart Manna Life</span>
+                <h1 class="text-3xl md:text-4xl font-serif font-bold text-[#59544D] leading-tight flex items-center gap-3">
+                    機智的嗎哪生活 
+                    <svg class="w-8 h-8 text-[#C2A695] icon-sketch" viewBox="0 0 24 24" stroke="currentColor">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
                     </svg>
-                 </div>
-                 <div class="flex flex-col">
-                     <h1 class="text-xl md:text-2xl font-bold tracking-widest text-[#5E5A54] leading-tight">機智的嗎哪生活</h1>
-                     <span class="text-[10px] text-[#A68C76] tracking-[0.2em] font-medium uppercase italic">Smart Manna Life</span>
-                 </div>
+                </h1>
             </div>
-            <div class="flex items-center gap-3">
-                <button onclick="window.openExportModal()" class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-[#A68C76] text-white text-xs font-bold shadow-sm">
-                    資料 / 備份
-                </button>
-                <div class="flex items-center bg-white rounded-xl px-3 py-2 border border-[#EBE6DE] shadow-sm">
-                     <input type="date" id="home-date-picker" class="bg-transparent border-none text-base font-medium focus:ring-0 outline-none cursor-pointer text-[#5E5A54] font-mono" onchange="window.handleDateChange(this.value)">
-                </div>
+            <div class="hidden sm:block">
+                <input type="date" id="home-date-picker" class="bg-white border border-[#E0DBD3] rounded-lg px-4 py-2 text-sm font-mono outline-none shadow-sm text-[#59544D]" onchange="window.handleDateChange(this.value)">
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 fade-in">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 fade-in">
             <!-- 今日嗎哪卡片 -->
-            <div class="md:col-span-1 flex flex-col bg-[#F9F7F5] p-6 rounded-2xl border border-[#EBE6DE] relative overflow-hidden group cursor-pointer hover:border-[#A68C76] transition-colors" onclick="window.switchMode('devotion')">
-                <div class="absolute -right-4 -top-4 text-9xl opacity-5 text-[#EBE6DE] group-hover:text-[#7E9B92] transition-colors pointer-events-none font-serif">M</div>
-                <div class="inline-block px-3 py-1 rounded-full bg-[#EBF2F0] text-[#7E9B92] text-[10px] font-bold tracking-widest mb-4 self-start uppercase">Today's Manna</div>
+            <div class="md:col-span-1 flex flex-col sketch-card p-8 relative overflow-hidden group cursor-pointer" onclick="window.switchMode('devotion')">
+                <!-- 裝飾用圖案 -->
+                <svg class="absolute -right-4 -top-4 w-32 h-32 text-[#E0DBD3] opacity-20 icon-sketch" viewBox="0 0 24 24" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    <path d="M2 12h20"></path>
+                </svg>
                 
-                <div id="home-manna-display" class="z-10 flex-1 flex flex-col justify-center py-4">
-                    <p class="serif-font text-xl md:text-2xl text-[#5E5A54] leading-relaxed mb-4" id="manna-text">載入中...</p>
-                    <p class="text-xs font-bold text-[#A68C76] tracking-widest" id="manna-ref"></p>
+                <div class="inline-block px-3 py-1 bg-[#F0EFEB] text-[#94A698] text-sm font-bold tracking-wider mb-6 self-start hand-font transform -rotate-2">Today's Manna</div>
+                
+                <div id="home-manna-display" class="z-10 flex-1 flex flex-col justify-center">
+                    <p class="serif-font text-2xl text-[#59544D] leading-relaxed mb-6 italic" id="manna-text">載入中...</p>
+                    <p class="text-sm font-bold text-[#C2A695] tracking-widest text-right" id="manna-ref"></p>
                 </div>
 
-                <div class="flex justify-between items-center mt-4 pt-4 border-t border-[#EBE6DE]/50 z-10">
-                     <span class="text-[10px] text-[#94908A] font-bold">點擊開始今日靈修</span>
-                     <span class="text-xs text-[#7E9B92] font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                        GO <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                    </span>
+                <div class="flex justify-between items-center mt-8 pt-6 border-t border-dashed border-[#E0DBD3] z-10">
+                     <span class="text-xs text-[#8C867D] font-bold uppercase tracking-wider hand-font">Start Devotion</span>
+                     <span class="text-sm text-[#94A698] font-bold group-hover:translate-x-1 transition-transform">GO ➔</span>
                 </div>
             </div>
 
             <!-- 靈修足跡月曆 -->
-            <div class="md:col-span-2 bg-white p-6 rounded-2xl border border-[#EBE6DE] relative overflow-hidden">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-[#5E5A54] flex items-center gap-2">❤️ 累積生命值 <div id="streak-badge" class="hidden items-center gap-1 px-2 py-0.5 rounded-full bg-[#FFF5EB] text-[#A68C76] text-[10px] border border-[#F2EBE5]">🔥 <span id="streak-count">0</span> 天</div></h3>
-                    <div class="flex items-center gap-2">
-                        <button onclick="window.changeCalendarMonth(-1)" class="p-1 text-[#94908A] hover:text-[#5E5A54]">◀</button>
-                        <div class="text-xs font-bold w-20 text-center" id="calendar-month-label"></div>
-                        <button onclick="window.changeCalendarMonth(1)" class="p-1 text-[#94908A] hover:text-[#5E5A54]">▶</button>
+            <div class="md:col-span-2 sketch-card p-8 bg-white">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-bold text-[#59544D] flex items-center gap-2 font-serif text-lg">
+                        生命足跡 <span id="streak-badge" class="hidden items-center px-3 py-1 rounded-full bg-[#F6E6E6] text-[#C2A695] text-xs ml-2 hand-font">🔥 <span id="streak-count" class="mx-1 font-sans font-bold">0</span> Days</span>
+                    </h3>
+                    <div class="flex items-center gap-4">
+                        <button onclick="window.changeCalendarMonth(-1)" class="w-8 h-8 flex items-center justify-center text-[#8C867D] hover:bg-[#F0EFEB] rounded-full transition-colors">◀</button>
+                        <div class="text-base font-bold w-24 text-center text-[#59544D] serif-font" id="calendar-month-label"></div>
+                        <button onclick="window.changeCalendarMonth(1)" class="w-8 h-8 flex items-center justify-center text-[#8C867D] hover:bg-[#F0EFEB] rounded-full transition-colors">▶</button>
                     </div>
                 </div>
-                <div class="grid grid-cols-7 gap-1 text-center text-[10px] text-[#A68C76] mb-2 font-bold uppercase">
+                <div class="grid grid-cols-7 gap-1 text-center text-xs text-[#C2A695] mb-3 font-bold uppercase tracking-widest hand-font">
                     <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
                 </div>
-                <div id="calendar-grid" class="grid grid-cols-7 gap-1"></div>
+                <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
             </div>
         </div>
 
-        <!-- 重新設計的選單佈局：上 2 下 3 -->
-        <div class="flex flex-col gap-4 fade-in">
-            <!-- 第一排：主要功能 (2欄) -->
-            <div class="grid grid-cols-2 gap-4">
-                <div onclick="window.switchMode('bible')" class="hover-card bg-white p-4 md:p-6 rounded-2xl border border-[#EBE6DE] cursor-pointer flex flex-col items-center justify-center gap-3 group h-36 md:h-56">
-                    <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-[#F2EBE5] flex items-center justify-center text-2xl md:text-3xl group-hover:bg-[#A68C76] group-hover:text-white transition-colors">📖</div>
-                    <h3 class="text-sm md:text-xl font-bold text-[#5E5A54]">人生攻略本</h3>
-                </div>
-                <div onclick="window.switchMode('devotion')" class="hover-card bg-white p-4 md:p-6 rounded-2xl border border-[#EBE6DE] cursor-pointer flex flex-col items-center justify-center gap-3 group h-36 md:h-56">
-                    <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-[#E0E8E4] flex items-center justify-center text-2xl md:text-3xl group-hover:bg-[#7E9B92] group-hover:text-white transition-colors">⚡</div>
-                    <h3 class="text-sm md:text-xl font-bold text-[#5E5A54]">每日充電站</h3>
-                </div>
+        <!-- 捷徑區域 (5 欄位：聖經、充電站、禱告、感恩、內心戲) -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-10 fade-in">
+            <!-- 1. 聖經閱讀 -->
+            <div onclick="window.switchMode('bible')" class="sketch-card p-6 cursor-pointer flex flex-col items-center gap-3 group hover:bg-[#FAF9F7]">
+                <svg class="w-8 h-8 text-[#8C867D] group-hover:text-[#59544D] icon-sketch transition-colors" viewBox="0 0 24 24" stroke="currentColor">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                </svg>
+                <h3 class="text-sm font-bold text-[#59544D] tracking-widest">聖經閱讀</h3>
             </div>
             
-            <!-- 第二排：日記功能 (3欄) -->
-            <div class="grid grid-cols-3 gap-3 md:gap-4">
-                <div onclick="window.switchMode('journal-prayer')" class="hover-card bg-white p-2 md:p-6 rounded-xl border border-[#EBE6DE] cursor-pointer flex flex-col items-center justify-center gap-2 group h-28 md:h-48">
-                    <span class="text-2xl md:text-4xl bg-[#FFF5EB] w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center">💬</span>
-                    <h4 class="text-xs md:text-lg font-bold text-[#5E5A54] text-center">跟神<br class="md:hidden">聊聊</h4>
-                </div>
-                <div onclick="window.switchMode('journal-gratitude')" class="hover-card bg-white p-2 md:p-6 rounded-xl border border-[#EBE6DE] cursor-pointer flex flex-col items-center justify-center gap-2 group h-28 md:h-48">
-                    <span class="text-2xl md:text-4xl bg-[#F0F7FF] w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center">💖</span>
-                    <h4 class="text-xs md:text-lg font-bold text-[#5E5A54] text-center">感恩<br class="md:hidden">日記</h4>
-                </div>
-                <div onclick="window.switchMode('journal-mood')" class="hover-card bg-white p-2 md:p-6 rounded-xl border border-[#EBE6DE] cursor-pointer flex flex-col items-center justify-center gap-2 group h-28 md:h-48">
-                    <span class="text-2xl md:text-4xl bg-[#FFF0F0] w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center">🎭</span>
-                    <h4 class="text-xs md:text-lg font-bold text-[#5E5A54] text-center">內心戲<br class="md:hidden">時間</h4>
-                </div>
+            <!-- 2. 每日充電站 (補回的區塊) -->
+            <div onclick="window.switchMode('devotion')" class="sketch-card p-6 cursor-pointer flex flex-col items-center gap-3 group hover:bg-[#FAF9F7]">
+                <svg class="w-8 h-8 text-[#8C867D] group-hover:text-[#C2A695] icon-sketch transition-colors" viewBox="0 0 24 24" stroke="currentColor">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                </svg>
+                <h3 class="text-sm font-bold text-[#59544D] tracking-widest">每日充電站</h3>
+            </div>
+
+            <!-- 3. 跟神聊聊 -->
+            <div onclick="window.switchMode('journal-prayer')" class="sketch-card p-6 cursor-pointer flex flex-col items-center gap-3 group hover:bg-[#FAF9F7]">
+                <svg class="w-8 h-8 text-[#8C867D] group-hover:text-[#94A698] icon-sketch transition-colors" viewBox="0 0 24 24" stroke="currentColor">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                </svg>
+                <h3 class="text-sm font-bold text-[#59544D] tracking-widest">跟神聊聊</h3>
+            </div>
+
+            <!-- 4. 感恩日記 -->
+            <div onclick="window.switchMode('journal-gratitude')" class="sketch-card p-6 cursor-pointer flex flex-col items-center gap-3 group hover:bg-[#FAF9F7]">
+                <svg class="w-8 h-8 text-[#8C867D] group-hover:text-[#D6C0BE] icon-sketch transition-colors" viewBox="0 0 24 24" stroke="currentColor">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                <h3 class="text-sm font-bold text-[#59544D] tracking-widest">感恩日記</h3>
+            </div>
+
+            <!-- 5. 內心戲 -->
+            <div onclick="window.switchMode('journal-mood')" class="sketch-card p-6 cursor-pointer flex flex-col items-center gap-3 group hover:bg-[#FAF9F7]">
+                <svg class="w-8 h-8 text-[#8C867D] group-hover:text-[#C2A695] icon-sketch transition-colors" viewBox="0 0 24 24" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                    <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                    <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                </svg>
+                <h3 class="text-sm font-bold text-[#59544D] tracking-widest">內心戲</h3>
             </div>
         </div>
 
-        <!-- 頁尾：社群連結與版權宣告 -->
-        <footer class="mt-16 mb-8 flex flex-col items-center gap-6 fade-in">
-            <div class="flex items-center gap-5">
-                <a href="https://www.facebook.com/profile.php?id=100068500932557" target="_blank" class="text-[#94908A] hover:text-[#1877F2] transition-colors p-2 bg-white rounded-full border border-[#EBE6DE] shadow-sm hover:scale-110 transform duration-200"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
-                <a href="https://www.instagram.com/forever.believe.in.jesus/" target="_blank" class="text-[#94908A] hover:text-[#E4405F] transition-colors p-2 bg-white rounded-full border border-[#EBE6DE] shadow-sm hover:scale-110 transform duration-200"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.069-4.85.069-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
-                <a href="https://line.me/R/ti/p/@469cjlho" target="_blank" class="text-[#94908A] hover:text-[#00C300] transition-colors p-2 bg-white rounded-full border border-[#EBE6DE] shadow-sm hover:scale-110 transform duration-200"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.346 5.86c-2.003-2.136-5.115-3.32-8.523-3.32C4.853 2.54 0 6.643 0 11.679c0 4.55 3.96 8.358 9.385 8.988.366.08.865.243 1.006.593.11.275.072.695.034 1.01l-.142.866c-.046.26-.216 1.022.895.536 4.39-2.316 6.134-4.22 8.35-6.84 3.12-3.696 2.37-8.127-.182-10.972z"/></svg></a>
-                <a href="mailto:newthingsinthelittlelight@gmail.com" class="text-[#94908A] hover:text-[#A68C76] transition-colors p-2 bg-white rounded-full border border-[#EBE6DE] shadow-sm hover:scale-110 transform duration-200"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></a>
+        <footer class="mt-auto py-10 text-center fade-in border-t border-dashed border-[#E0DBD3] w-2/3 mx-auto">
+            <div class="flex justify-center gap-6 mb-4">
+                <a href="#" class="text-[#8C867D] hover:text-[#C2A695] transition-colors"><svg class="w-5 h-5 icon-sketch" viewBox="0 0 24 24" stroke="currentColor"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+                <a href="#" class="text-[#8C867D] hover:text-[#94A698] transition-colors"><svg class="w-5 h-5 icon-sketch" viewBox="0 0 24 24" stroke="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
             </div>
-            <div class="text-[10px] md:text-xs text-[#94908A] font-bold tracking-widest uppercase">
-                版權宣告 耶穌加油站 x 微光新事
-            </div>
+            <p class="text-[10px] text-[#C2A695] font-bold tracking-widest uppercase hand-font text-lg">耶穌加油站 x 微光新事 © 2024</p>
         </footer>
     </div>
 
-    <!-- 2. 工作區視圖 (單欄分頁模式) -->
-    <main id="view-workspace" class="hidden flex-1 w-full max-w-5xl mx-auto flex flex-col h-full overflow-hidden bg-white">
+    <!-- 2. 工作區視圖 -->
+    <main id="view-workspace" class="hidden flex-1 w-full max-w-7xl mx-auto flex flex-col h-full overflow-hidden bg-[#F9F8F4]">
         
         <!-- 全域分頁切換 -->
-        <div id="workspace-tabs" class="flex border-b border-[#EBE6DE] shrink-0 bg-white z-20 shadow-sm">
-            <button id="tab-reader" class="workspace-tab-btn active" onclick="window.switchWorkspaceTab('reader')">
-                <span class="text-xl mr-1" id="tab-reader-icon">📖</span> <span id="tab-reader-text">閱讀經文</span>
+        <div id="workspace-tabs" class="flex border-b border-[#E0DBD3] shrink-0 bg-[#F9F8F4] z-20 px-4 pt-2 gap-2">
+            <button id="tab-reader" class="workspace-tab-btn active rounded-t-xl" onclick="window.switchWorkspaceTab('reader')">
+                <span class="text-xl mr-1 hand-font">Read</span> <span id="tab-reader-text">閱讀經文</span>
             </button>
-            <button id="tab-journal" class="workspace-tab-btn" onclick="window.switchWorkspaceTab('journal')">
-                <span class="text-xl mr-1" id="tab-journal-icon">✍🏻</span> <span id="tab-journal-text">靈修筆記</span>
+            <button id="tab-journal" class="workspace-tab-btn rounded-t-xl" onclick="window.switchWorkspaceTab('journal')">
+                <span class="text-xl mr-1 hand-font">Write</span> <span id="tab-journal-text">靈修筆記</span>
             </button>
         </div>
 
-        <!-- 內容容器 -->
-        <div class="flex-1 flex flex-col overflow-hidden relative">
+        <!-- 雙欄內容容器 -->
+        <div class="flex-1 flex overflow-hidden relative p-0 md:p-4 gap-4">
             
             <!-- 閱讀器區塊 -->
-            <section id="section-reader" class="flex-1 flex flex-col bg-white overflow-hidden absolute inset-0 z-10 transition-opacity duration-300">
+            <section id="section-reader" class="w-full lg:w-1/2 flex flex-col bg-white border border-[#E0DBD3] rounded-none md:rounded-2xl transition-all duration-300 absolute lg:relative inset-0 z-10 lg:z-auto shadow-sm">
                 
-                <!-- 四軌切換器 (僅 Devotion 模式顯示，強制置頂) -->
-                <div id="devotion-tabs" class="hidden grid grid-cols-4 gap-2 p-3 bg-white border-b border-[#EBE6DE] shrink-0 z-20 relative">
-                    <!-- JS 生成 -->
+                <!-- 四軌切換器 (Devotion Mode) -->
+                <div id="devotion-tabs" class="hidden grid grid-cols-4 gap-3 p-4 bg-[#FAF9F7] border-b border-dashed border-[#E0DBD3] shrink-0 rounded-t-2xl"></div>
+                
+                <!-- 書卷庫 (Bible Mode) -->
+                <div id="view-bible-books" class="hidden flex-col h-full p-6 overflow-y-auto">
+                     <div class="flex gap-4 mb-6 shrink-0">
+                        <button onclick="window.renderMainBooks('old')" id="btn-old" class="flex-1 py-3 text-sm font-bold rounded-lg border-2 border-[#C2A695] bg-[#C2A695] text-white transition-all transform hover:-translate-y-1">舊約 Old Testament</button>
+                        <button onclick="window.renderMainBooks('new')" id="btn-new" class="flex-1 py-3 text-sm font-bold rounded-lg border-2 border-[#C2A695] bg-white text-[#C2A695] transition-all transform hover:-translate-y-1">新約 New Testament</button>
+                    </div>
+                    <div id="main-book-list" class="grid grid-cols-2 sm:grid-cols-4 gap-3 content-start pb-10"></div>
                 </div>
 
-                <!-- 標題與搜尋欄 (移到這裡，確保在內容上方) -->
-                <div class="px-4 py-3 border-b flex justify-between items-center bg-white shrink-0" id="reader-header">
-                    <!-- 標題區 (整合按鈕與標題，解決擠壓問題) -->
-                    <div class="flex items-center gap-3 overflow-hidden flex-1" id="reader-title-wrapper">
-                        <!-- 切換卷章按鈕 (Bible 模式顯示) -->
-                        <button id="btn-switch-chapter" onclick="window.goBackToMainBooks()" class="hidden shrink-0 px-3 py-1.5 rounded-lg border border-[#A68C76] text-[#A68C76] text-xs font-bold hover:bg-[#A68C76] hover:text-white transition-colors">
-                            📚 目錄
-                        </button>
-                        
-                        <div class="min-w-0 flex-1">
-                            <span class="text-[10px] font-bold text-[#7E9B92] uppercase tracking-widest block" id="reader-tag">SCRIPTURE</span>
-                            <h2 id="reader-title" class="text-lg text-[#5E5A54] font-bold leading-tight truncate">請選擇經文</h2>
-                        </div>
-                    </div>
-                    
-                    <!-- 功能按鈕區 (搜尋 & 複製) -->
-                    <div class="flex items-center gap-2 shrink-0">
-                        <!-- 搜尋欄 (在 Devotion 模式下會被隱藏) -->
-                        <div class="relative group" id="reader-search-container">
-                            <input type="text" id="inline-search" placeholder="系統啟動中..." disabled class="pl-3 pr-8 py-1 rounded-full bg-[#F9F7F5] border-none text-base focus:ring-1 focus:ring-[#7E9B92] w-24 sm:w-32 transition-all focus:w-48 outline-none text-[#5E5A54] disabled:opacity-50 disabled:cursor-not-allowed" onkeyup="if(event.key === 'Enter') window.performSearch()">
-                            <button onclick="window.performSearch()" class="absolute right-2 top-1.5 text-[#94908A] hover:text-[#7E9B92]"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></button>
-                        </div>
-                        
-                        <!-- 複製按鈕 -->
-                        <button id="btn-copy-verses" onclick="window.copySelectedVerses()" class="p-1.5 rounded-full bg-[#F9F7F5] text-[#94908A] hover:bg-[#A68C76] hover:text-white transition-colors border border-[#EBE6DE]" title="複製選取經文">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- 書卷庫 (Bible 模式首頁) - 主畫面顯示 (修改 class: h-full -> flex-1) -->
-                <div id="view-bible-books" class="hidden flex-col flex-1 p-4 overflow-y-auto">
-                     <div class="flex gap-2 mb-4 shrink-0">
-                        <button onclick="window.renderMainBooks('old')" id="btn-old" class="flex-1 py-2 text-xs font-bold rounded-lg bg-[#A68C76] text-white">舊約</button>
-                        <button onclick="window.renderMainBooks('new')" id="btn-new" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white border text-[#A68C76]">新約</button>
-                    </div>
-                    <div id="main-book-list" class="flex-1 grid grid-cols-3 sm:grid-cols-4 gap-3 content-start pb-20"></div>
-                </div>
-
-                <!-- 章節選擇 (Bible 模式) - 主畫面顯示 (修改 class: h-full -> flex-1) -->
-                <div id="view-bible-chapters" class="hidden flex-col flex-1 p-4 overflow-y-auto">
-                    <button onclick="window.goBackToMainBooks()" class="mb-4 text-xs font-bold text-[#94908A] flex items-center gap-1">
-                        <span class="text-lg">◀</span> 返回書卷目錄
+                <!-- 章節選擇 (Bible Mode) -->
+                <div id="view-bible-chapters" class="hidden flex-col h-full p-6 overflow-y-auto">
+                    <button onclick="window.goBackToMainBooks()" class="mb-6 text-xs font-bold text-[#8C867D] flex items-center gap-1 hover:text-[#C2A695]">
+                        <span class="text-lg">◀</span> 返回目錄
                     </button>
-                    <h3 id="main-chapter-title" class="text-xl font-bold text-[#5E5A54] mb-6 border-b pb-2"></h3>
-                    <div id="main-chapter-grid" class="grid grid-cols-5 sm:grid-cols-6 gap-3 content-start pb-20"></div>
+                    <h3 id="main-chapter-title" class="text-3xl font-serif font-bold text-[#59544D] mb-8 border-b-2 border-[#F0EFEB] pb-4"></h3>
+                    <div id="main-chapter-grid" class="grid grid-cols-5 sm:grid-cols-6 gap-3 pb-10"></div>
                 </div>
 
-                <!-- 側邊欄覆蓋層 (Bible模式用，作為獨立選單) -->
-                <div id="bible-sidebar-overlay" class="hidden absolute inset-0 bg-white z-30 flex flex-col">
-                    <div class="p-4 border-b flex justify-between items-center bg-[#FAF9F6]">
-                        <h3 class="font-bold text-[#5E5A54]">選擇書卷</h3>
-                        <button onclick="window.toggleBibleSidebar()" class="text-2xl text-[#94908A]">&times;</button>
-                    </div>
-                    <div id="sidebar-bible" class="flex-1 flex flex-col overflow-hidden">
-                        <div id="sidebar-book-list-container" class="flex flex-col h-full p-4">
-                            <div class="flex gap-2 mb-4 shrink-0">
-                                <button onclick="window.renderSidebarBooks('old')" id="btn-old-sidebar" class="flex-1 py-2 text-xs font-bold rounded-lg bg-[#A68C76] text-white">舊約</button>
-                                <button onclick="window.renderSidebarBooks('new')" id="btn-new-sidebar" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white border text-[#A68C76]">新約</button>
+                <!-- 經文顯示區 -->
+                <div id="bible-container" class="flex-1 flex flex-col overflow-hidden rounded-2xl">
+                    <div class="px-5 py-4 border-b border-[#E0DBD3] flex justify-between items-center bg-[#FAF9F7] shrink-0">
+                        <div class="flex items-center gap-3 flex-1 min-w-0">
+                            <button id="btn-switch-chapter" onclick="window.goBackToMainBooks()" class="hidden shrink-0 w-8 h-8 rounded-full border border-[#C2A695] text-[#C2A695] flex items-center justify-center text-xs hover:bg-[#C2A695] hover:text-white transition-colors">📚</button>
+                            <div class="min-w-0">
+                                <span class="text-[12px] font-bold text-[#94A698] uppercase tracking-widest block hand-font" id="reader-tag">Scripture</span>
+                                <h2 id="reader-title" class="text-lg text-[#59544D] font-bold truncate font-serif">請選擇經文</h2>
                             </div>
-                            <div id="sidebar-book-list" class="flex-1 overflow-y-auto pr-2 grid grid-cols-2 gap-2 content-start no-scrollbar pb-20"></div>
                         </div>
-                        <div id="sidebar-chapter-list-container" class="hidden flex-col h-full p-4">
-                            <button onclick="window.backToSidebarBooks()" class="mb-4 text-xs font-bold text-[#94908A] flex items-center">◀ 返回目錄</button>
-                            <h3 id="sidebar-chapter-title" class="text-lg font-bold text-[#5E5A54] mb-4 border-b pb-2"></h3>
-                            <div id="sidebar-chapter-grid" class="flex-1 overflow-y-auto pr-2 grid grid-cols-5 gap-3 content-start no-scrollbar pb-20"></div>
+                        <div class="flex items-center gap-2">
+                            <div class="relative hidden sm:block" id="search-box">
+                                <input type="text" id="inline-search" placeholder="Search..." class="pl-3 pr-8 py-1.5 rounded-lg bg-white text-xs w-28 focus:w-48 transition-all outline-none border border-[#E0DBD3] focus:border-[#94A698]">
+                                <button onclick="window.performSearch()" class="absolute right-2 top-2 text-[#8C867D]"><svg class="w-4 h-4 icon-sketch" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
+                            </div>
+                            <button id="btn-copy-verses" onclick="window.copySelectedVerses()" class="w-9 h-9 flex items-center justify-center rounded-lg bg-white text-[#8C867D] border border-[#E0DBD3] hover:border-[#C2A695] hover:text-[#C2A695] transition-colors shadow-sm">
+                                <svg class="w-5 h-5 icon-sketch" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                            </button>
                         </div>
                     </div>
+                    <div id="bible-content" class="flex-1 overflow-y-auto p-6 md:p-10 bible-text text-[#4A4A4A] bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')]"></div>
                 </div>
-
-                <div id="bible-content" class="flex-1 overflow-y-auto p-5 md:p-8 bible-text text-[#5E5A54] w-full pb-24"></div>
             </section>
 
-            <!-- 筆記區塊 (預設隱藏) -->
-            <section id="section-journal" class="flex-1 flex flex-col bg-white overflow-hidden absolute inset-0 z-0 opacity-0 pointer-events-none transition-opacity duration-300">
-                <div class="bg-[#FAF9F6] px-6 py-3 border-b flex gap-3 overflow-x-auto no-scrollbar items-center shrink-0" id="active-mood-list">
+            <!-- 筆記區塊 -->
+            <section id="section-journal" class="w-full lg:w-1/2 flex flex-col bg-white border border-[#E0DBD3] rounded-none md:rounded-2xl transition-all duration-300 absolute lg:relative inset-0 opacity-0 lg:opacity-100 pointer-events-none lg:pointer-events-auto z-0 lg:z-auto shadow-sm">
+                <div class="bg-[#FAF9F7] px-6 py-4 border-b border-[#E0DBD3] flex gap-3 overflow-x-auto no-scrollbar items-center shrink-0 rounded-t-2xl">
                     <button class="mood-sticker" onclick="window.selectMood(this, '☀️')">☀️</button>
                     <button class="mood-sticker" onclick="window.selectMood(this, '☁️')">☁️</button>
                     <button class="mood-sticker" onclick="window.selectMood(this, '🌧️')">🌧️</button>
@@ -395,162 +384,116 @@
                     <button class="mood-sticker" onclick="window.selectMood(this, '🌱')">🌱</button>
                     <input type="hidden" id="note-mood">
                 </div>
-                <div class="flex-1 overflow-y-auto p-6 space-y-6 pb-24">
-                    
-                    <!-- 靈修筆記欄位 (Devotion Mode) -->
-                    <div id="journal-devotion-fields" class="space-y-6">
+                <div class="flex-1 overflow-y-auto p-8 space-y-10 pb-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+                    <!-- 靈修筆記 (Devotion) -->
+                    <div id="journal-devotion-fields" class="space-y-8">
                         <div>
-                            <label class="block text-xs font-bold text-[#A68C76] mb-2 uppercase tracking-widest">Rhema / 重點金句</label>
-                            <textarea id="note-rhema" placeholder="今天觸動你的話..." class="w-full bg-transparent border-b border-dashed border-[#EBE6DE] focus:border-[#A68C76] outline-none min-h-[80px] resize-none p-1 text-lg"></textarea>
+                            <label class="block text-sm font-bold text-[#C2A695] mb-2 uppercase tracking-widest hand-font">Rhema / 重點金句</label>
+                            <textarea id="note-rhema" placeholder="今天觸動你的話..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#C2A695] outline-none min-h-[80px] resize-none p-2 text-lg leading-relaxed"></textarea>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-[#7E9B92] mb-2 uppercase tracking-widest">Reflection / 心得筆記</label>
-                            <textarea id="note-reflection" placeholder="你有什麼看見或體會？..." class="w-full bg-transparent border-b border-dashed border-[#EBE6DE] focus:border-[#7E9B92] outline-none min-h-[150px] resize-none p-1 text-lg"></textarea>
+                            <label class="block text-sm font-bold text-[#94A698] mb-2 uppercase tracking-widest hand-font">Reflection / 心得筆記</label>
+                            <textarea id="note-reflection" placeholder="你的看見或體會..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#94A698] outline-none min-h-[150px] resize-none p-2 text-lg leading-relaxed"></textarea>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-[#A68C76] mb-2 uppercase tracking-widest">Prayer / 禱告事項</label>
-                            <textarea id="note-prayer-devotion" placeholder="跟神聊聊你的需要..." class="w-full bg-transparent border-b border-dashed border-[#EBE6DE] focus:border-[#A68C76] outline-none min-h-[100px] resize-none p-1 text-lg"></textarea>
-                        </div>
-                        <!-- 匯出按鈕 -->
-                        <div class="pt-6 mt-2">
-                            <button onclick="window.backupData()" class="w-full py-3 rounded-xl bg-[#F9F7F5] border border-[#EBE6DE] text-[#94908A] text-xs font-bold hover:bg-[#A68C76] hover:text-white hover:border-[#A68C76] transition-all flex items-center justify-center gap-2 group">
-                                <span class="group-hover:scale-110 transition-transform">💾</span> 
-                                <span>寫完了嗎？記得匯出備份喔！</span>
-                            </button>
+                            <label class="block text-sm font-bold text-[#C2A695] mb-2 uppercase tracking-widest hand-font">Prayer / 禱告事項</label>
+                            <textarea id="note-prayer-devotion" placeholder="跟神聊聊..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#C2A695] outline-none min-h-[100px] resize-none p-2 text-lg leading-relaxed"></textarea>
                         </div>
                     </div>
                     
-                    <!-- 其他筆記欄位... -->
-                    <!-- 跟神聊聊欄位 (Chat Mode - 鹹魚版) -->
-                    <div id="journal-prayer-fields" class="space-y-6 hidden">
+                    <!-- 跟神聊聊 (Prayer) -->
+                    <div id="journal-prayer-fields" class="space-y-8 hidden">
                         <div>
-                            <label class="block text-xs font-bold text-[#A68C76] mb-2 uppercase tracking-widest">🎯 許願池 / 禱告事項</label>
-                            <textarea id="note-topic" placeholder="想要什麼？大膽跟神求..." class="w-full bg-transparent border-b border-dashed border-[#EBE6DE] focus:border-[#A68C76] outline-none min-h-[60px] resize-none p-1 text-lg"></textarea>
+                            <label class="block text-sm font-bold text-[#C2A695] mb-2 uppercase tracking-widest hand-font">🎯 Wish / 許願池</label>
+                            <textarea id="note-topic" placeholder="想要什麼？大膽跟神求..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#C2A695] outline-none min-h-[60px] resize-none p-2 text-lg leading-relaxed"></textarea>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-[#7E9B92] mb-2 uppercase tracking-widest">💬 鹹魚碎碎唸 / 禱告內容</label>
-                            <textarea id="note-content" placeholder="把心裡話都倒出來吧 (點擊經文可加入)..." class="w-full bg-transparent border-b border-dashed border-[#EBE6DE] focus:border-[#7E9B92] outline-none min-h-[150px] resize-none p-1 text-lg"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-[#A68C76] mb-2 uppercase tracking-widest">🐟 鹹魚翻身觀察 / 追蹤</label>
-                            <textarea id="note-tracking" placeholder="坐等神蹟，紀錄變化..." class="w-full bg-transparent border-b border-dashed border-[#EBE6DE] focus:border-[#A68C76] outline-none min-h-[80px] resize-none p-1 text-lg"></textarea>
-                        </div>
-                        <!-- 匯出按鈕 -->
-                        <div class="pt-6 mt-2">
-                            <button onclick="window.backupData()" class="w-full py-3 rounded-xl bg-[#F9F7F5] border border-[#EBE6DE] text-[#94908A] text-xs font-bold hover:bg-[#A68C76] hover:text-white hover:border-[#A68C76] transition-all flex items-center justify-center gap-2 group">
-                                <span class="group-hover:scale-110 transition-transform">💾</span> 
-                                <span>聊完了嗎？記得匯出備份喔！</span>
-                            </button>
+                            <label class="block text-sm font-bold text-[#94A698] mb-2 uppercase tracking-widest hand-font">💬 Murmur / 碎碎唸</label>
+                            <textarea id="note-content" placeholder="把心裡話都倒出來吧..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#94A698] outline-none min-h-[200px] resize-none p-2 text-lg leading-relaxed"></textarea>
                         </div>
                     </div>
 
-                    <!-- 感恩日記欄位 (Gratitude Mode) -->
-                    <div id="journal-gratitude-fields" class="space-y-6 hidden">
+                    <!-- 感恩日記 (Gratitude) -->
+                    <div id="journal-gratitude-fields" class="space-y-8 hidden">
                         <div>
-                            <label class="block text-xs font-bold text-[#A68C76] mb-2 uppercase tracking-widest">💖 感恩事項</label>
-                            <textarea id="note-thanks" placeholder="今天發生了什麼好事？..." class="w-full bg-transparent border-b border-dashed border-[#EBE6DE] focus:border-[#A68C76] outline-none min-h-[80px] resize-none p-1 text-lg"></textarea>
+                            <label class="block text-sm font-bold text-[#C2A695] mb-2 uppercase tracking-widest hand-font">💖 Gratitude / 感恩事項</label>
+                            <textarea id="note-thanks" placeholder="今天發生了什麼好事？..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#C2A695] outline-none min-h-[120px] resize-none p-2 text-lg leading-relaxed"></textarea>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-[#7E9B92] mb-2 uppercase tracking-widest">✨ 恩典記號</label>
-                            <textarea id="note-grace" placeholder="哪裡看見神的作為？..." class="w-full bg-transparent border-b border-dashed border-[#EBE6DE] focus:border-[#7E9B92] outline-none min-h-[80px] resize-none p-1 text-lg"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-[#A68C76] mb-2 uppercase tracking-widest">📝 生活隨筆</label>
-                            <textarea id="note-diary" placeholder="隨手記下此刻的心情..." class="w-full bg-transparent border-b border-dashed border-[#EBE6DE] focus:border-[#A68C76] outline-none min-h-[100px] resize-none p-1 text-lg"></textarea>
-                        </div>
-                        <!-- 匯出按鈕 -->
-                        <div class="pt-6 mt-2">
-                            <button onclick="window.backupData()" class="w-full py-3 rounded-xl bg-[#F9F7F5] border border-[#EBE6DE] text-[#94908A] text-xs font-bold hover:bg-[#A68C76] hover:text-white hover:border-[#A68C76] transition-all flex items-center justify-center gap-2 group">
-                                <span class="group-hover:scale-110 transition-transform">💾</span> 
-                                <span>記錄完了嗎？記得匯出備份喔！</span>
-                            </button>
+                            <label class="block text-sm font-bold text-[#94A698] mb-2 uppercase tracking-widest hand-font">✨ Grace / 恩典記號</label>
+                            <textarea id="note-grace" placeholder="哪裡看見神的作為？..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#94A698] outline-none min-h-[120px] resize-none p-2 text-lg leading-relaxed"></textarea>
                         </div>
                     </div>
 
-                    <!-- 內心戲時間欄位 (Mood Mode - 情緒日記) -->
-                    <div id="journal-mood-fields" class="space-y-6 hidden">
-                         <div class="p-3 bg-[#F9F7F5] rounded-xl border border-[#EBE6DE]">
-                            <label class="block text-xs font-bold text-[#5E5A54] mb-2">🎬 發生了什麼事？</label>
-                            <textarea id="note-mood-event" placeholder="客觀記錄事件..." class="w-full bg-white border border-[#EBE6DE] rounded-lg p-2 text-sm outline-none resize-none h-20 focus:border-[#A68C76]"></textarea>
-                            <div class="mt-2 flex items-center gap-2">
-                                <label class="text-xs font-bold text-[#94908A]">🏷️ 情緒標籤:</label>
-                                <input type="text" id="note-mood-tag" placeholder="如: 委屈、焦慮" class="bg-white border border-[#EBE6DE] rounded-lg px-2 py-1 text-sm outline-none flex-1 focus:border-[#A68C76]">
+                    <!-- 內心戲 (Mood) -->
+                    <div id="journal-mood-fields" class="space-y-8 hidden">
+                        <div class="p-5 bg-[#FAF9F7] rounded-3xl border border-dashed border-[#E0DBD3]">
+                            <label class="block text-sm font-bold text-[#59544D] mb-3 uppercase hand-font">🎬 Event / 發生了什麼事？</label>
+                            <textarea id="note-mood-event" placeholder="記錄事件與感受..." class="w-full bg-white border border-[#E0DBD3] rounded-xl p-4 text-base outline-none resize-none h-28 focus:border-[#C2A695] leading-relaxed"></textarea>
+                        </div>
+                        <div class="grid grid-cols-1 gap-8">
+                            <div>
+                                <label class="block text-sm font-bold text-[#C2A695] mb-2 hand-font">🤥 Lie / 我相信了什麼謊言？</label>
+                                <textarea id="note-mood-lie" class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#C2A695] outline-none min-h-[50px] resize-none p-2 text-lg"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-[#94A698] mb-2 hand-font">👓 Truth / 神怎麼看這件事？</label>
+                                <textarea id="note-mood-god-view" class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#94A698] outline-none min-h-[50px] resize-none p-2 text-lg"></textarea>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="grid grid-cols-1 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-[#A68C76] mb-1">🤥 我是否相信了什麼謊言？</label>
-                                <textarea id="note-mood-lie" placeholder="ex: 神不愛我、我不夠好..." class="w-full bg-transparent border-b border-dashed border-[#EBE6DE] focus:border-[#A68C76] outline-none min-h-[50px] resize-none p-1 text-base"></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-[#7E9B92] mb-1">👓 神怎麼看這件事？</label>
-                                <textarea id="note-mood-god-view" placeholder="在禱告中領受神的眼光..." class="w-full bg-transparent border-b border-dashed border-[#EBE6DE] focus:border-[#7E9B92] outline-none min-h-[50px] resize-none p-1 text-base"></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-[#A68C76] mb-1">💡 我現在怎麼看？</label>
-                                <textarea id="note-mood-my-view" placeholder="對齊真理後的新看見..." class="w-full bg-transparent border-b border-dashed border-[#EBE6DE] focus:border-[#A68C76] outline-none min-h-[50px] resize-none p-1 text-base"></textarea>
-                            </div>
-                        </div>
-
-                        <div class="pt-2 border-t border-[#EBE6DE]/50">
-                             <label class="block text-xs font-bold text-[#5E5A54] mb-2">🙏 禱告 & 🎁 領受</label>
-                             <textarea id="note-mood-prayer" placeholder="最後的交託與領受..." class="w-full bg-transparent border border-[#EBE6DE] rounded-xl p-3 focus:border-[#A68C76] outline-none min-h-[80px] resize-none text-base"></textarea>
-                        </div>
-                        
-                        <div class="pt-4 mt-2">
-                            <button onclick="window.backupData()" class="w-full py-3 rounded-xl bg-[#F9F7F5] border border-[#EBE6DE] text-[#94908A] text-xs font-bold hover:bg-[#A68C76] hover:text-white hover:border-[#A68C76] transition-all flex items-center justify-center gap-2 group">
-                                <span class="group-hover:scale-110 transition-transform">💾</span> 
-                                <span>整理好了嗎？記得匯出備份喔！</span>
-                            </button>
-                        </div>
+                    <!-- 底部儲存提示 -->
+                    <div class="pt-8">
+                        <button onclick="window.backupData()" class="w-full py-4 rounded-xl bg-[#FAF9F7] border border-[#E0DBD3] text-[#8C867D] text-sm font-bold hover:bg-[#C2A695] hover:text-white transition-all flex items-center justify-center gap-3 group shadow-sm">
+                            <span class="group-hover:scale-110 transition-transform">💾</span> 
+                            <span>Save & Backup</span>
+                        </button>
                     </div>
                 </div>
             </section>
         </div>
     </main>
 
-    <!-- Data Modal -->
-    <div id="export-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden" onclick="if(event.target===this)window.closeExportModal()">
-        <div class="bg-white w-full max-w-md p-6 rounded-2xl shadow-xl m-4" onclick="event.stopPropagation()">
-            <h3 class="text-lg font-bold mb-4">資料管理</h3>
-            <div class="space-y-4">
-                <div class="p-4 bg-[#F9F7F5] rounded-xl text-center mb-2">
-                    <p class="text-xs text-[#94908A]">您的靈修筆記儲存在瀏覽器中。<br>建議定期備份以免遺失。</p>
-                </div>
-                <div class="flex gap-3">
-                     <button onclick="window.backupData()" class="flex-1 p-4 rounded-xl border border-[#EBE6DE] hover:border-[#A68C76] bg-white transition-all text-sm font-bold text-[#5E5A54] flex flex-col items-center gap-2">
-                        <span class="text-2xl">💾</span>
-                        <span>下載備份</span>
-                     </button>
-                     <button onclick="document.getElementById('restore-input').click()" class="flex-1 p-4 rounded-xl border border-[#EBE6DE] hover:border-[#A68C76] bg-white transition-all text-sm font-bold text-[#5E5A54] flex flex-col items-center gap-2">
-                        <span class="text-2xl">🔄</span>
-                        <span>還原資料</span>
-                     </button>
-                     <input type="file" id="restore-input" class="hidden" accept=".json" onchange="window.restoreData(this)">
-                </div>
+    <!-- Modal: 匯出/匯入 -->
+    <div id="export-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-[#59544D]/20 backdrop-blur-sm hidden" onclick="if(event.target===this)window.closeExportModal()">
+        <div class="bg-[#FFFEFA] w-full max-w-sm p-8 rounded-[40px] shadow-2xl m-4 border border-[#E0DBD3]" onclick="event.stopPropagation()">
+            <h3 class="text-2xl font-bold mb-3 font-serif text-[#59544D] text-center">Data Manager</h3>
+            <p class="text-sm text-[#8C867D] mb-8 text-center">筆記儲存在瀏覽器中，記得定期備份。</p>
+            
+            <div class="grid grid-cols-1 gap-4">
+                 <button onclick="window.backupData()" class="w-full py-4 rounded-2xl bg-[#C2A695] text-white hover:bg-[#B09280] transition-all text-sm font-bold flex items-center justify-center gap-3 shadow-md">
+                    <svg class="w-5 h-5 icon-sketch" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                    下載備份 (.json)
+                 </button>
+                 <button onclick="document.getElementById('restore-input').click()" class="w-full py-4 rounded-2xl border-2 border-[#E0DBD3] hover:border-[#94A698] hover:text-[#94A698] transition-all text-sm font-bold text-[#8C867D] flex items-center justify-center gap-3">
+                    <svg class="w-5 h-5 icon-sketch" stroke="currentColor" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                    還原資料
+                 </button>
+                 <input type="file" id="restore-input" class="hidden" accept=".json" onchange="window.restoreData(this)">
             </div>
-            <button onclick="window.closeExportModal()" class="mt-6 text-xs text-[#94908A] underline w-full text-center">關閉</button>
+            <button onclick="window.closeExportModal()" class="mt-8 text-xs text-[#C2A695] font-bold w-full text-center hover:underline uppercase tracking-widest">Close</button>
         </div>
     </div>
 
     <script>
-        // Constants & Global Variables
+        // --- 設定 ---
         const REMOTE_DB_URL = "https://raw.githubusercontent.com/annelin0321/bible-zh/main/bible_complete.db";
         let sqlDb = null, sqlDbLoaded = false, SQL = null, els = {};
-        let isDbLoading = false; 
+        // 增加 dbTable 和 dbCols 用於動態偵測
+        let dbTable = "verses";
+        let dbCols = { book: "book", chapter: "chapter", verse: "verse", text: "text" };
+        
         let currentMode = 'home';
         let calendarDate = new Date();
-        let currentFontSize = 18;
         let currentDailyPlan = []; 
 
         const mannaVerses = [
             { t: "「敬畏耶和華是智慧的開端。」", r: "— 箴言 9:10" },
             { t: "「耶和華是我的牧者，我必不致缺乏。」", r: "— 詩篇 23:1" },
-            { t: "「應當一無掛慮，只要凡事藉著禱告、祈求，和感謝，將你們所要的告訴神。」", r: "— 腓立比書 4:6" },
-            { t: "「神就是愛；住在愛裡面的，就住在神裡面。」", r: "— 約翰一書 4:16" },
             { t: "「喜樂的心乃是良藥；憂傷的靈使骨枯乾。」", r: "— 箴言 17:22" },
-            { t: "「我靠著那加給我力量的，凡事都能做。」", r: "— 腓立比書 4:13" }
+            { t: "「我靠著那加給我力量的，凡事都能做。」", r: "— 腓立比書 4:13" },
+            { t: "「凡勞苦擔重擔的人可以到我這裡來，我就使你們得安息。」", r: "— 馬太福音 11:28" }
         ];
 
         const bibleBooks = {
@@ -558,757 +501,492 @@
             new: [{n:"馬太福音",abbr:"太",c:28},{n:"馬可福音",abbr:"可",c:16},{n:"路加福音",abbr:"路",c:24},{n:"約翰福音",abbr:"約",c:21},{n:"使徒行傳",abbr:"徒",c:28},{n:"羅馬書",abbr:"羅",c:16},{n:"哥林多前書",abbr:"林前",c:16},{n:"哥林多後書",abbr:"林後",c:13},{n:"加拉太書",abbr:"加",c:6},{n:"以弗所書",abbr:"弗",c:6},{n:"腓立比書",abbr:"腓",c:4},{n:"歌羅西書",abbr:"西",c:4},{n:"帖撒羅尼迦前書",abbr:"帖前",c:5},{n:"帖撒羅尼迦後書",abbr:"帖後",c:3},{n:"提摩太前書",abbr:"提前",c:6},{n:"提摩太後書",abbr:"提後",c:4},{n:"提多書",abbr:"多",c:3},{n:"腓利門書",abbr:"門",c:1},{n:"希伯來書",abbr:"來",c:13},{n:"雅各書",abbr:"雅",c:5},{n:"彼得前書",abbr:"彼前",c:5},{n:"彼得後書",abbr:"彼後",c:3},{n:"約翰一書",abbr:"約一",c:5},{n:"約翰二書",abbr:"約二",c:1},{n:"約翰三書",abbr:"約三",c:1},{n:"猶大書",abbr:"猶",c:1},{n:"啟示錄",abbr:"啟",c:22}]
         };
 
-        const psmVerses = [6,12,8,8,12,10,17,9,20,18,7,8,6,7,5,11,15,50,14,9,13,31,6,10,22,12,14,9,11,12,24,11,22,22,28,12,40,22,13,17,13,11,5,26,17,11,9,14,20,23,19,9,6,7,23,13,11,11,17,12,8,12,11,10,13,20,7,35,36,5,24,20,28,23,10,12,20,72,13,19,16,8,18,12,13,17,7,18,52,17,16,15,5,23,11,13,12,9,9,5,8,28,22,35,45,48,43,13,31,7,10,10,9,8,18,19,2,29,176,7,8,9,4,8,5,6,5,6,8,8,3,18,3,3,21,26,9,8,24,13,10,7,12,15,21,10,20,14,9,6];
-        const proVerses = [33,22,35,27,23,35,27,36,18,32,31,28,25,35,33,33,28,24,29,30,31,29,35,34,28,28,27,28,27,33,31];
-
-        // 完整定義 Plan Tracks 確保資料正確
         const planTracks = [
-            // Track 1: 舊約 (排除詩篇箴言)
-            [{n:"創世記",abbr:"創",c:50},{n:"出埃及記",abbr:"出",c:40},{n:"利未記",abbr:"利",c:27},{n:"民數記",abbr:"民",c:36},{n:"申命記",abbr:"申",c:34},{n:"約書亞記",abbr:"書",c:24},{n:"士師記",abbr:"士",c:21},{n:"路得記",abbr:"得",c:4},{n:"撒母耳記上",abbr:"撒上",c:31},{n:"撒母耳記下",abbr:"撒下",c:24},{n:"列王紀上",abbr:"王上",c:22},{n:"列王紀下",abbr:"王下",c:25},{n:"歷代志上",abbr:"代上",c:29},{n:"歷代志下",abbr:"代下",c:36},{n:"以斯拉記",abbr:"拉",c:10},{n:"尼希米記",abbr:"尼",c:13},{n:"以斯帖記",abbr:"斯",c:10},{n:"約伯記",abbr:"伯",c:42},{n:"傳道書",abbr:"傳",c:12},{n:"雅歌",abbr:"歌",c:8},{n:"以賽亞書",abbr:"賽",c:66},{n:"耶利米書",abbr:"耶",c:52},{n:"耶利米哀歌",abbr:"哀",c:5},{n:"以西結書",abbr:"結",c:48},{n:"但以理書",abbr:"但",c:12},{n:"何西阿書",abbr:"何",c:14},{n:"約珥書",abbr:"珥",c:3},{n:"阿摩司書",abbr:"摩",c:9},{n:"俄巴底亞書",abbr:"俄",c:1},{n:"約拿書",abbr:"拿",c:4},{n:"彌迦書",abbr:"彌",c:7},{n:"那鴻書",abbr:"鴻",c:3},{n:"哈巴谷書",abbr:"哈",c:3},{n:"西番雅書",abbr:"番",c:3},{n:"哈該書",abbr:"該",c:2},{n:"撒迦利亞書",abbr:"亞",c:14},{n:"瑪拉基書",abbr:"瑪",c:4}],
-            // Track 2: 新約
-            [{n:"馬太福音",abbr:"太",c:28},{n:"馬可福音",abbr:"可",c:16},{n:"路加福音",abbr:"路",c:24},{n:"約翰福音",abbr:"約",c:21},{n:"使徒行傳",abbr:"徒",c:28},{n:"羅馬書",abbr:"羅",c:16},{n:"哥林多前書",abbr:"林前",c:16},{n:"哥林多後書",abbr:"林後",c:13},{n:"加拉太書",abbr:"加",c:6},{n:"以弗所書",abbr:"弗",c:6},{n:"腓立比書",abbr:"腓",c:4},{n:"歌羅西書",abbr:"西",c:4},{n:"帖撒羅尼迦前書",abbr:"帖前",c:5},{n:"帖撒羅尼迦後書",abbr:"帖後",c:3},{n:"提摩太前書",abbr:"提前",c:6},{n:"提摩太後書",abbr:"提後",c:4},{n:"提多書",abbr:"多",c:3},{n:"腓利門書",abbr:"門",c:1},{n:"希伯來書",abbr:"來",c:13},{n:"雅各書",abbr:"雅",c:5},{n:"彼得前書",abbr:"彼前",c:5},{n:"彼得後書",abbr:"彼後",c:3},{n:"約翰一書",abbr:"約一",c:5},{n:"約翰二書",abbr:"約二",c:1},{n:"約翰三書",abbr:"約三",c:1},{n:"猶大書",abbr:"猶",c:1},{n:"啟示錄",abbr:"啟",c:22}],
-            // Track 3: 詩篇
-            [{n:"詩篇",abbr:"詩",c:150}],
-            // Track 4: 箴言
-            [{n:"箴言",abbr:"箴",c:31}]
+            {t: "舊約", books: bibleBooks.old},
+            {t: "新約", books: bibleBooks.new},
+            {t: "詩篇", books: [{n:"詩篇",abbr:"詩",c:150}]},
+            {t: "箴言", books: [{n:"箴言",abbr:"箴",c:31}]}
         ];
 
         const bookMap = {};
         [...bibleBooks.old, ...bibleBooks.new].forEach(b => {
             bookMap[b.abbr] = b.n;
-            bookMap[b.n] = b.n; 
+            bookMap[b.n] = b.n;
             bookMap[b.n.replace("書","")] = b.n;
         });
 
-        // --- Core Functions ---
-        window.generateReadingUnits = function(trackData, trackIndex) {
-            let units = [];
-            if (trackIndex === 2) { 
-                const b = trackData[0]; 
-                for(let i=1; i<=b.c; i++) {
-                    const verses = psmVerses[i-1] || 25;
-                    const parts = Math.ceil(verses / 7);
-                    const step = Math.ceil(verses / parts);
-                    for (let p = 0; p < parts; p++) {
-                        const start = p * step + 1;
-                        const end = Math.min((p + 1) * step, verses);
-                        units.push(`${b.abbr} ${i}:${start}-${end}`);
-                    }
-                }
-                return units;
-            }
-            if (trackIndex === 3) {
-                const b = trackData[0];
-                const partsPerChapter = 12; 
-                for(let i=1; i<=b.c; i++) {
-                    const verses = proVerses[i-1] || 30;
-                    const step = Math.max(1, Math.floor(verses / partsPerChapter));
-                    let current = 1;
-                    while (current <= verses) {
-                        let end = current + step - 1;
-                        if (end > verses || (verses - end) < 3) end = verses; 
-                        units.push(`${b.abbr} ${i}:${current}-${end}`);
-                        current = end + 1;
-                        if (current > verses) break;
-                    }
-                }
-                return units;
-            }
-            const totalChapters = trackData.reduce((acc, b) => acc + b.c, 0);
-            let partsPerChapter = 1;
-            if (totalChapters < 365) partsPerChapter = Math.ceil(365 / totalChapters);
-            trackData.forEach(b => {
-                for(let i=1; i<=b.c; i++) {
-                    if (partsPerChapter > 1) {
-                        if (partsPerChapter === 2) {
-                            units.push(`${b.abbr} ${i}:1-15`);
-                            units.push(`${b.abbr} ${i}:16-end`);
-                        } else {
-                            units.push(`${b.abbr} ${i}:1-10`);
-                            units.push(`${b.abbr} ${i}:11-20`);
-                            units.push(`${b.abbr} ${i}:21-end`);
-                        }
-                    } else {
-                        units.push(`${b.abbr} ${i}`);
-                    }
-                }
-            });
-            return units;
-        }
+        // --- 核心功能 ---
 
-        window.getDailyPlan = function(date) {
-            const start = new Date(date.getFullYear(), 0, 0);
-            const diff = date - start;
-            let dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
-            if(dayOfYear < 1) dayOfYear = 1;
-            if (dayOfYear > 365) dayOfYear = 365;
-            
-            const labels = ["舊約", "新約", "詩篇", "箴言"];
-            return planTracks.map((track, idx) => {
-                const units = window.generateReadingUnits(track, idx);
-                const total = units.length;
-                const itemsPerDay = total / 365;
-                const startIndex = Math.floor((dayOfYear - 1) * itemsPerDay);
-                let endIndex = Math.floor(dayOfYear * itemsPerDay);
-                if (dayOfYear === 365) endIndex = total; 
-                if (endIndex > total) endIndex = total;
-                if (startIndex === endIndex && total >= 365) endIndex = startIndex + 1;
-                const dailyItems = units.slice(startIndex, endIndex);
-                if (!dailyItems || dailyItems.length === 0) return null;
-                let ref = dailyItems[0];
-                if (dailyItems.length > 1) {
-                    const first = dailyItems[0];
-                    const last = dailyItems[dailyItems.length - 1];
-                    const parse = (s) => {
-                        const parts = s.split(' ');
-                        const b = parts[0];
-                        const nums = parts[1].split(':');
-                        return { b, c: nums[0], v: nums[1] || '' };
-                    };
-                    const f = parse(first);
-                    const l = parse(last);
-                    if (f.b === l.b) {
-                        if (f.c === l.c) {
-                            const startV = f.v ? f.v.split('-')[0] : '1';
-                            const endV = l.v ? l.v.split('-')[1] : 'end';
-                            if (startV === '1' && endV === 'end') ref = `${f.b} ${f.c}`;
-                            else ref = `${f.b} ${f.c}:${startV}-${endV}`;
-                        } else ref = `${f.b} ${f.c}-${l.c}`;
-                    } else ref = `${first} - ${last}`;
-                }
-                ref = ref.replace(/:(\d+)-end/g, ":$1+"); 
-                return { t: labels[idx], r: ref, raw: dailyItems };
-            }).filter(i => i);
-        }
+        // 初始化
+        async function initApp() {
+            els = {
+                viewHome: document.getElementById('view-home'),
+                viewWorkspace: document.getElementById('view-workspace'),
+                mainHeader: document.getElementById('main-header'),
+                bibleContent: document.getElementById('bible-content'),
+                readerTitle: document.getElementById('reader-title'),
+                headerTitle: document.getElementById('header-title'),
+                datePicker: document.getElementById('date-picker'),
+                homeDatePicker: document.getElementById('home-date-picker'),
+                inlineSearch: document.getElementById('inline-search'),
+                calendarGrid: document.getElementById('calendar-grid'),
+                calendarMonthLabel: document.getElementById('calendar-month-label'),
+                streakCount: document.getElementById('streak-count'),
+                streakBadge: document.getElementById('streak-badge')
+            };
 
-        window.fetchBibleRef = async function(refInput) {
-            if(!refInput) return;
+            const now = new Date();
+            const todayKey = now.toISOString().split('T')[0];
+            window.handleDateChange(todayKey);
             
-            // UI Loading States
-            if (isDbLoading) {
-                els.bibleContent.innerHTML = '<div class="h-full flex flex-col items-center justify-center py-20 text-[#A68C76]"><span class="loader mb-4"></span><p>📥 聖經資料庫下載中 (5MB)...<br>請稍候</p></div>';
-                return;
-            }
-            
-            if (!sqlDbLoaded || !sqlDb) {
-                    els.bibleContent.innerHTML = '<div class="h-full flex flex-col items-center justify-center py-20 text-red-400"><p>⚠️ 資料庫尚未載入</p><button onclick="window.location.reload()" class="mt-4 px-4 py-2 bg-[#A68C76] text-white rounded-lg text-sm">重整頁面</button></div>';
-                    return;
-            }
+            // 自動產生並設定 App Icon
+            window.setAppIcon();
 
-            els.bibleContent.innerHTML = '<div class="h-full flex items-center justify-center py-20"><span class="loader"></span></div>';
-            
-            let isKeywordSearch = false;
-            let queries = [];
-
-            // Determine if input is array (from daily plan) or string (manual search)
-            if (Array.isArray(refInput)) {
-                queries = refInput.map(r => r.replace(/-end/g, "-176")); 
-            } else {
-                els.readerTitle.innerText = refInput;
-                const cleanRef = refInput.replace(/-end/g, "-176").trim();
+            // 自動載入資料庫
+            try {
+                SQL = await window.initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${f}` });
+                const res = await fetch(REMOTE_DB_URL);
+                if (!res.ok) throw new Error("CORS or Network Error");
+                const buffer = await res.arrayBuffer();
+                sqlDb = new SQL.Database(new Uint8Array(buffer));
+                sqlDbLoaded = true;
                 
-                const refRegex = /^([\u4e00-\u9fa5]+|[a-zA-Z]+)\s*\d+/;
+                // 載入後自動偵測表格結構
+                window.detectTableStructure();
                 
-                if (refRegex.test(cleanRef)) {
-                    if (cleanRef.includes(':') || (cleanRef.includes('-') && !cleanRef.includes(' - '))) {
-                            if(cleanRef.includes('-') && !cleanRef.includes(':')) {
-                                const parts = cleanRef.split(/[- ]+/);
-                                if(parts.length >= 2) {
-                                    const book = parts[0];
-                                    const start = parseInt(parts[1]);
-                                    const end = parseInt(parts[parts.length-1]);
-                                    for(let i=start; i<=end; i++) queries.push(`${book} ${i}`);
-                                } else queries.push(cleanRef);
-                            } else queries.push(cleanRef);
-                    } else queries.push(cleanRef.split('-')[0].trim()); 
-                } else {
-                    isKeywordSearch = true;
-                    queries.push(cleanRef);
-                }
+                els.inlineSearch.placeholder = "🔍 搜尋經文...";
+            } catch(e) {
+                console.error("DB Load Fail", e);
+                els.inlineSearch.placeholder = "⚠️ 資料載入失敗";
             }
-
-            let allHtml = "";
-
-            if (sqlDbLoaded && sqlDb) {
-                if (isKeywordSearch) {
-                    const keyword = queries[0];
-                    try {
-                        const query = `SELECT * FROM ${dbTable} WHERE ${dbCols.text} LIKE ? LIMIT 100`; 
-                        const params = [`%${keyword}%`];
-                        const res = sqlDb.exec(query, params);
-                        
-                        if (res && res.length > 0) {
-                            const list = res[0].values.map(row => {
-                                const colNames = res[0].columns;
-                                const r = {};
-                                colNames.forEach((c, i) => r[c] = row[i]);
-                                return { 
-                                    ref: `${r[dbCols.book]} ${r[dbCols.chapter]}:${r[dbCols.verse]}`, 
-                                    text: r[dbCols.text] 
-                                };
-                            });
-                            
-                            allHtml += `<div class="p-3 mb-4 text-xs font-bold text-[#A68C76] bg-[#F9F7F5] rounded-lg border border-[#EBE6DE]">
-                                🔍 關鍵字搜尋：<span class="text-[#5E5A54] text-sm">"${keyword}"</span> (顯示前 100 筆)
-                            </div>`;
-
-                            allHtml += list.map(v => {
-                                const highlightedText = v.text.replace(new RegExp(keyword, 'g'), `<span class="bg-[#FFF5EB] text-[#A68C76] font-bold px-1 rounded">${keyword}</span>`);
-                                return `
-                                    <div class="verse-item mb-2 p-3 rounded-lg cursor-pointer hover:bg-gray-50 transition-all border-l-4 border-transparent bg-white border border-gray-50 shadow-sm" onclick="window.toggleVerseSelection(this)" data-ref="${v.ref}" data-text="${(v.text||'').replace(/"/g, '&quot;')}">
-                                        <div class="text-xs font-bold text-[#A68C76] mb-1">${v.ref}</div>
-                                        <div class="text-[#5E5A54] leading-relaxed">${highlightedText}</div>
-                                    </div>
-                                `;
-                            }).join('');
-                        } else {
-                            allHtml = '<div class="flex flex-col items-center justify-center py-20 text-[#94908A]"><span class="text-4xl mb-2">🤔</span><p>找不到包含該關鍵字的經文</p></div>';
-                        }
-                    } catch(e) { 
-                        console.error("Search Error", e);
-                        allHtml = '<p class="text-center py-10 text-red-400">搜尋發生錯誤</p>';
-                    }
-                } else {
-                    for(let q of queries) {
-                        const match = q.match(/^([\u4e00-\u9fa5]+|[a-zA-Z]+)\s*(\d+)(?::(\d+)(?:-(\d+))?)?$/);
-                        if (match) {
-                            const bookAbbr = match[1];
-                            const chapter = parseInt(match[2]);
-                            const startVerse = match[3] ? parseInt(match[3]) : null;
-                            const endVerse = match[4] ? parseInt(match[4]) : (startVerse || null);
-                            const fullBookName = bookMap[bookAbbr] || bookAbbr;
-                            
-                            try {
-                                let query = `SELECT * FROM ${dbTable} WHERE ${dbCols.book} = ? AND ${dbCols.chapter} = ?`;
-                                let params = [fullBookName, chapter];
-                                
-                                if (startVerse !== null) {
-                                    if (endVerse !== null) {
-                                        query += ` AND ${dbCols.verse} >= ? AND ${dbCols.verse} <= ?`;
-                                        params.push(startVerse, endVerse);
-                                    } else {
-                                        query += ` AND ${dbCols.verse} = ?`;
-                                        params.push(startVerse);
-                                    }
-                                }
-                                
-                                const res = sqlDb.exec(query, params);
-                                if (res && res.length > 0) {
-                                    const list = res[0].values.map(row => {
-                                        const colNames = res[0].columns;
-                                        const r = {};
-                                        colNames.forEach((c, i) => r[c] = row[i]);
-                                        return { ref: `${r[dbCols.chapter]}:${r[dbCols.verse]}`, text: r[dbCols.text] };
-                                    });
-                                    
-                                    allHtml += list.map(v => `
-                                        <div class="verse-item mb-2 p-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-all border-l-4 border-transparent" onclick="window.toggleVerseSelection(this)" data-ref="${v.ref}" data-text="${(v.text||'').replace(/"/g, '&quot;')}">
-                                            <span class="text-xs font-bold text-[#A68C76] align-top mr-1 select-none">${v.ref}</span>
-                                            <span class="text-[#5E5A54]">${v.text}</span>
-                                        </div>
-                                    `).join('');
-                                }
-                            } catch(e) { console.error("SQL Error", e); }
-                        }
-                    }
-                }
-            }
-            
-            if(allHtml) {
-                els.bibleContent.innerHTML = allHtml;
-                els.bibleContent.scrollTop = 0;
-            } else if (!isKeywordSearch) { 
-                els.bibleContent.innerHTML = '<p class="p-8 text-center text-gray-400 font-serif">🔍 未找到相關經文<br><span class="text-xs">請確認書卷名稱或章節是否正確</span></p>';
-            }
-        }
-
-        window.handleDateChange = function(dKey) {
-            const parts = dKey.split('-');
-            calendarDate = new Date(parts[0], parts[1]-1, parts[2]);
-            if(els.datePicker) els.datePicker.value = dKey;
-            if(els.homeDatePicker) els.homeDatePicker.value = dKey;
-            const randomVerse = mannaVerses[Math.abs(dKey.split('').reduce((a, b) => a + b.charCodeAt(0), 0)) % mannaVerses.length];
-            if(document.getElementById('manna-text')) {
-                document.getElementById('manna-text').innerText = randomVerse.t;
-                document.getElementById('manna-ref').innerText = randomVerse.r;
-            }
-            
-            const fields = [
-                'note-rhema', 'note-reflection', 'note-prayer-devotion', 
-                'note-topic', 'note-content', 'note-tracking', 
-                'note-thanks', 'note-grace', 'note-diary', 'note-mood',
-                'note-mood-event', 'note-mood-tag', 'note-mood-lie', 'note-mood-god-view', 'note-mood-my-view', 'note-mood-prayer'
-            ];
-            fields.forEach(id => {
-                const el = document.getElementById(id);
-                if(el) el.value = localStorage.getItem(`${dKey}-${id}`) || "";
-            });
 
             window.renderCalendar();
             window.calculateStreak();
-            if(currentMode === 'devotion') window.updateDevotionUI();
         }
 
-        window.updateDevotionUI = function() {
-            const plan = window.getDailyPlan(calendarDate);
-            const container = document.getElementById('devotion-tabs');
-            window.currentDailyPlan = plan; 
-            container.innerHTML = plan.map((item, idx) => `
-                <div class="devotion-track-card ${idx===0?'active':''}" onclick="window.loadTrack(${idx}, this)">
-                    <span class="track-tag">${item.t}</span>
-                    <span class="track-ref">${item.r}</span>
-                </div>
-            `).join('');
-            if(plan.length > 0) window.loadTrack(0);
+        // --- 自動產生主畫面圖示 ---
+        window.setAppIcon = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 192;
+            canvas.height = 192;
+            const ctx = canvas.getContext('2d');
+            
+            // 背景色 (紙張白)
+            ctx.fillStyle = '#F9F8F4';
+            ctx.fillRect(0, 0, 192, 192);
+            
+            // 圖示樣式 (土司線條)
+            ctx.strokeStyle = '#C2A695';
+            ctx.lineWidth = 12;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            // 繪製土司 (放大 6 倍)
+            ctx.translate(24, 24);
+            ctx.scale(6, 6);
+            
+            // 外輪廓
+            ctx.beginPath();
+            ctx.moveTo(4, 14);
+            ctx.bezierCurveTo(4, 14, 4, 7, 12, 7);
+            ctx.bezierCurveTo(20, 7, 20, 14, 20, 14);
+            ctx.lineTo(20, 18);
+            ctx.bezierCurveTo(20, 19.1, 19.1, 20, 18, 20);
+            ctx.lineTo(6, 20);
+            ctx.bezierCurveTo(4.9, 20, 4, 19.1, 4, 18);
+            ctx.closePath();
+            ctx.stroke();
+            
+            // 底部線條
+            ctx.beginPath();
+            ctx.moveTo(4, 14);
+            ctx.lineTo(20, 14);
+            ctx.stroke();
+            
+            // 眼睛 (實心圓)
+            ctx.fillStyle = '#C2A695';
+            ctx.beginPath(); ctx.arc(10.5, 10.5, 1, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(14.5, 10.5, 1, 0, Math.PI * 2); ctx.fill();
+
+            const dataURL = canvas.toDataURL('image/png');
+            
+            // 設定為 Favicon 和 Apple Icon
+            const linkIcon = document.createElement('link');
+            linkIcon.rel = 'icon';
+            linkIcon.href = dataURL;
+            document.head.appendChild(linkIcon);
+            
+            const linkApple = document.createElement('link');
+            linkApple.rel = 'apple-touch-icon';
+            linkApple.href = dataURL;
+            document.head.appendChild(linkApple);
         }
 
-        window.loadTrack = function(idx, btnEl) {
-            if(btnEl) window.highlightTrack(btnEl);
-            else {
-                const btns = document.querySelectorAll('.devotion-track-card');
-                if(btns[idx]) window.highlightTrack(btns[idx]);
+        // --- 新增：自動偵測資料表結構 ---
+        window.detectTableStructure = function() {
+            if(!sqlDb) return;
+            try {
+                // 1. 偵測 Table 名稱
+                const tables = sqlDb.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
+                if(tables[0] && tables[0].values.length > 0) {
+                    const names = tables[0].values.flat();
+                    // 優先尋找 verses 或 bible，否則使用第一個找到的表名
+                    dbTable = names.includes('verses') ? 'verses' : (names.includes('bible') ? 'bible' : names[0]);
+                    console.log("Detected table:", dbTable);
+                }
+                
+                // 2. 偵測 Column 名稱
+                const cols = sqlDb.exec(`PRAGMA table_info(${dbTable})`);
+                if(cols.length > 0) {
+                    const colNames = cols[0].values.map(r => r[1]);
+                    
+                    if(colNames.includes('content')) dbCols.text = 'content';
+                    else if(colNames.includes('scripture')) dbCols.text = 'scripture';
+                    else if(colNames.includes('text')) dbCols.text = 'text';
+
+                    if(colNames.includes('book_name')) dbCols.book = 'book_name';
+                    else if(colNames.includes('book')) dbCols.book = 'book';
+                    
+                    if(colNames.includes('chapter_number')) dbCols.chapter = 'chapter_number';
+                    else if(colNames.includes('chapter')) dbCols.chapter = 'chapter';
+
+                    if(colNames.includes('verse_number')) dbCols.verse = 'verse_number';
+                    else if(colNames.includes('verse')) dbCols.verse = 'verse';
+                    
+                    console.log("Detected columns:", dbCols);
+                }
+            } catch(e) { 
+                console.error("Table detection failed", e); 
             }
-            const planItem = window.currentDailyPlan[idx];
-            if(planItem && planItem.raw) window.fetchBibleRef(planItem.raw); 
         }
 
-        window.highlightTrack = function(el) {
-            document.querySelectorAll('.devotion-track-card').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
-        }
-
-        window.toggleVerseSelection = function(el) {
-             el.classList.toggle('selected');
-             window.updateCopyButton();
-        }
-
-        window.updateCopyButton = function() {
-             const selectedCount = document.querySelectorAll('.verse-item.selected').length;
-             const btn = document.getElementById('btn-copy-verses');
-             if(btn) {
-                 const originalHtml = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>`;
-                 btn.innerHTML = selectedCount > 0 ? `📋 複製 (${selectedCount})` : originalHtml;
-                 btn.classList.toggle('bg-[#A68C76]', selectedCount > 0);
-                 btn.classList.toggle('text-white', selectedCount > 0);
-             }
-        }
-
-        window.copySelectedVerses = function() {
-             const selected = document.querySelectorAll('.verse-item.selected');
-             if (selected.length === 0) return;
-             
-             let textToCopy = "";
-             selected.forEach(el => {
-                 const ref = el.getAttribute('data-ref');
-                 const text = el.getAttribute('data-text');
-                 textToCopy += `${ref} ${text}\n`;
-             });
-             
-             const ta = document.createElement('textarea');
-             ta.value = textToCopy;
-             document.body.appendChild(ta);
-             ta.select();
-             document.execCommand('copy');
-             document.body.removeChild(ta);
-             
-             const btn = document.getElementById('btn-copy-verses');
-             btn.innerHTML = "✅ 已複製";
-             setTimeout(() => {
-                 selected.forEach(el => el.classList.remove('selected'));
-                 window.updateCopyButton();
-                 btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>`;
-             }, 1000);
-        }
-
+        // 切換模式
         window.switchMode = function(m) {
             currentMode = m;
             els.viewHome.classList.toggle('hidden', m !== 'home');
             els.viewWorkspace.classList.toggle('hidden', m === 'home');
             els.mainHeader.classList.toggle('hidden', m === 'home');
+
+            const isDevotion = m === 'devotion';
+            const isPureJournal = ['journal-prayer','journal-gratitude','journal-mood'].includes(m);
+            const isBible = m === 'bible';
+
+            // 僅在靈修模式顯示分頁籤 (聖經模式不需要筆記)
+            document.getElementById('workspace-tabs').classList.toggle('hidden', !isDevotion);
             
-            let title = m.toUpperCase();
-            if (m === 'journal-prayer') title = '跟神聊聊';
-            else if (m === 'journal-gratitude') title = '感恩日記';
-            else if (m === 'journal-mood') title = '內心戲時間';
-            els.headerTitle.innerText = title;
-            
-            if(m !== 'home') {
-                const isDevotion = m === 'devotion';
-                document.getElementById('devotion-tabs').classList.toggle('hidden', !isDevotion);
-                
-                const readerHeader = document.getElementById('reader-header');
-                const titleWrapper = document.getElementById('reader-title-wrapper');
-                const searchContainer = document.getElementById('reader-search-container');
-                
-                readerHeader.classList.remove('hidden');
-                titleWrapper.classList.remove('hidden', 'invisible');
-                searchContainer.classList.remove('hidden', 'invisible');
+            document.getElementById('devotion-tabs').classList.toggle('hidden', !isDevotion);
+            document.getElementById('search-box').classList.toggle('hidden', isDevotion);
+            document.getElementById('btn-switch-chapter').classList.toggle('hidden', !isBible);
 
-                if (m === 'devotion') {
-                    titleWrapper.classList.add('invisible'); 
-                    searchContainer.classList.add('hidden');
-                }
-                
-                ['journal-devotion-fields', 'journal-prayer-fields', 'journal-gratitude-fields', 'journal-mood-fields']
-                    .forEach(id => document.getElementById(id).classList.add('hidden'));
-                
-                if (m === 'devotion') document.getElementById('journal-devotion-fields').classList.remove('hidden');
-                else if (m === 'journal-prayer') document.getElementById('journal-prayer-fields').classList.remove('hidden');
-                else if (m === 'journal-gratitude') document.getElementById('journal-gratitude-fields').classList.remove('hidden');
-                else if (m === 'journal-mood') document.getElementById('journal-mood-fields').classList.remove('hidden');
-                
-                let tabText = '靈修筆記';
-                let tabIcon = '✍🏻';
-                if (m === 'journal-prayer') { tabText = '跟神聊聊'; tabIcon = '💬'; }
-                else if (m === 'journal-gratitude') { tabText = '感恩日記'; tabIcon = '💖'; }
-                else if (m === 'journal-mood') { tabText = '內心戲'; tabIcon = '🎭'; }
-                
-                document.getElementById('tab-journal-text').innerText = tabText;
-                document.getElementById('tab-journal-icon').innerText = tabIcon;
+            // 筆記欄位切換
+            ['journal-devotion-fields', 'journal-prayer-fields', 'journal-gratitude-fields', 'journal-mood-fields']
+                .forEach(id => document.getElementById(id).classList.add('hidden'));
 
-                const readerSec = document.getElementById('section-reader');
-                const journalSec = document.getElementById('section-journal');
-                const tabs = document.getElementById('workspace-tabs');
-                const switchBtn = document.getElementById('btn-switch-chapter');
-
-                readerSec.classList.remove('hidden', 'lg:hidden'); 
-                readerSec.classList.add('flex', 'lg:flex', 'lg:col-span-5');
-                journalSec.classList.remove('hidden', 'lg:hidden', 'lg:col-span-8', 'lg:col-start-3');
-                journalSec.classList.add('flex', 'lg:flex', 'lg:col-span-4');
-                tabs.classList.remove('hidden'); 
-                switchBtn.classList.add('hidden'); 
-
-                const isPureJournalMode = (m === 'journal-gratitude' || m === 'journal-prayer' || m === 'journal-mood');
-
-                if (isPureJournalMode) {
-                    readerSec.classList.remove('flex', 'lg:flex');
-                    readerSec.classList.add('hidden'); 
-                    journalSec.classList.remove('lg:col-span-4');
-                    journalSec.classList.add('lg:col-span-8', 'lg:col-start-3');
-                    tabs.classList.add('hidden');
-                    window.switchWorkspaceTab('journal');
-                } else if (m === 'bible') {
-                    journalSec.classList.remove('flex', 'lg:flex');
-                    journalSec.classList.add('hidden'); 
-                    
-                    readerSec.classList.remove('lg:col-span-5');
-                    readerSec.classList.add('lg:col-span-8', 'lg:col-start-3');
-                    tabs.classList.add('hidden'); 
-                    switchBtn.classList.remove('hidden'); 
-                    window.switchWorkspaceTab('reader');
-                    window.renderMainBooks('old');
-                    els.readerTitle.innerText = "請選擇書卷";
-                    els.bibleContent.innerHTML = '<div class="h-full flex items-center justify-center text-gray-300 italic font-serif">請點擊上方按鈕選擇經文...</div>';
-                    
-                    document.getElementById('view-bible-chapters').classList.add('hidden');
-                    document.getElementById('bible-content').classList.add('hidden');
-                    document.getElementById('view-bible-books').classList.remove('hidden');
-                    document.getElementById('view-bible-books').classList.add('flex');
-                    
-                    document.getElementById('tab-reader-text').innerText = "閱讀經文";
-                } else if (m === 'devotion') {
-                    if(window.innerWidth < 1024) window.switchWorkspaceTab('reader');
-                    document.getElementById('tab-reader-text').innerText = "讀經進度";
-                    window.updateDevotionUI();
-                    
-                    document.getElementById('view-bible-books').classList.add('hidden');
-                    document.getElementById('view-bible-chapters').classList.add('hidden');
-                    document.getElementById('bible-content').classList.remove('hidden');
-                }
-                
-                if (m === 'bible') {
-                    document.getElementById('tab-reader-text').innerText = "閱讀經文";
-                }
-            }
-        }
-        
-        window.switchWorkspaceTab = function(tab) {
-            const readerBtn = document.getElementById('tab-reader');
-            const journalBtn = document.getElementById('tab-journal');
             const readerSec = document.getElementById('section-reader');
             const journalSec = document.getElementById('section-journal');
+
+            // Reset layout classes
+            readerSec.classList.remove('hidden', 'lg:w-1/2');
+            journalSec.classList.remove('hidden', 'lg:w-1/2');
             
-            if (tab === 'reader') {
-                readerBtn.classList.add('active');
-                journalBtn.classList.remove('active');
+            // Default to full width for non-split modes
+            readerSec.classList.add('w-full'); 
+            journalSec.classList.add('w-full');
+
+            if (isDevotion) {
+                // Split view on desktop
+                readerSec.classList.remove('w-full');
+                journalSec.classList.remove('w-full');
+                readerSec.classList.add('lg:w-1/2');
+                journalSec.classList.add('lg:w-1/2');
+
+                document.getElementById('journal-devotion-fields').classList.remove('hidden');
+                els.headerTitle.innerText = "Daily Devotion";
+                window.updateDevotionUI();
+                window.switchWorkspaceTab('reader'); // Default tab on mobile
+            } else if (isBible) {
+                // Full screen reader
+                journalSec.classList.add('hidden'); // Completely hide journal
+                // readerSec keeps w-full
+                
+                els.headerTitle.innerText = "Bible Reading";
+                window.renderMainBooks('old');
+                window.goBackToMainBooks();
+                window.switchWorkspaceTab('reader'); // Ensure reader is visible
+            } else if (isPureJournal) {
+                // Full screen journal
+                readerSec.classList.add('hidden'); // Completely hide reader
+                // journalSec keeps w-full
+
+                const map = {'journal-prayer':'Prayer Journal','journal-gratitude':'Gratitude','journal-mood':'Mood Diary'};
+                const fieldMap = {'journal-prayer':'journal-prayer-fields','journal-gratitude':'journal-gratitude-fields','journal-mood':'journal-mood-fields'};
+                els.headerTitle.innerText = map[m];
+                document.getElementById(fieldMap[m]).classList.remove('hidden');
+                window.switchWorkspaceTab('journal'); // Ensure journal is visible
+            }
+        }
+
+        // 經文查詢 (修改為使用動態 Table 和 Column 名稱，並新增關鍵字搜尋支援)
+        window.fetchBibleRef = async function(refInput) {
+            if (!sqlDbLoaded || !refInput) return;
+            const ref = refInput.trim();
+            els.bibleContent.innerHTML = '<div class="flex justify-center py-10"><div class="loader"></div></div>';
+            
+            // 1. 嘗試解析為經文出處 (Reference Parsing)
+            // 支援格式：創1, 創 1, 創 1:1, 創 1:1-5
+            const match = ref.match(/^([\u4e00-\u9fa5]+|[a-zA-Z]+)\s*(\d+)(?::(\d+)(?:-(\d+))?)?$/);
+            
+            // 如果格式像經文出處，且書卷名稱存在於對照表中
+            const bookKey = match ? match[1] : null;
+            const isBookRef = bookKey && (bookMap[bookKey] || bookMap[bookKey.replace("書","")]);
+
+            if (match && isBookRef) {
+                // --- 模式 A: 經文跳轉 ---
+                const book = bookMap[bookKey] || bookKey; 
+                const chapter = parseInt(match[2]);
+                const startV = match[3] ? parseInt(match[3]) : 1;
+                // 如果沒有指定結束節，且有指定開始節，則只顯示該節 (endV = startV)。
+                // 如果沒指定開始節(代表整章)，則顯示整章 (endV = 200，假設一章不超過200節)
+                const endV = match[4] ? parseInt(match[4]) : (match[3] ? parseInt(match[3]) : 200); 
+
+                try {
+                    const query = `SELECT ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.book} = ? AND ${dbCols.chapter} = ? AND ${dbCols.verse} >= ? AND ${dbCols.verse} <= ?`;
+                    const res = sqlDb.exec(query, [book, chapter, startV, endV]);
+                    
+                    if (res.length > 0) {
+                        els.readerTitle.innerText = `${book} ${chapter}${match[3]?':'+match[3]:''}${match[4]?'-'+match[4]:''}`;
+                        els.bibleContent.innerHTML = res[0].values.map(v => `
+                            <div class="verse-item mb-4 p-2 rounded-xl" onclick="this.classList.toggle('selected'); window.updateCopyButton()">
+                                <span class="text-[10px] font-bold text-[#C2A695] mr-2 font-mono bg-[#FAF9F7] px-1 rounded select-none">${v[1]}</span>
+                                <span class="text-verse leading-loose">${v[2]}</span>
+                            </div>
+                        `).join('');
+                    } else {
+                        els.bibleContent.innerHTML = "<p class='p-8 opacity-50 italic text-center text-sm'>此章節查無內容，請確認章節是否超出範圍。</p>";
+                    }
+                } catch(e) { 
+                    console.error(e); 
+                    els.bibleContent.innerHTML = "<p class='p-8 text-red-400 text-center text-sm'>讀取發生錯誤</p>"; 
+                }
+
             } else {
-                journalBtn.classList.add('active');
-                readerBtn.classList.remove('active');
+                // --- 模式 B: 關鍵字搜尋 ---
+                try {
+                    els.readerTitle.innerText = `搜尋: "${ref}"`;
+                    
+                    // 限制筆數以免卡頓 (Limit 50)
+                    // 注意：這裡假設 dbCols.text 是經文內容欄位，dbCols.book 是書卷名
+                    const query = `SELECT ${dbCols.book}, ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.text} LIKE ? LIMIT 50`;
+                    const res = sqlDb.exec(query, [`%${ref}%`]);
+
+                    if (res.length > 0) {
+                        const results = res[0].values;
+                        els.bibleContent.innerHTML = results.map(v => {
+                            const b = v[0], c = v[1], ver = v[2], txt = v[3];
+                            // 關鍵字高亮
+                            const highlightedTxt = txt.replace(new RegExp(ref, 'g'), `<span class="bg-[#F6E6E6] text-[#59544D] font-bold px-1 rounded">${ref}</span>`);
+                            return `
+                                <div class="verse-item mb-4 p-4 rounded-2xl border border-transparent hover:border-[#E0DBD3] transition-all bg-white shadow-sm cursor-pointer" onclick="this.classList.toggle('selected'); window.updateCopyButton()">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="text-[10px] font-bold text-white bg-[#C2A695] px-2 py-1 rounded-md tracking-wider">${b} ${c}:${ver}</span>
+                                    </div>
+                                    <span class="text-verse text-[#59544D] leading-relaxed block">${highlightedTxt}</span>
+                                </div>
+                            `;
+                        }).join('') + (results.length >= 50 ? `<div class="text-center py-6"><span class="text-xs font-bold text-[#C2A695] bg-[#FAF9F7] px-3 py-1 rounded-full">僅顯示前 50 筆結果</span></div>` : '');
+                    } else {
+                        els.bibleContent.innerHTML = `
+                            <div class="flex flex-col items-center justify-center py-12 opacity-60">
+                                <span class="text-4xl mb-4">🍂</span>
+                                <p class="text-sm font-serif">找不到包含「${ref}」的經文</p>
+                                <p class="text-xs mt-2">試試看更短的關鍵字？</p>
+                            </div>`;
+                    }
+                } catch(e) {
+                    console.error("Search Error", e);
+                    els.bibleContent.innerHTML = "<p class='p-8 opacity-50 italic text-center text-sm'>搜尋功能暫時無法使用</p>";
+                }
             }
-
-            const isDesktop = window.innerWidth >= 1024;
-            const isSplitView = currentMode === 'devotion';
-
-            if (isDesktop && isSplitView) {
-                readerSec.style.opacity = '1';
-                readerSec.style.pointerEvents = 'auto';
-                readerSec.style.zIndex = 'auto';
-                journalSec.style.opacity = '1';
-                journalSec.style.pointerEvents = 'auto';
-                journalSec.style.zIndex = 'auto';
-                return; 
-            }
-
-            if (tab === 'reader') {
-                readerSec.style.opacity = '1';
-                readerSec.style.pointerEvents = 'auto';
-                readerSec.style.zIndex = '10';
-                journalSec.style.opacity = '0';
-                journalSec.style.pointerEvents = 'none';
-                journalSec.style.zIndex = '0';
-            } else {
-                readerSec.style.opacity = '0';
-                readerSec.style.pointerEvents = 'none';
-                readerSec.style.zIndex = '0';
-                journalSec.style.opacity = '1';
-                journalSec.style.pointerEvents = 'auto';
-                journalSec.style.zIndex = '10';
-            }
-        }
-        
-        window.toggleBibleSidebar = function() {
-            const sidebar = document.getElementById('bible-sidebar-overlay');
-            sidebar.classList.toggle('hidden');
         }
 
-        window.renderSidebarBooks = function(t) {
-            document.getElementById('sidebar-book-list').innerHTML = bibleBooks[t].map(b => `<button class="text-left px-3 py-2 rounded-lg hover:bg-[#F2EBE5] text-sm border border-gray-100" onclick='window.showSidebarChapters(${JSON.stringify(b)})'>${b.n}</button>`).join('');
-            document.getElementById('btn-old-sidebar').className = t==='old'?"flex-1 py-2 text-xs font-bold rounded-lg bg-[#A68C76] text-white":"flex-1 py-2 text-xs font-bold rounded-lg bg-white border text-[#A68C76]";
-            document.getElementById('btn-new-sidebar').className = t==='new'?"flex-1 py-2 text-xs font-bold rounded-lg bg-[#A68C76] text-white":"flex-1 py-2 text-xs font-bold rounded-lg bg-white border text-[#A68C76]";
-        }
-        
-        window.renderMainBooks = function(t) {
-            document.getElementById('main-book-list').innerHTML = bibleBooks[t].map(b => `<button class="text-left px-3 py-2 rounded-lg hover:bg-[#F2EBE5] text-sm border border-gray-100" onclick='window.showMainChapters(${JSON.stringify(b)})'>${b.n}</button>`).join('');
-            document.getElementById('btn-old').className = t==='old'?"flex-1 py-2 text-xs font-bold rounded-lg bg-[#A68C76] text-white":"flex-1 py-2 text-xs font-bold rounded-lg bg-white border text-[#A68C76]";
-            document.getElementById('btn-new').className = t==='new'?"flex-1 py-2 text-xs font-bold rounded-lg bg-[#A68C76] text-white":"flex-1 py-2 text-xs font-bold rounded-lg bg-white border text-[#A68C76]";
-        }
-        
-        window.renderBibleBooks = window.renderMainBooks; 
-
-        window.showSidebarChapters = function(b) {
-            document.getElementById('sidebar-book-list-container').classList.add('hidden');
-            document.getElementById('sidebar-chapter-list-container').classList.remove('hidden');
-            document.getElementById('sidebar-chapter-list-container').classList.add('flex');
+        // 進度計算 (1年 365 天)
+        window.updateDevotionUI = function() {
+            const start = new Date(calendarDate.getFullYear(), 0, 0);
+            const diff = calendarDate - start;
+            const dayOfYear = Math.floor(diff / 86400000);
             
-            document.getElementById('sidebar-chapter-title').innerText = b.n;
-            document.getElementById('sidebar-chapter-grid').innerHTML = Array.from({length:b.c}, (_,i)=> `<button class="aspect-square border rounded-lg hover:bg-[#A68C76] hover:text-white transition-colors flex items-center justify-center font-mono" onclick="window.fetchBibleRef('${b.abbr}${i+1}'); window.toggleBibleSidebar()">${i+1}</button>`).join('');
-        }
-        
-        window.showMainChapters = function(b) {
-            document.getElementById('view-bible-books').classList.add('hidden');
-            document.getElementById('view-bible-books').classList.remove('flex');
-            document.getElementById('bible-content').classList.add('hidden');
-            document.getElementById('view-bible-chapters').classList.remove('hidden');
-            document.getElementById('view-bible-chapters').classList.add('flex');
+            const container = document.getElementById('devotion-tabs');
+            container.innerHTML = planTracks.map((track, idx) => {
+                // 簡單的分發邏輯
+                const totalChapters = track.books.reduce((a,b)=>a+b.c, 0);
+                const chapterIdx = Math.floor((dayOfYear % totalChapters)) || 1;
+                
+                // 找出該 index 對應哪卷書
+                let currentCount = 0, targetBook = track.books[0], targetChapter = 1;
+                for(let b of track.books) {
+                    if (currentCount + b.c >= chapterIdx) {
+                        targetBook = b;
+                        targetChapter = chapterIdx - currentCount;
+                        break;
+                    }
+                    currentCount += b.c;
+                }
+
+                const ref = `${targetBook.abbr} ${targetChapter}`;
+                return `
+                    <div class="devotion-track-card ${idx===0?'active':''}" onclick="window.fetchBibleRef('${ref}'); document.querySelectorAll('.devotion-track-card').forEach(c=>c.classList.remove('active')); this.classList.add('active');">
+                        <span class="track-tag uppercase">${track.t}</span>
+                        <span class="track-ref font-mono">${ref}</span>
+                    </div>
+                `;
+            }).join('');
             
-            document.getElementById('main-chapter-title').innerText = b.n;
-            document.getElementById('main-chapter-grid').innerHTML = Array.from({length:b.c}, (_,i)=> `<button class="aspect-square border rounded-lg hover:bg-[#A68C76] hover:text-white transition-colors flex items-center justify-center font-mono" onclick="window.fetchBibleRef('${b.abbr}${i+1}'); window.showBibleContent()">${i+1}</button>`).join('');
-        }
-        
-        window.showChapters = window.showSidebarChapters;
-
-        window.showBibleContent = function() {
-            document.getElementById('view-bible-books').classList.add('hidden');
-            document.getElementById('view-bible-chapters').classList.add('hidden');
-            document.getElementById('view-bible-chapters').classList.remove('flex');
-            document.getElementById('bible-content').classList.remove('hidden');
+            // 預設載入第一軌
+            const firstRef = container.querySelector('.track-ref').innerText;
+            window.fetchBibleRef(firstRef);
         }
 
-        window.backToSidebarBooks = function() { 
-            document.getElementById('sidebar-chapter-list-container').classList.add('hidden');
-            document.getElementById('sidebar-chapter-list-container').classList.remove('flex');
-            document.getElementById('sidebar-book-list-container').classList.remove('hidden');
-        }
-        
-        window.goBackToMainBooks = function() {
-             window.renderMainBooks('old');
-             document.getElementById('view-bible-chapters').classList.add('hidden');
-             document.getElementById('bible-content').classList.add('hidden');
-             document.getElementById('view-bible-books').classList.remove('hidden');
-             document.getElementById('view-bible-books').classList.add('flex');
-        }
-        
-        window.backToBooks = window.backToSidebarBooks;
+        // 日期處理
+        window.handleDateChange = function(val) {
+            calendarDate = new Date(val);
+            if(els.datePicker) els.datePicker.value = val;
+            if(els.homeDatePicker) els.homeDatePicker.value = val;
+            
+            // 隨機今日嗎哪
+            const daySeed = val.split('-').reduce((a,b)=>a+parseInt(b), 0);
+            const m = mannaVerses[daySeed % mannaVerses.length];
+            document.getElementById('manna-text').innerText = m.t;
+            document.getElementById('manna-ref').innerText = m.r;
 
+            // 載入筆記
+            const fields = ['note-rhema','note-reflection','note-prayer-devotion','note-topic','note-content','note-thanks','note-grace','note-mood-event'];
+            fields.forEach(f => {
+                const el = document.getElementById(f);
+                if(el) {
+                    el.value = localStorage.getItem(`${val}-${f}`) || "";
+                    el.oninput = () => {
+                        localStorage.setItem(`${val}-${f}`, el.value);
+                        window.renderCalendar();
+                    };
+                }
+            });
+            window.renderCalendar();
+        }
+
+        // 月曆渲染
         window.renderCalendar = function() {
             const y = calendarDate.getFullYear(), m = calendarDate.getMonth();
-            els.calendarMonthLabel.innerText = `${y}年 ${m+1}月`;
+            els.calendarMonthLabel.innerText = `${y} . ${m+1}`;
             els.calendarGrid.innerHTML = "";
-            const start = new Date(y, m, 1).getDay();
-            for(let i=0; i<start; i++) els.calendarGrid.appendChild(document.createElement('div'));
-            for(let i=1; i<=new Date(y,m+1,0).getDate(); i++) {
-                const div = document.createElement('div'); div.className = "calendar-day"; div.innerText = i;
+            const startDay = new Date(y, m, 1).getDay();
+            const totalDays = new Date(y, m + 1, 0).getDate();
+
+            for(let i=0; i<startDay; i++) els.calendarGrid.appendChild(document.createElement('div'));
+            for(let i=1; i<=totalDays; i++) {
+                const d = document.createElement('div');
                 const key = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-                let hasEntry = false;
-                const checkFields = ['note-rhema','note-content','note-thanks','note-mood-event'];
-                for (let f of checkFields) {
-                     if(localStorage.getItem(`${key}-${f}`)) { hasEntry = true; break; }
-                }
-                if(hasEntry) div.classList.add('has-entry');
-                if(key === els.datePicker.value) div.classList.add('selected-day');
-                const isToday = key === new Date().toISOString().split('T')[0];
-                if(isToday) div.classList.add('today');
-                div.onclick = () => window.handleDateChange(key); 
-                els.calendarGrid.appendChild(div);
+                d.className = "calendar-day";
+                d.innerText = i;
+                if (key === els.datePicker.value) d.classList.add('selected-day');
+                if (localStorage.getItem(`${key}-note-rhema`) || localStorage.getItem(`${key}-note-content`)) d.classList.add('has-entry');
+                d.onclick = () => window.handleDateChange(key);
+                els.calendarGrid.appendChild(d);
             }
+        }
+
+        // 其他 UI
+        window.switchWorkspaceTab = function(t) {
+            const r = document.getElementById('section-reader'), j = document.getElementById('section-journal');
+            const tr = document.getElementById('tab-reader'), tj = document.getElementById('tab-journal');
+            if (t === 'reader') {
+                r.classList.replace('opacity-0', 'opacity-100'); r.classList.replace('z-0', 'z-10'); r.style.pointerEvents = "auto";
+                j.classList.replace('opacity-100', 'opacity-0'); j.classList.replace('z-10', 'z-0'); j.style.pointerEvents = "none";
+                tr.classList.add('active'); tj.classList.remove('active');
+            } else {
+                j.classList.replace('opacity-0', 'opacity-100'); j.classList.replace('z-0', 'z-10'); j.style.pointerEvents = "auto";
+                r.classList.replace('opacity-100', 'opacity-0'); r.classList.replace('z-10', 'z-0'); r.style.pointerEvents = "none";
+                tj.classList.add('active'); tr.classList.remove('active');
+            }
+        }
+
+        window.renderMainBooks = function(t) {
+            document.getElementById('main-book-list').innerHTML = bibleBooks[t].map(b => `
+                <button class="px-3 py-3 text-sm border border-[#E0DBD3] rounded-lg bg-white hover:border-[#C2A695] text-left shadow-sm transition-all" onclick='window.showMainChapters(${JSON.stringify(b)})'>${b.n}</button>
+            `).join('');
+            document.getElementById('btn-old').className = t==='old'?"flex-1 py-3 text-sm font-bold rounded-lg border-2 border-[#C2A695] bg-[#C2A695] text-white transition-all transform hover:-translate-y-1 shadow-md":"flex-1 py-3 text-sm font-bold rounded-lg border-2 border-[#C2A695] bg-white text-[#C2A695] transition-all transform hover:-translate-y-1 shadow-sm";
+            document.getElementById('btn-new').className = t==='new'?"flex-1 py-3 text-sm font-bold rounded-lg border-2 border-[#C2A695] bg-[#C2A695] text-white transition-all transform hover:-translate-y-1 shadow-md":"flex-1 py-3 text-sm font-bold rounded-lg border-2 border-[#C2A695] bg-white text-[#C2A695] transition-all transform hover:-translate-y-1 shadow-sm";
+        }
+
+        window.showMainChapters = function(b) {
+            document.getElementById('view-bible-books').classList.add('hidden');
+            document.getElementById('view-bible-chapters').classList.remove('hidden');
+            document.getElementById('main-chapter-title').innerText = b.n;
+            document.getElementById('main-chapter-grid').innerHTML = Array.from({length:b.c}, (_,i)=> `
+                <button class="aspect-square border border-[#E0DBD3] rounded-xl hover:bg-[#C2A695] hover:text-white transition-all flex items-center justify-center font-mono text-sm bg-white shadow-sm" onclick="window.fetchBibleRef('${b.abbr}${i+1}'); document.getElementById('view-bible-chapters').classList.add('hidden'); document.getElementById('bible-container').classList.remove('hidden');">${i+1}</button>
+            `).join('');
+            document.getElementById('bible-container').classList.add('hidden');
+        }
+
+        window.goBackToMainBooks = function() {
+            document.getElementById('view-bible-chapters').classList.add('hidden');
+            document.getElementById('bible-container').classList.add('hidden');
+            document.getElementById('view-bible-books').classList.remove('hidden');
+        }
+
+        window.changeCalendarMonth = function(n) { calendarDate.setMonth(calendarDate.getMonth()+n); window.renderCalendar(); }
+        window.goHome = function() { window.switchMode('home'); }
+        window.openExportModal = function() { document.getElementById('export-modal').classList.remove('hidden'); }
+        window.closeExportModal = function() { document.getElementById('export-modal').classList.add('hidden'); }
+        window.selectMood = function(el, m) { document.getElementById('note-mood').value = m; document.querySelectorAll('.mood-sticker').forEach(s=>s.classList.remove('selected')); el.classList.add('selected'); }
+        
+        window.performSearch = function() { window.fetchBibleRef(els.inlineSearch.value); }
+        window.updateCopyButton = function() {
+            const count = document.querySelectorAll('.verse-item.selected').length;
+            document.getElementById('btn-copy-verses').innerHTML = count > 0 ? `<span class='text-[10px] font-bold'>${count}</span>` : `<svg class="w-5 h-5 icon-sketch" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>`;
+        }
+        
+        window.copySelectedVerses = function() {
+            const sel = document.querySelectorAll('.verse-item.selected');
+            if (sel.length === 0) return;
+            const text = Array.from(sel).map(v => v.innerText.trim()).join('\n');
+            const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t);
+            const btn = document.getElementById('btn-copy-verses'); btn.innerHTML = "✅";
+            setTimeout(() => { sel.forEach(v=>v.classList.remove('selected')); window.updateCopyButton(); }, 1000);
+        }
+
+        window.backupData = function() {
+            const data = {};
+            for(let i=0; i<localStorage.length; i++){
+                const k = localStorage.key(i);
+                if(k.includes('note-')) data[k] = localStorage.getItem(k);
+            }
+            const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = `manna-backup-${new Date().toISOString().split('T')[0]}.json`; a.click();
+        }
+
+        window.restoreData = function(input) {
+            const r = new FileReader();
+            r.onload = e => {
+                const data = JSON.parse(e.target.result);
+                Object.keys(data).forEach(k => localStorage.setItem(k, data[k]));
+                location.reload();
+            }
+            r.readAsText(input.files[0]);
         }
 
         window.calculateStreak = function() {
             let s = 0, d = new Date();
             while(true) {
-                const key = d.toISOString().split('T')[0];
-                let hasEntry = false;
-                const checkFields = ['note-rhema','note-content','note-thanks','note-mood-event'];
-                for (let f of checkFields) {
-                     if(localStorage.getItem(`${key}-${f}`)) { hasEntry = true; break; }
-                }
-                if(hasEntry) { s++; d.setDate(d.getDate()-1); } 
-                else { break; }
+                const k = d.toISOString().split('T')[0];
+                if (localStorage.getItem(`${k}-note-rhema`) || localStorage.getItem(`${k}-note-content`)) {
+                    s++; d.setDate(d.getDate()-1);
+                } else break;
             }
-            els.streakCount.innerText = s; 
-            els.streakBadge.style.display = s>0?"flex":"none";
+            els.streakCount.innerText = s;
+            els.streakBadge.classList.toggle('hidden', s === 0);
+            els.streakBadge.classList.add('inline-flex');
         }
-
-        window.selectMood = function(el, emoji) {
-            document.getElementById('note-mood').value = emoji;
-            localStorage.setItem(`${els.datePicker.value}-note-mood`, emoji);
-            document.querySelectorAll('.mood-sticker').forEach(s => s.classList.remove('selected'));
-            el.classList.add('selected');
-        }
-
-        window.performSearch = function() {
-            els.inlineSearch.blur(); 
-            const kw = els.inlineSearch.value;
-            if(kw) {
-                window.fetchBibleRef(kw);
-                if (currentMode === 'bible') window.showBibleContent();
-            }
-        }
-
-        window.openExportModal = function() { document.getElementById('export-modal').classList.remove('hidden'); }
-        window.closeExportModal = function() { document.getElementById('export-modal').classList.add('hidden'); }
-        
-        window.goHome = function() { window.switchMode('home'); }
-        
-        window.changeCalendarMonth = function(dir) { calendarDate.setMonth(calendarDate.getMonth() + dir); window.renderCalendar(); }
-        
-        window.backupData = function() {
-            const data = {};
-            for(let i=0; i<localStorage.length; i++){
-                const k = localStorage.key(i);
-                if(k.match(/^\d{4}-\d{2}-\d{2}/)) data[k] = localStorage.getItem(k);
-            }
-            const blob = new Blob([JSON.stringify(data)], {type: "application/json"});
-            const a = document.createElement("a");
-            a.href = URL.createObjectURL(blob);
-            a.download = `manna-backup-${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-        }
-
-        window.restoreData = function(input) {
-            const reader = new FileReader();
-            reader.onload = e => {
-                const data = JSON.parse(e.target.result);
-                Object.keys(data).forEach(k => localStorage.setItem(k, data[k]));
-                alert("還原成功！");
-                location.reload();
-            };
-            reader.readAsText(input.files[0]);
-        }
-        
-        window.handleManualSqliteUpload = function(input) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                try {
-                    sqlDb = new SQL.Database(new Uint8Array(reader.result));
-                    sqlDbLoaded = true;
-                    window.detectTableStructure();
-                    alert("載入成功！");
-                    els.inlineSearch.placeholder = "🔍 搜尋 (如: 創 1:1)...";
-                    window.closeExportModal();
-                } catch(e) { alert("檔案讀取失敗"); }
-            };
-            reader.readAsArrayBuffer(input.files[0]);
-        }
-        
-        let dbTable = "verses", dbCols = { book: "book", chapter: "chapter", verse: "verse", text: "text" };
-
-        window.detectTableStructure = function() {
-            if(!sqlDb) return;
-            try {
-                const tables = sqlDb.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
-                if(tables[0]) {
-                    const names = tables[0].values.flat();
-                    dbTable = names.includes('verses') ? 'verses' : (names.includes('bible') ? 'bible' : names[0]);
-                }
-                const cols = sqlDb.exec(`PRAGMA table_info(${dbTable})`);
-                if(cols.length > 0) {
-                    const colNames = cols[0].values.map(r => r[1]);
-                    if(colNames.includes('content')) dbCols.text = 'content';
-                    else if(colNames.includes('scripture')) dbCols.text = 'scripture';
-                    else if(colNames.includes('經文')) dbCols.text = '經文';
-
-                    if(colNames.includes('book_name')) dbCols.book = 'book_name';
-                    else if(colNames.includes('書卷')) dbCols.book = '書卷';
-                }
-            } catch(e) {}
-        }
-        
-        window.setupSqlite = async function() {
-            const searchInput = document.getElementById('inline-search');
-            if (searchInput) {
-                if (typeof window.initSqlJs === 'undefined') {
-                    searchInput.placeholder = "⚠️ 元件載入失敗";
-                    return;
-                }
-                searchInput.placeholder = "📥 下載資料庫 (5MB)...";
-            }
-            
-            try {
-                isDbLoading = true;
-                SQL = await window.initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${f}` });
-                
-                if (REMOTE_DB_URL) {
-                    const res = await fetch(REMOTE_DB_URL);
-                    if (!res.ok) throw new Error("Network response was not ok");
-                    const buffer = await res.arrayBuffer();
-                    sqlDb = new SQL.Database(new Uint8Array(buffer));
-                    sqlDbLoaded = true;
-                    window.detectTableStructure();
-                    
-                    if (searchInput) {
-                        searchInput.disabled = false;
-                        searchInput.placeholder = "🔍 搜尋 (如: 創 1:1)...";
-                    }
-                    console.log("Database loaded successfully");
-                }
-            } catch(e) { 
-                console.error("Database load error:", e);
-                if (searchInput) {
-                    searchInput.disabled = false;
-                    searchInput.placeholder = "⚠️ 載入失敗，請重整";
-                }
-            } finally {
-                isDbLoading = false;
-            }
-        }
-
-        function initApp() {
-            els = {
-                viewHome: document.getElementById('view-home'), viewWorkspace: document.getElementById('view-workspace'), mainHeader: document.getElementById('main-header'),
-                bibleContent: document.getElementById('bible-content'), readerTitle: document.getElementById('reader-title'), headerTitle: document.getElementById('header-title'),
-                datePicker: document.getElementById('date-picker'), homeDatePicker: document.getElementById('home-date-picker'),
-                inlineSearch: document.getElementById('inline-search'), calendarGrid: document.getElementById('calendar-grid'),
-                calendarMonthLabel: document.getElementById('calendar-month-label'), streakCount: document.getElementById('streak-count'), streakBadge: document.getElementById('streak-badge')
-            };
-            const now = new Date();
-            const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-            window.handleDateChange(today);
-            window.setupSqlite();
-            window.renderSidebarBooks('old');
-        }
-        
-        window.setupSqlite = setupSqlite;
 
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
