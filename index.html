@@ -46,6 +46,7 @@
             line-height: 2.4; /* 增加行距，呼吸感 */
             font-size: 1.1rem;
             letter-spacing: 0.05em;
+            font-style: normal !important; /* 強制正體 */
         }
 
         /* 手繪感卡片 (不規則圓角) */
@@ -225,7 +226,7 @@
                 <div class="inline-block px-3 py-1 bg-[#F0EFEB] text-[#94A698] text-sm font-bold tracking-wider mb-6 self-start hand-font transform -rotate-2">Today's Manna</div>
                 
                 <div id="home-manna-display" class="z-10 flex-1 flex flex-col justify-center">
-                    <p class="serif-font text-2xl text-[#59544D] leading-relaxed mb-6" id="manna-text">載入中...</p>
+                    <p class="serif-font text-2xl text-[#59544D] leading-relaxed mb-6 not-italic" id="manna-text">載入中...</p>
                     <p class="text-sm font-bold text-[#C2A695] tracking-widest text-right" id="manna-ref"></p>
                 </div>
 
@@ -394,17 +395,30 @@
                 <div class="flex-1 overflow-y-auto p-8 space-y-10 pb-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
                     <!-- 靈修筆記 (Devotion) -->
                     <div id="journal-devotion-fields" class="space-y-8">
+                        <!-- 自動抓取今日進度 -->
                         <div>
-                            <label class="block text-sm font-bold text-[#C2A695] mb-2 uppercase tracking-widest hand-font">Rhema / 重點金句</label>
-                            <textarea id="note-rhema" placeholder="今天觸動你的話..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#C2A695] outline-none min-h-[80px] resize-none p-2 text-lg leading-relaxed"></textarea>
+                            <label class="block text-sm font-bold text-[#8C867D] mb-2 uppercase tracking-widest hand-font">📖 Reading / 今日進度</label>
+                            <input type="text" id="note-devotion-progress" readonly class="w-full bg-[#FAF9F7] border border-[#E0DBD3] rounded-lg p-3 text-sm text-[#59544D] outline-none select-none cursor-default" value="載入中...">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-[#C2A695] mb-2 uppercase tracking-widest hand-font">✨ Rhema / 觸動金句</label>
+                            <textarea id="note-rhema" placeholder="記下今天最觸動你的經文..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#C2A695] outline-none min-h-[80px] resize-none p-2 text-lg leading-relaxed"></textarea>
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-[#94A698] mb-2 uppercase tracking-widest hand-font">Reflection / 心得筆記</label>
-                            <textarea id="note-reflection" placeholder="你的看見或體會..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#94A698] outline-none min-h-[150px] resize-none p-2 text-lg leading-relaxed"></textarea>
+                            <label class="block text-sm font-bold text-[#94A698] mb-2 uppercase tracking-widest hand-font">📝 Reflection / 靈修心得</label>
+                            <textarea id="note-reflection" placeholder="你的看見、體會，或是天父對你說的話..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#94A698] outline-none min-h-[150px] resize-none p-2 text-lg leading-relaxed"></textarea>
                         </div>
+                        
+                        <!-- 新增：生活應用 -->
                         <div>
-                            <label class="block text-sm font-bold text-[#C2A695] mb-2 uppercase tracking-widest hand-font">Prayer / 禱告事項</label>
-                            <textarea id="note-prayer-devotion" placeholder="跟神聊聊..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#C2A695] outline-none min-h-[100px] resize-none p-2 text-lg leading-relaxed"></textarea>
+                            <label class="block text-sm font-bold text-[#8C867D] mb-2 uppercase tracking-widest hand-font">🌱 Action / 生活應用</label>
+                            <textarea id="note-application" placeholder="具體可以行出來的小練習..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#8C867D] outline-none min-h-[80px] resize-none p-2 text-lg leading-relaxed"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-[#C2A695] mb-2 uppercase tracking-widest hand-font">💌 Response / 禱告回應</label>
+                            <textarea id="note-prayer-devotion" placeholder="寫給神的回信..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#C2A695] outline-none min-h-[100px] resize-none p-2 text-lg leading-relaxed"></textarea>
                         </div>
                     </div>
                     
@@ -788,39 +802,89 @@
             }
         }
 
+        // 進度計算 (1年 365 天)
         window.updateDevotionUI = function() {
             const start = new Date(calendarDate.getFullYear(), 0, 0);
             const diff = calendarDate - start;
             const dayOfYear = Math.floor(diff / 86400000);
+            
+            // 用來收集今日進度的文字陣列
+            let progressTexts = [];
+
             const container = document.getElementById('devotion-tabs');
             container.innerHTML = planTracks.map((track, idx) => {
+                // 簡單的分發邏輯
                 const totalChapters = track.books.reduce((a,b)=>a+b.c, 0);
                 const chapterIdx = Math.floor((dayOfYear % totalChapters)) || 1;
+                
+                // 找出該 index 對應哪卷書
                 let currentCount = 0, targetBook = track.books[0], targetChapter = 1;
                 for(let b of track.books) {
-                    if (currentCount + b.c >= chapterIdx) { targetBook = b; targetChapter = chapterIdx - currentCount; break; }
+                    if (currentCount + b.c >= chapterIdx) {
+                        targetBook = b;
+                        targetChapter = chapterIdx - currentCount;
+                        break;
+                    }
                     currentCount += b.c;
                 }
+
                 const ref = `${targetBook.abbr} ${targetChapter}`;
-                return `<div class="devotion-track-card ${idx===0?'active':''}" onclick="window.fetchBibleRef('${ref}'); document.querySelectorAll('.devotion-track-card').forEach(c=>c.classList.remove('active')); this.classList.add('active');"><span class="track-tag uppercase">${track.t}</span><span class="track-ref font-mono">${ref}</span></div>`;
+                progressTexts.push(ref); // 收集進度
+
+                return `
+                    <div class="devotion-track-card ${idx===0?'active':''}" onclick="window.fetchBibleRef('${ref}'); document.querySelectorAll('.devotion-track-card').forEach(c=>c.classList.remove('active')); this.classList.add('active');">
+                        <span class="track-tag uppercase">${track.t}</span>
+                        <span class="track-ref font-mono">${ref}</span>
+                    </div>
+                `;
             }).join('');
+            
+            // 更新「今日進度」欄位
+            const progressField = document.getElementById('note-devotion-progress');
+            if(progressField) {
+                progressField.value = progressTexts.join(' / ');
+            }
+
+            // 預設載入第一軌
             const firstRef = container.querySelector('.track-ref').innerText;
             window.fetchBibleRef(firstRef);
         }
 
+        // 日期處理
         window.handleDateChange = function(val) {
             calendarDate = new Date(val);
             if(els.datePicker) els.datePicker.value = val;
             if(els.homeDatePicker) els.homeDatePicker.value = val;
+            
+            // 隨機今日嗎哪
             const daySeed = val.split('-').reduce((a,b)=>a+parseInt(b), 0);
             const m = mannaVerses[daySeed % mannaVerses.length];
             document.getElementById('manna-text').innerText = m.t;
             document.getElementById('manna-ref').innerText = m.r;
-            const fields = ['note-rhema', 'note-reflection', 'note-prayer-devotion', 'note-topic', 'note-content', 'note-thanks', 'note-grace', 'note-mood-event', 'note-mood-tags', 'note-mood-lie', 'note-mood-god-view', 'note-mood-prayer'];
+
+            // 載入筆記 (新增 note-application)
+            const fields = [
+                'note-rhema', 'note-reflection', 'note-application', 'note-prayer-devotion',
+                'note-topic', 'note-content', 
+                'note-thanks', 'note-grace', 
+                'note-mood-event', 'note-mood-tags', 'note-mood-lie', 'note-mood-god-view', 'note-mood-prayer'
+            ];
             fields.forEach(f => {
                 const el = document.getElementById(f);
-                if(el) { el.value = localStorage.getItem(`${val}-${f}`) || ""; el.oninput = () => { localStorage.setItem(`${val}-${f}`, el.value); window.renderCalendar(); }; }
+                if(el) {
+                    el.value = localStorage.getItem(`${val}-${f}`) || "";
+                    el.oninput = () => {
+                        localStorage.setItem(`${val}-${f}`, el.value);
+                        window.renderCalendar();
+                    };
+                }
             });
+            
+            // 更新進度顯示 (如果是靈修模式)
+            if(currentMode === 'devotion') {
+                window.updateDevotionUI();
+            }
+            
             window.renderCalendar();
         }
 
