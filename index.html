@@ -10,187 +10,361 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
     <!-- Google Fonts -->
     <style>
-        /* 引入襯線體與手寫英文字體 */
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&family=Caveat:wght@400;700&family=Zen+Maru+Gothic:wght@300;400;700&display=swap');
+        /* 保持 Noto Sans TC 避免缺字，保留 VT323 裝飾 */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=VT323&display=swap');
         
         :root {
-            /* 文青配色：宣紙白、炭筆灰、乾燥玫瑰、鼠尾草綠、陶土棕 */
-            --bg-paper: #F9F8F4;
-            --bg-card: #FFFEFA;
-            --ink-primary: #59544D;
-            --ink-secondary: #8C867D;
-            --accent-sage: #94A698;
-            --accent-clay: #C2A695;
-            --accent-rose: #D6C0BE;
-            --border-sketch: #E0DBD3;
+            /* 樂高積木配色 (Lego Palette) */
+            --lego-red: #E3000B;
+            --lego-red-dark: #bf0009;
+            --lego-blue: #0055BF;
+            --lego-blue-dark: #004296;
+            --lego-yellow: #FFD500;
+            --lego-yellow-dark: #ccaa00;
+            --lego-green: #008F39;
+            --lego-green-dark: #006b2b;
+            --lego-white: #FFFFFF;
+            --lego-grey: #A0A5A9;
+            --lego-dark-grey: #6D6E71;
+            
+            --bg-baseplate: #F4F6F8; /* 淺灰底板色 */
+            --stud-shadow: rgba(0,0,0,0.15);
         }
 
         body { 
-            font-family: 'Zen Maru Gothic', 'Noto Serif TC', sans-serif; /* 圓體字更親和 */
-            background-color: var(--bg-paper);
-            color: var(--ink-primary);
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-baseplate);
+            color: #333;
             -webkit-tap-highlight-color: transparent;
-            /* 模擬紙張紋理 */
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            /* 樂高底板背景圖案 (Stud Pattern) */
+            background-image: 
+                radial-gradient(var(--stud-shadow) 15%, transparent 16%),
+                radial-gradient(var(--stud-shadow) 15%, transparent 16%);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
         }
         
-        .serif-font, .bible-text, h1, h2, h3 { 
-            font-family: 'Noto Serif TC', serif; 
-        }
-
-        .hand-font {
-            font-family: 'Caveat', cursive;
-        }
-
-        .bible-text {
-            line-height: 2.4; /* 增加行距，呼吸感 */
-            font-size: 1.1rem;
-            letter-spacing: 0.05em;
-            font-style: normal !important; /* 強制正體 */
-        }
-
-        /* 手繪感卡片 (不規則圓角) */
-        .sketch-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-sketch);
-            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px; /* 手繪風格邊框 */
-            box-shadow: 2px 3px 10px rgba(0,0,0,0.02);
-            transition: all 0.3s ease;
-        }
-        .sketch-card:hover {
-            transform: translateY(-3px) rotate(0.5deg);
-            box-shadow: 4px 6px 15px rgba(0,0,0,0.05);
-            border-color: var(--accent-clay);
-        }
-
-        /* 經文選取樣式 - 像螢光筆劃線 */
-        .verse-item {
+        .pixel-font { font-family: 'VT323', monospace; }
+        
+        /* 積木卡片 (Brick Card) */
+        .brick-card {
+            background: var(--lego-white);
+            border-radius: 8px; /* 稍微圓角，像現代樂高磚 */
+            border: 2px solid rgba(0,0,0,0.05);
+            /* 積木的立體感：底部厚度陰影 */
+            box-shadow: 0 6px 0 #E0E0E0, 0 12px 10px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
             position: relative;
-            padding: 4px 8px;
-            margin-bottom: 4px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background 0.2s;
+            overflow: hidden;
         }
-        .verse-item.selected {
-            background: linear-gradient(120deg, #f6e6e6 0%, #f6e6e6 100%);
-            background-repeat: no-repeat;
-            background-size: 100% 40%;
-            background-position: 0 88%;
+        /* 頂部裝飾條：模擬積木側面 */
+        .brick-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: rgba(0,0,0,0.05);
+        }
+
+        /* 通用積木按鈕 */
+        .brick-btn {
+            background-color: var(--lego-white);
+            color: #333;
+            font-weight: 900;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            position: relative;
+            /* 實體按鈕效果 */
+            box-shadow: 0 5px 0 #ccc; 
+            transition: all 0.1s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .brick-btn:active, .brick-btn.active {
+            transform: translateY(5px); /* 壓下去 */
+            box-shadow: 0 0 0 #ccc; /* 陰影消失 */
+        }
+        
+        /* 顏色變體 */
+        .btn-yellow { background-color: var(--lego-yellow); color: #333; box-shadow: 0 5px 0 var(--lego-yellow-dark); }
+        .btn-yellow:active { box-shadow: 0 0 0 var(--lego-yellow-dark); }
+        
+        .btn-blue { background-color: var(--lego-blue); color: white; box-shadow: 0 5px 0 var(--lego-blue-dark); }
+        .btn-blue:active { box-shadow: 0 0 0 var(--lego-blue-dark); }
+        
+        .btn-red { background-color: var(--lego-red); color: white; box-shadow: 0 5px 0 var(--lego-red-dark); }
+        .btn-red:active { box-shadow: 0 0 0 var(--lego-red-dark); }
+        
+        .btn-green { background-color: var(--lego-green); color: white; box-shadow: 0 5px 0 var(--lego-green-dark); }
+        .btn-green:active { box-shadow: 0 0 0 var(--lego-green-dark); }
+
+        /* 真實積木風格按鈕 (用於捷徑) */
+        .real-brick-btn {
+            position: relative;
+            border-radius: 4px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.1s;
+            overflow: hidden;
+        }
+        /* 表面凸粒紋理 */
+        .real-brick-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(rgba(0,0,0,0.2) 20%, transparent 22%);
+            background-size: 16px 16px; /* 凸粒大小 */
+            background-position: 8px 8px;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        /* 頂部反光效果 */
+        .real-brick-btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.3) 0%, transparent 40%);
+            pointer-events: none;
+        }
+        .real-brick-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 0 0 transparent !important;
+        }
+
+        /* 捷徑積木顏色定義 */
+        .brick-bible {
+            background-color: var(--lego-blue);
+            color: white;
+            box-shadow: 0 8px 0 var(--lego-blue-dark), 0 15px 15px rgba(0,0,0,0.2);
+        }
+        .brick-prayer {
+            background-color: var(--lego-green);
+            color: white;
+            box-shadow: 0 8px 0 var(--lego-green-dark), 0 15px 15px rgba(0,0,0,0.2);
+        }
+        .brick-gratitude {
+            background-color: var(--lego-yellow);
+            color: #333;
+            box-shadow: 0 8px 0 var(--lego-yellow-dark), 0 15px 15px rgba(0,0,0,0.2);
+        }
+        .brick-mood {
+            background-color: var(--lego-red);
+            color: white;
+            box-shadow: 0 8px 0 var(--lego-red-dark), 0 15px 15px rgba(0,0,0,0.2);
+        }
+
+        /* 新增：小型積木紋理 (用於圖示) */
+        .mini-brick {
+            position: relative;
+            overflow: hidden;
+        }
+        .mini-brick::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            /* 2x2 凸粒 */
+            background-image: radial-gradient(rgba(0,0,0,0.15) 25%, transparent 28%);
+            background-size: 20px 20px; 
+            background-position: 0 0;
+        }
+        .mini-brick::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* 經文樣式 */
+        .bible-text {
+            line-height: 2.2;
+            font-size: 1.15rem;
+            letter-spacing: 0.05em;
+            font-weight: 500;
+        }
+
+        /* 經文選取 - 積木堆疊感 */
+        .verse-item {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            background: #FAFAFA;
+            transition: all 0.1s;
         }
         .verse-item:hover {
-            background-color: rgba(0,0,0,0.02);
+            border-color: var(--lego-yellow);
+            background: #fff;
+        }
+        .verse-item.selected {
+            background-color: var(--lego-yellow);
+            color: #333;
+            border-bottom: 4px solid var(--lego-yellow-dark);
+            transform: translateY(-2px);
+            font-weight: 700;
         }
 
         /* 隱藏卷軸 */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background-color: #DCD6CC; border-radius: 10px; }
-        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: var(--lego-grey); border-radius: 6px; border: 3px solid #f1f1f1; }
 
-        .fade-in { animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* 四軌進度 - 郵票風格 */
+        /* 閱讀進度條 - 積木條 */
         .devotion-track-card {
-            background: #FFFEFA; 
-            transition: all 0.2s; 
+            background: white;
+            border-radius: 6px;
             cursor: pointer;
-            border: 1px dashed var(--border-sketch); /* 虛線邊框 */
-            border-radius: 8px;
+            padding: 8px 4px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 10px 4px;
-            min-height: 65px;
-            position: relative;
+            transition: all 0.1s;
+            border-bottom: 4px solid #ddd;
         }
-        .devotion-track-card:hover { 
-            border-color: var(--accent-clay); 
-            background: #FAF8F5;
-        }
+        .devotion-track-card:hover { transform: translateY(-2px); border-bottom-width: 6px; }
         .devotion-track-card.active {
-            background: var(--accent-sage); 
+            background: var(--lego-blue);
             color: white;
-            border: 1px solid var(--accent-sage);
-            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-            box-shadow: 2px 4px 8px rgba(148, 166, 152, 0.4);
+            border-bottom-color: var(--lego-blue-dark);
+            transform: translateY(1px);
+            border-bottom-width: 2px;
         }
         .devotion-track-card.active .track-tag { color: rgba(255,255,255,0.9); }
-        
-        .track-tag { font-size: 11px; font-weight: 700; color: var(--ink-secondary); margin-bottom: 2px; font-family: 'Caveat', cursive; letter-spacing: 1px; }
-        .track-ref { font-size: 13px; font-weight: 600; text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: 'Noto Serif TC'; }
 
-        /* 分頁按鈕 - 紙膠帶風格 */
+        .track-tag { font-size: 12px; font-weight: 700; color: #888; margin-bottom: 2px; }
+        .track-ref { font-size: 14px; font-weight: 700; font-family: 'VT323', monospace; letter-spacing: 1px;}
+
+        /* 分頁按鈕 - 積木接合處 */
         .workspace-tab-btn {
-            flex: 1; text-align: center; padding: 14px 10px; font-size: 15px; font-weight: bold; 
-            color: var(--ink-secondary); border-bottom: 3px solid transparent; transition: all 0.2s;
+            flex: 1; text-align: center; padding: 12px 10px; font-size: 16px; font-weight: 700; 
+            color: #888; border-radius: 8px 8px 0 0;
+            transition: all 0.1s;
+            position: relative;
+            background: #eee;
+            margin-right: 4px;
         }
         .workspace-tab-btn.active { 
-            color: var(--accent-clay); 
-            border-bottom-color: var(--accent-clay); 
-            background-color: rgba(194, 166, 149, 0.05);
-            font-family: 'Noto Serif TC';
+            background-color: var(--lego-white);
+            color: var(--lego-blue); 
+            box-shadow: 0 -3px 0 var(--lego-blue) inset; /* 頂部亮條 */
+            z-index: 10;
+            margin-bottom: -2px; /* 連接下方 */
+            padding-bottom: 14px;
         }
 
-        /* 心情貼紙 */
+        /* 心情貼紙 - 圓形積木 (Round Plate 1x1) */
         .mood-sticker {
-            font-size: 1.4rem; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; cursor: pointer; transition: all 0.2s; background-color: #fff; border: 1px dashed var(--border-sketch);
+            font-size: 1.5rem; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; cursor: pointer; transition: all 0.1s; background-color: #fff; 
+            border-bottom: 4px solid #ddd;
         }
-        .mood-sticker.selected { background-color: var(--accent-sage); color: white; border-style: solid; border-color: var(--accent-sage); transform: scale(1.1) rotate(10deg); }
+        .mood-sticker:active, .mood-sticker.selected { 
+            transform: translateY(3px);
+            border-bottom-width: 0;
+            background-color: var(--lego-yellow);
+        }
 
-        /* 月曆樣式 */
+        /* 月曆樣式 - 像 1x1 拼貼磚 */
         .calendar-day {
-            aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 50%;
-            font-size: 0.85rem; cursor: pointer; transition: all 0.2s; position: relative; font-family: 'Caveat', cursive; font-size: 1.1rem;
+            aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 4px;
+            font-size: 1rem; cursor: pointer; transition: all 0.1s; position: relative; font-weight: 700;
+            background: #fff;
+            border-bottom: 3px solid #ddd;
+            font-family: 'VT323', monospace; font-size: 1.4rem;
         }
+        .calendar-day:active { transform: translateY(3px); border-bottom: 0; }
         .calendar-day.has-entry::after {
-            content: ''; position: absolute; bottom: 3px; width: 4px; height: 4px; background: var(--accent-sage); border-radius: 50%;
+            content: ''; position: absolute; bottom: 4px; width: 6px; height: 6px; background: var(--lego-green); 
+            border-radius: 50%;
         }
-        .calendar-day.selected-day { background-color: var(--accent-clay) !important; color: white !important; }
-        .calendar-day.today { border: 2px dashed var(--accent-clay); font-weight: bold; color: var(--accent-clay); }
+        .calendar-day.selected-day { 
+            background-color: var(--lego-blue) !important; 
+            color: white !important; 
+            border-bottom-color: var(--lego-blue-dark);
+        }
+        .calendar-day.today { 
+            border: 2px dashed var(--lego-red); 
+            color: var(--lego-red); 
+            border-bottom: 2px dashed var(--lego-red); /* Reset shadow style */
+        }
 
         .loader {
-            width: 30px; height: 30px; border: 3px solid #EBE6DE; border-bottom-color: var(--accent-sage);
-            border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite;
+            width: 40px; height: 40px; 
+            background-color: var(--lego-yellow);
+            box-shadow: 0 4px 0 var(--lego-yellow-dark);
+            border-radius: 4px;
+            animation: bounce 0.6s infinite alternate;
         }
-        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes bounce { 
+            from { transform: translateY(0); } 
+            to { transform: translateY(-10px); } 
+        }
 
-        /* 手繪圖示 SVG 通用樣式 */
-        .icon-sketch { stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
-        
-        /* 輸入框手繪風 */
+        /* 輸入框 - 凹陷區塊 */
         textarea, input[type="text"], input[type="date"] {
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
-            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: #FAFAFA;
+            border: 2px solid #ddd;
+            border-top: 4px solid #ccc; /* 頂部陰影加深，製造凹陷感 */
+            border-radius: 6px;
+            font-family: 'Noto Sans TC', sans-serif;
+            transition: all 0.2s;
+        }
+        textarea:focus, input:focus {
+            outline: none;
+            background-color: white;
+            border-color: var(--lego-blue);
+            border-top-color: var(--lego-blue);
+        }
+        
+        /* 標籤 Badge */
+        .badge {
+            background: var(--lego-red);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            box-shadow: 0 2px 0 var(--lego-red-dark);
         }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden selection:bg-[#D6C0BE] selection:text-[#59544D]">
+<body class="h-screen flex flex-col overflow-hidden selection:bg-[#FFD500] selection:text-black">
 
-    <!-- 頂部導覽列 -->
-    <header id="main-header" class="bg-[#F9F8F4]/90 backdrop-blur-sm border-b border-[#E0DBD3] sticky top-0 z-30 shrink-0 hidden">
+    <!-- 頂部導覽列：像一條長積木 -->
+    <header id="main-header" class="bg-white/95 backdrop-blur-none border-b-4 border-[#eee] sticky top-0 z-30 shrink-0 hidden">
         <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center gap-4">
             <div class="flex items-center gap-2 cursor-pointer group" onclick="window.goHome()">
-                <!-- Logo 換成 SVG 吐司 -->
-                <svg class="w-7 h-7 text-[#C2A695] group-hover:rotate-12 transition-transform icon-sketch" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M4 14C4 14 4 7 12 7C20 7 20 14 20 14V18C20 19.1 19.1 20 18 20H6C4.9 20 4 19.1 4 18V14Z"></path>
-                    <path d="M4 14H20"></path>
-                    <path d="M9 11C9 11 9.5 10 10.5 10C11.5 10 12 11 12 11"></path>
-                    <path d="M13 11C13 11 13.5 10 14.5 10C15.5 10 16 11 16 11"></path>
-                </svg>
-                <h1 class="hidden sm:block text-sm font-bold tracking-widest text-[#59544D] font-serif">機智的嗎哪生活</h1>
+                <!-- Game Icon: Yellow Brick -->
+                <div class="w-10 h-10 bg-[#FFD500] rounded flex items-center justify-center shadow-[0_4px_0_#ccaa00] active:shadow-none active:translate-y-1 transition-all mini-brick border border-yellow-400">
+                     <svg class="w-6 h-6 text-[#333] relative z-10" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5">
+                        <path d="M4 14C4 14 4 7 12 7C20 7 20 14 20 14V18C20 19.1 19.1 20 18 20H6C4.9 20 4 19.1 4 18V14Z"></path>
+                        <path d="M4 14H20"></path>
+                        <path d="M9 11C9 11 9.5 10 10.5 10C11.5 10 12 11 12 11"></path>
+                        <path d="M13 11C13 11 13.5 10 14.5 10C15.5 10 16 11 16 11"></path>
+                    </svg>
+                </div>
+                <h1 class="hidden sm:block text-lg font-bold tracking-wider text-[#333]">機智的嗎哪生活</h1>
             </div>
-            <div id="header-title" class="flex-1 text-center font-family-caveat text-xl text-[#94A698] font-bold tracking-widest uppercase truncate hand-font">HOME</div>
+            
+            <div id="header-title" class="flex-1 text-center pixel-font text-2xl text-[#333] font-bold tracking-widest uppercase truncate">HOME</div>
+            
             <div class="flex items-center gap-2">
-                <button onclick="window.openExportModal()" class="p-2 text-[#8C867D] hover:text-[#C2A695]">
-                    <svg class="w-5 h-5 icon-sketch" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                <button onclick="window.openExportModal()" class="brick-btn p-2 hover:bg-gray-50">
+                    <svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                 </button>
-                <input type="date" id="date-picker" class="bg-[#F0EFEB] border-none rounded-md px-3 py-1 text-xs font-mono outline-none text-[#59544D] cursor-pointer" onchange="window.handleDateChange(this.value)">
+                <input type="date" id="date-picker" class="border-2 border-[#ddd] rounded px-2 py-1 text-sm font-bold outline-none text-[#333] cursor-pointer" onchange="window.handleDateChange(this.value)">
             </div>
         </div>
     </header>
@@ -199,127 +373,134 @@
     <div id="view-home" class="flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-5xl mx-auto flex flex-col">
         
         <div class="flex justify-between items-end mb-10 fade-in pt-4">
-            <div class="flex flex-col gap-1">
-                <span class="text-xs text-[#C2A695] tracking-[0.2em] font-bold uppercase hand-font text-lg">Smart Manna Life</span>
-                <h1 class="text-3xl md:text-4xl font-serif font-bold text-[#59544D] leading-tight flex items-center gap-3">
+            <div class="flex flex-col gap-2">
+                <span class="inline-block px-2 py-1 bg-[#333] text-[#FFD500] text-xs font-bold tracking-widest uppercase pixel-font transform -rotate-2 rounded shadow-sm">Smart Manna Life</span>
+                <h1 class="text-3xl md:text-5xl font-black text-[#333] leading-tight flex items-center gap-3 drop-shadow-sm">
                     機智的嗎哪生活 
-                    <svg class="w-8 h-8 text-[#C2A695] icon-sketch" viewBox="0 0 24 24" stroke="currentColor">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
-                    </svg>
+                    <div class="w-10 h-10 bg-[#E3000B] rounded flex items-center justify-center relative top-1 shadow-[0_4px_0_#bf0009] mini-brick border border-red-600">
+                        <svg class="w-6 h-6 text-white relative z-10" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
+                        </svg>
+                    </div>
                 </h1>
             </div>
             <div class="hidden sm:block">
-                <input type="date" id="home-date-picker" class="bg-white border border-[#E0DBD3] rounded-lg px-4 py-2 text-sm font-mono outline-none shadow-sm text-[#59544D]" onchange="window.handleDateChange(this.value)">
+                <input type="date" id="home-date-picker" class="bg-white border-2 border-[#ddd] rounded px-4 py-2 text-sm font-bold outline-none shadow-[0_4px_0_#ccc] active:shadow-none active:translate-y-1 transition-all text-[#333]" onchange="window.handleDateChange(this.value)">
             </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 fade-in">
             <!-- 今日嗎哪卡片 -->
-            <div class="md:col-span-1 flex flex-col sketch-card p-8 relative overflow-hidden group cursor-pointer bg-[#FFFEFA] hover:bg-[#FAF9F7] transition-colors" onclick="window.switchMode('devotion')">
+            <div class="md:col-span-1 flex flex-col brick-card p-6 relative group cursor-pointer" onclick="window.switchMode('devotion')">
                 <!-- 裝飾用圖案 -->
-                <svg class="absolute -right-4 -top-4 w-32 h-32 text-[#E0DBD3] opacity-20 icon-sketch" viewBox="0 0 24 24" stroke="currentColor">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-                    <path d="M2 12h20"></path>
-                </svg>
+                <div class="absolute top-4 right-4 p-2 opacity-10 rotate-12">
+                    <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.8L18.4 19H5.6L12 5.8z"/></svg>
+                </div>
                 
-                <div class="inline-block px-3 py-1 bg-[#F0EFEB] text-[#94A698] text-sm font-bold tracking-wider mb-6 self-start hand-font transform -rotate-2">Today's Manna</div>
+                <div class="inline-block px-3 py-1 bg-[#0055BF] text-white text-sm font-bold mb-6 self-start rounded shadow-[0_3px_0_#004296]">Today's Build</div>
                 
                 <div id="home-manna-display" class="z-10 flex-1 flex flex-col justify-center">
-                    <p class="serif-font text-2xl text-[#59544D] leading-relaxed mb-6 not-italic" id="manna-text">載入中...</p>
-                    <p class="text-sm font-bold text-[#C2A695] tracking-widest text-right" id="manna-ref"></p>
+                    <p class="text-2xl font-bold text-[#333] leading-relaxed mb-6 not-italic" id="manna-text">Loading...</p>
+                    <p class="text-sm font-bold bg-[#333] text-white px-2 py-1 w-fit self-end pixel-font tracking-wider rounded" id="manna-ref"></p>
                 </div>
 
                 <!-- 行動呼籲區域 -->
-                <div class="flex items-center justify-between mt-8 pt-5 border-t border-dashed border-[#E0DBD3] z-10">
+                <div class="flex items-center justify-between mt-8 pt-5 border-t-2 border-dashed border-gray-200 z-10">
                      <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-[#F6E6E6] flex items-center justify-center text-[#C2A695] group-hover:bg-[#C2A695] group-hover:text-white transition-colors shadow-sm">
-                            <svg class="w-5 h-5 icon-sketch" viewBox="0 0 24 24" stroke="currentColor">
+                        <div class="w-10 h-10 bg-[#FFD500] rounded flex items-center justify-center text-[#333] shadow-[0_3px_0_#ccaa00]">
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5">
                                 <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
                             </svg>
                         </div>
                         <div class="flex flex-col">
-                            <span class="text-[10px] text-[#94A698] font-bold uppercase tracking-wider leading-tight">Start Devotion</span>
-                            <span class="text-sm text-[#59544D] font-bold tracking-widest font-serif">開始靈修</span>
+                            <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider leading-tight">START BUILDING</span>
+                            <span class="text-base text-[#333] font-bold tracking-widest">開始靈修</span>
                         </div>
                      </div>
-                     <span class="text-xl text-[#C2A695] font-bold group-hover:translate-x-1 transition-transform">➔</span>
+                     <span class="text-2xl text-[#E3000B] font-black group-hover:translate-x-2 transition-transform">→</span>
                 </div>
             </div>
 
             <!-- 靈修足跡月曆 -->
-            <div class="md:col-span-2 sketch-card p-8 bg-white">
+            <div class="md:col-span-2 brick-card p-6">
                 <div class="flex justify-between items-center mb-6">
-                    <h3 class="font-bold text-[#59544D] flex items-center gap-2 font-serif text-lg">
-                        生命足跡 <span id="streak-badge" class="hidden items-center px-3 py-1 rounded-full bg-[#F6E6E6] text-[#C2A695] text-xs ml-2 hand-font">🔥 <span id="streak-count" class="mx-1 font-sans font-bold">0</span> Days</span>
+                    <h3 class="font-bold text-[#333] flex items-center gap-2 text-xl">
+                        生命足跡 <span id="streak-badge" class="hidden items-center px-3 py-1 bg-[#FFD500] text-[#333] text-xs ml-2 rounded shadow-[0_2px_0_#ccaa00]">🔥 <span id="streak-count" class="mx-1 font-mono text-lg">0</span> Days</span>
                     </h3>
-                    <div class="flex items-center gap-4">
-                        <button onclick="window.changeCalendarMonth(-1)" class="w-8 h-8 flex items-center justify-center text-[#8C867D] hover:bg-[#F0EFEB] rounded-full transition-colors">◀</button>
-                        <div class="text-base font-bold w-24 text-center text-[#59544D] serif-font" id="calendar-month-label"></div>
-                        <button onclick="window.changeCalendarMonth(1)" class="w-8 h-8 flex items-center justify-center text-[#8C867D] hover:bg-[#F0EFEB] rounded-full transition-colors">▶</button>
+                    <div class="flex items-center gap-3">
+                        <button onclick="window.changeCalendarMonth(-1)" class="w-8 h-8 flex items-center justify-center brick-btn p-0">◀</button>
+                        <div class="text-xl font-bold w-24 text-center text-[#333] pixel-font" id="calendar-month-label"></div>
+                        <button onclick="window.changeCalendarMonth(1)" class="w-8 h-8 flex items-center justify-center brick-btn p-0">▶</button>
                     </div>
                 </div>
-                <div class="grid grid-cols-7 gap-1 text-center text-xs text-[#C2A695] mb-3 font-bold uppercase tracking-widest hand-font">
+                <div class="grid grid-cols-7 gap-2 text-center text-xs text-gray-400 mb-3 font-bold uppercase tracking-widest pixel-font">
                     <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
                 </div>
                 <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
             </div>
         </div>
 
-        <!-- 捷徑區域 -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10 fade-in">
-            <div onclick="window.switchMode('bible')" class="sketch-card p-6 cursor-pointer flex flex-col items-center gap-3 group hover:bg-[#FAF9F7]">
-                <svg class="w-8 h-8 text-[#8C867D] group-hover:text-[#59544D] icon-sketch transition-colors" viewBox="0 0 24 24" stroke="currentColor">
+        <!-- 捷徑區域 (積木風格) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10 fade-in">
+            <!-- 藍色積木：聖經閱讀 -->
+            <div onclick="window.switchMode('bible')" class="real-brick-btn brick-bible cursor-pointer group h-auto">
+                <svg class="w-10 h-10 text-white opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
                     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                     <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
                 </svg>
-                <h3 class="text-sm font-bold text-[#59544D] tracking-widest">聖經閱讀</h3>
+                <h3 class="text-base font-bold text-white tracking-widest mt-auto">聖經閱讀</h3>
             </div>
-            <div onclick="window.switchMode('journal-prayer')" class="sketch-card p-6 cursor-pointer flex flex-col items-center gap-3 group hover:bg-[#FAF9F7]">
-                <svg class="w-8 h-8 text-[#8C867D] group-hover:text-[#94A698] icon-sketch transition-colors" viewBox="0 0 24 24" stroke="currentColor">
+            
+            <!-- 綠色積木：跟神聊聊 -->
+            <div onclick="window.switchMode('journal-prayer')" class="real-brick-btn brick-prayer cursor-pointer group h-auto">
+                <svg class="w-10 h-10 text-white opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
                     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
                 </svg>
-                <h3 class="text-sm font-bold text-[#59544D] tracking-widest">跟神聊聊</h3>
+                <h3 class="text-base font-bold text-white tracking-widest mt-auto">跟神聊聊</h3>
             </div>
-            <div onclick="window.switchMode('journal-gratitude')" class="sketch-card p-6 cursor-pointer flex flex-col items-center gap-3 group hover:bg-[#FAF9F7]">
-                <svg class="w-8 h-8 text-[#8C867D] group-hover:text-[#D6C0BE] icon-sketch transition-colors" viewBox="0 0 24 24" stroke="currentColor">
+            
+            <!-- 黃色積木：感恩日記 -->
+            <div onclick="window.switchMode('journal-gratitude')" class="real-brick-btn brick-gratitude cursor-pointer group h-auto">
+                <svg class="w-10 h-10 text-[#333] opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                 </svg>
-                <h3 class="text-sm font-bold text-[#59544D] tracking-widest">感恩日記</h3>
+                <h3 class="text-base font-bold text-[#333] tracking-widest mt-auto">感恩日記</h3>
             </div>
-            <div onclick="window.switchMode('journal-mood')" class="sketch-card p-6 cursor-pointer flex flex-col items-center gap-3 group hover:bg-[#FAF9F7]">
-                <svg class="w-8 h-8 text-[#8C867D] group-hover:text-[#C2A695] icon-sketch transition-colors" viewBox="0 0 24 24" stroke="currentColor">
+            
+            <!-- 紅色積木：內心戲 -->
+            <div onclick="window.switchMode('journal-mood')" class="real-brick-btn brick-mood cursor-pointer group h-auto">
+                <svg class="w-10 h-10 text-white opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
                     <circle cx="12" cy="12" r="10"></circle>
                     <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
                     <line x1="9" y1="9" x2="9.01" y2="9"></line>
                     <line x1="15" y1="9" x2="15.01" y2="9"></line>
                 </svg>
-                <h3 class="text-sm font-bold text-[#59544D] tracking-widest">內心戲</h3>
+                <h3 class="text-base font-bold text-white tracking-widest mt-auto">內心戲</h3>
             </div>
         </div>
 
-        <footer class="mt-auto py-10 text-center fade-in border-t border-dashed border-[#E0DBD3] w-11/12 md:w-2/3 mx-auto">
+        <footer class="mt-auto py-10 text-center fade-in border-t-4 border-[#ddd] w-11/12 md:w-2/3 mx-auto">
             <div class="flex justify-center flex-wrap gap-5 md:gap-6 mb-4">
-                <a href="https://www.facebook.com/profile.php?id=100068500932557" target="_blank" class="text-[#8C867D] hover:text-[#1877F2] transition-colors p-2 hover:scale-110 transform duration-200"><svg class="w-6 h-6 icon-sketch" viewBox="0 0 24 24" stroke="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
-                <a href="https://www.instagram.com/forever.believe.in.jesus/" target="_blank" class="text-[#8C867D] hover:text-[#E4405F] transition-colors p-2 hover:scale-110 transform duration-200"><svg class="w-6 h-6 icon-sketch" viewBox="0 0 24 24" stroke="currentColor"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
-                <a href="https://www.threads.net/@forever.believe.in.jesus" target="_blank" class="text-[#8C867D] hover:text-black transition-colors p-2 hover:scale-110 transform duration-200"><svg class="w-6 h-6 icon-sketch" viewBox="0 0 24 24" stroke="currentColor"><path d="M12.27 4.15c-4.46 0-7.85 3.32-7.85 7.85 0 4.54 3.39 7.85 7.85 7.85 2.5 0 4.67-1.16 6.04-2.81l-1.92-1.46c-1 1.15-2.52 1.83-4.12 1.83-2.91 0-5.32-2.31-5.32-5.41s2.41-5.41 5.32-5.41c2.46 0 4.8 1.63 5.24 4.09l.06.35c.19 1.09.08 1.95-.31 2.34-.18.18-.45.26-.81.26-.58 0-1.17-.26-1.54-1.12l-.12-.27c-.49-1.15-.74-2.42-.74-3.69v-.39h-2.52v.4c0 1.57.34 3.09.98 4.49-.9 1.02-2.22 1.69-3.7 1.69-2.7 0-4.9-2.2-4.9-4.9 0-2.7 2.2-4.9 4.9-4.9 2.59 0 4.86 1.98 5.16 4.53.13 1.14.07 2.01-.17 2.65-.54 1.43-1.69 1.98-2.98 1.98-1.25 0-2.2-.69-2.61-1.91-.45-.87-.45-1.95-.45-2.07 0-.58.11-1.14.32-1.67.58-1.45 2.03-2.46 3.69-2.46z"/></svg></a>
-                <a href="https://line.me/R/ti/p/@469cjlho" target="_blank" class="text-[#8C867D] hover:text-[#00C300] transition-colors p-2 hover:scale-110 transform duration-200"><svg class="w-6 h-6 icon-sketch" viewBox="0 0 24 24" stroke="currentColor"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></a>
-                <a href="mailto:newthingsinthelittlelight@gmail.com" class="text-[#8C867D] hover:text-[#C2A695] transition-colors p-2 hover:scale-110 transform duration-200"><svg class="w-6 h-6 icon-sketch" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></a>
+                <a href="https://www.facebook.com/profile.php?id=100068500932557" target="_blank" class="text-gray-400 hover:text-[#1877F2] transition-colors p-2 hover:scale-110 transform duration-200"><svg class="w-6 h-6" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
+                <a href="https://www.instagram.com/forever.believe.in.jesus/" target="_blank" class="text-gray-400 hover:text-[#E4405F] transition-colors p-2 hover:scale-110 transform duration-200"><svg class="w-6 h-6" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+                <a href="https://www.threads.net/@forever.believe.in.jesus" target="_blank" class="text-gray-400 hover:text-black transition-colors p-2 hover:scale-110 transform duration-200"><svg class="w-6 h-6" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M12.27 4.15c-4.46 0-7.85 3.32-7.85 7.85 0 4.54 3.39 7.85 7.85 7.85 2.5 0 4.67-1.16 6.04-2.81l-1.92-1.46c-1 1.15-2.52 1.83-4.12 1.83-2.91 0-5.32-2.31-5.32-5.41s2.41-5.41 5.32-5.41c2.46 0 4.8 1.63 5.24 4.09l.06.35c.19 1.09.08 1.95-.31 2.34-.18.18-.45.26-.81.26-.58 0-1.17-.26-1.54-1.12l-.12-.27c-.49-1.15-.74-2.42-.74-3.69v-.39h-2.52v.4c0 1.57.34 3.09.98 4.49-.9 1.02-2.22 1.69-3.7 1.69-2.7 0-4.9-2.2-4.9-4.9 0-2.7 2.2-4.9 4.9-4.9 2.59 0 4.86 1.98 5.16 4.53.13 1.14.07 2.01-.17 2.65-.54 1.43-1.69 1.98-2.98 1.98-1.25 0-2.2-.69-2.61-1.91-.45-.87-.45-1.95-.45-2.07 0-.58.11-1.14.32-1.67.58-1.45 2.03-2.46 3.69-2.46z"/></svg></a>
+                <a href="https://line.me/R/ti/p/@469cjlho" target="_blank" class="text-gray-400 hover:text-[#00C300] transition-colors p-2 hover:scale-110 transform duration-200"><svg class="w-6 h-6" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></a>
+                <a href="mailto:newthingsinthelittlelight@gmail.com" class="text-gray-400 hover:text-[#E3000B] transition-colors p-2 hover:scale-110 transform duration-200"><svg class="w-6 h-6" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></a>
             </div>
-            <p class="text-[10px] text-[#C2A695] font-bold tracking-widest uppercase hand-font text-lg">耶穌加油站 x 微光新事 © 2024</p>
+            <p class="text-xs text-gray-400 font-bold tracking-widest uppercase pixel-font text-lg">耶穌加油站 x 微光新事 © 2024</p>
         </footer>
     </div>
 
     <!-- 2. 工作區視圖 -->
-    <main id="view-workspace" class="hidden flex-1 w-full max-w-7xl mx-auto flex flex-col h-full overflow-hidden bg-[#F9F8F4]">
+    <main id="view-workspace" class="hidden flex-1 w-full max-w-7xl mx-auto flex flex-col h-full overflow-hidden bg-transparent">
         
-        <!-- 全域分頁切換 (靈修模式) -->
-        <div id="workspace-tabs" class="flex border-b border-[#E0DBD3] shrink-0 bg-[#F9F8F4] z-20 px-4 pt-2 gap-2">
-            <button id="tab-reader" class="workspace-tab-btn active rounded-t-xl" onclick="window.switchWorkspaceTab('reader')">
-                <span class="text-xl mr-1 hand-font">Read</span> <span id="tab-reader-text">閱讀經文</span>
+        <!-- 全域分頁切換 -->
+        <div id="workspace-tabs" class="flex border-b-4 border-[#ccc] shrink-0 bg-[#F4F6F8] z-20 px-4 pt-2 gap-1">
+            <button id="tab-reader" class="workspace-tab-btn active" onclick="window.switchWorkspaceTab('reader')">
+                <span class="text-xl mr-1 pixel-font">Read</span> <span id="tab-reader-text">閱讀經文</span>
             </button>
-            <button id="tab-journal" class="workspace-tab-btn rounded-t-xl" onclick="window.switchWorkspaceTab('journal')">
-                <span class="text-xl mr-1 hand-font">Write</span> <span id="tab-journal-text">靈修筆記</span>
+            <button id="tab-journal" class="workspace-tab-btn" onclick="window.switchWorkspaceTab('journal')">
+                <span class="text-xl mr-1 pixel-font">Write</span> <span id="tab-journal-text">靈修筆記</span>
             </button>
         </div>
 
@@ -327,40 +508,40 @@
         <div class="flex-1 flex overflow-hidden relative p-0 md:p-4 gap-4">
             
             <!-- 閱讀器區塊 (Left) -->
-            <section id="section-reader" class="w-full lg:w-1/2 flex flex-col bg-white border border-[#E0DBD3] rounded-none md:rounded-2xl transition-all duration-300 absolute lg:relative inset-0 z-10 lg:z-auto shadow-sm">
+            <section id="section-reader" class="w-full lg:w-1/2 flex flex-col brick-card rounded-none md:rounded-lg transition-all duration-300 absolute lg:relative inset-0 z-10 lg:z-auto shadow-none md:shadow-[0_6px_0_#E0E0E0,0_12px_10px_rgba(0,0,0,0.1)]">
                 
-                <!-- A. Devotion Tabs (Sticky top in section) -->
-                <div id="devotion-tabs" class="hidden grid grid-cols-4 gap-3 p-4 bg-[#FAF9F7] border-b border-dashed border-[#E0DBD3] shrink-0 rounded-t-2xl"></div>
+                <!-- A. Devotion Tabs (Sticky top) -->
+                <div id="devotion-tabs" class="hidden grid grid-cols-4 gap-2 p-4 bg-[#F9F9F9] border-b-2 border-gray-100 shrink-0"></div>
                 
-                <!-- B. Universal Header (New) -->
-                <div id="reader-universal-header" class="px-5 py-4 border-b border-[#E0DBD3] flex justify-between items-center bg-[#FAF9F7] shrink-0 rounded-t-2xl">
+                <!-- B. Universal Header -->
+                <div id="reader-universal-header" class="px-5 py-4 border-b-2 border-gray-100 flex justify-between items-center bg-white shrink-0">
                     <!-- Left: Nav/Title -->
                     <div class="flex items-center gap-3 flex-1 min-w-0">
-                         <!-- Back Button (Dynamic) -->
-                         <button id="btn-header-back" onclick="window.goBackToMainBooks()" class="hidden shrink-0 w-8 h-8 rounded-full border border-[#C2A695] text-[#C2A695] flex items-center justify-center text-xs hover:bg-[#C2A695] hover:text-white transition-colors">◀</button>
+                         <!-- Back Button -->
+                         <button id="btn-header-back" onclick="window.goBackToMainBooks()" class="hidden shrink-0 w-8 h-8 rounded bg-[#333] text-white flex items-center justify-center text-xs hover:bg-black transition-colors shadow-[0_3px_0_#000] active:shadow-none active:translate-y-1">◀</button>
                          
                          <!-- Title Info -->
                          <div class="min-w-0">
                              <div class="flex items-center gap-2">
-                                <span id="header-subtitle" class="text-[12px] font-bold text-[#94A698] uppercase tracking-widest block hand-font">Scripture</span>
-                                <!-- Added Copy Progress Button -->
-                                <button id="btn-copy-progress" onclick="window.copyDevotionProgress()" class="hidden text-[10px] text-[#94A698] border border-[#94A698] rounded px-1 hover:bg-[#94A698] hover:text-white transition-colors leading-tight" title="複製今日進度">
-                                    複製今日進度
+                                <span id="header-subtitle" class="text-[12px] font-bold text-gray-400 uppercase tracking-widest block pixel-font">Scripture</span>
+                                <!-- Copy Progress Button -->
+                                <button id="btn-copy-progress" onclick="window.copyDevotionProgress()" class="hidden text-[10px] bg-[#333] text-white rounded px-2 py-0.5 hover:bg-black transition-colors leading-tight tracking-wider" title="複製今日進度">
+                                    複製進度
                                 </button>
                              </div>
-                             <h2 id="header-main-title" class="text-lg text-[#59544D] font-bold truncate font-serif">Bible Reading</h2>
+                             <h2 id="header-main-title" class="text-lg text-[#333] font-bold truncate">Bible Reading</h2>
                          </div>
                     </div>
                     <!-- Right: Actions -->
                     <div class="flex items-center gap-2">
-                         <!-- Search (Always visible) -->
+                         <!-- Search -->
                          <div class="relative" id="search-box">
-                             <input type="text" id="inline-search" placeholder="Search..." class="pl-3 pr-8 py-1.5 rounded-lg bg-white text-xs w-28 focus:w-48 transition-all outline-none border border-[#E0DBD3] focus:border-[#94A698]" onkeyup="if(event.key==='Enter') window.performSearch()">
-                             <button onclick="window.performSearch()" class="absolute right-2 top-2 text-[#8C867D]"><svg class="w-4 h-4 icon-sketch" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
+                             <input type="text" id="inline-search" placeholder="Search..." class="pl-3 pr-8 py-1.5 rounded bg-gray-50 text-xs w-28 focus:w-48 transition-all outline-none border-2 border-gray-200 focus:border-[#0055BF]" onkeyup="if(event.key==='Enter') window.performSearch()">
+                             <button onclick="window.performSearch()" class="absolute right-2 top-2 text-gray-400"><svg class="w-4 h-4" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
                          </div>
-                         <!-- Copy (Only visible in content mode) -->
-                         <button id="btn-copy-verses" onclick="window.copySelectedVerses()" class="hidden w-9 h-9 flex items-center justify-center rounded-lg bg-white text-[#8C867D] border border-[#E0DBD3] hover:border-[#C2A695] hover:text-[#C2A695] transition-colors shadow-sm">
-                            <svg class="w-5 h-5 icon-sketch" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                         <!-- Copy -->
+                         <button id="btn-copy-verses" onclick="window.copySelectedVerses()" class="hidden w-9 h-9 flex items-center justify-center rounded bg-[#FFD500] text-[#333] border-none shadow-[0_3px_0_#ccaa00] active:shadow-none active:translate-y-1 transition-all">
+                            <svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
                          </button>
                     </div>
                 </div>
@@ -371,26 +552,26 @@
                     <!-- 1. Books View -->
                     <div id="view-bible-books" class="hidden flex-col min-h-full p-6">
                          <div class="flex gap-4 mb-6 shrink-0">
-                            <button onclick="window.renderMainBooks('old')" id="btn-old" class="flex-1 py-3 text-sm font-bold rounded-lg border-2 border-[#C2A695] bg-[#C2A695] text-white transition-all transform hover:-translate-y-1">舊約 Old Testament</button>
-                            <button onclick="window.renderMainBooks('new')" id="btn-new" class="flex-1 py-3 text-sm font-bold rounded-lg border-2 border-[#C2A695] bg-white text-[#C2A695] transition-all transform hover:-translate-y-1">新約 New Testament</button>
+                            <button onclick="window.renderMainBooks('old')" id="btn-old" class="brick-btn btn-yellow flex-1 py-3 text-sm">舊約 Old Testament</button>
+                            <button onclick="window.renderMainBooks('new')" id="btn-new" class="brick-btn flex-1 py-3 text-sm border-2 border-gray-100">新約 New Testament</button>
                         </div>
                         <div id="main-book-list" class="grid grid-cols-2 sm:grid-cols-4 gap-3 content-start pb-10"></div>
                     </div>
 
                     <!-- 2. Chapters View -->
                     <div id="view-bible-chapters" class="hidden flex-col min-h-full p-6">
-                        <h3 id="main-chapter-title" class="text-3xl font-serif font-bold text-[#59544D] mb-8 border-b-2 border-[#F0EFEB] pb-4"></h3>
+                        <h3 id="main-chapter-title" class="text-3xl font-bold text-[#333] mb-8 border-b-4 border-[#FFD500] w-fit pb-1 px-2"></h3>
                         <div id="main-chapter-grid" class="grid grid-cols-5 sm:grid-cols-6 gap-3 pb-10"></div>
                     </div>
 
                     <!-- 3. Text View -->
-                    <div id="view-bible-text" class="hidden min-h-full p-6 md:p-10 bible-text text-[#4A4A4A] bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')]"></div>
+                    <div id="view-bible-text" class="hidden min-h-full p-6 md:p-10 bible-text text-gray-800"></div>
                 </div>
             </section>
 
             <!-- 筆記區塊 (Right) -->
-            <section id="section-journal" class="w-full lg:w-1/2 flex flex-col bg-white border border-[#E0DBD3] rounded-none md:rounded-2xl transition-all duration-300 absolute lg:relative inset-0 opacity-0 lg:opacity-100 pointer-events-none lg:pointer-events-auto z-0 lg:z-auto shadow-sm">
-                <div class="bg-[#FAF9F7] px-6 py-4 border-b border-[#E0DBD3] flex gap-3 overflow-x-auto no-scrollbar items-center shrink-0 rounded-t-2xl">
+            <section id="section-journal" class="w-full lg:w-1/2 flex flex-col brick-card rounded-none md:rounded-lg transition-all duration-300 absolute lg:relative inset-0 opacity-0 lg:opacity-100 pointer-events-none lg:pointer-events-auto z-0 lg:z-auto shadow-none md:shadow-[0_6px_0_#E0E0E0,0_12px_10px_rgba(0,0,0,0.1)]">
+                <div class="bg-gray-50 px-6 py-4 border-b-2 border-gray-100 flex gap-3 overflow-x-auto no-scrollbar items-center shrink-0">
                     <button class="mood-sticker" onclick="window.selectMood(this, '☀️')">☀️</button>
                     <button class="mood-sticker" onclick="window.selectMood(this, '☁️')">☁️</button>
                     <button class="mood-sticker" onclick="window.selectMood(this, '🌧️')">🌧️</button>
@@ -398,96 +579,96 @@
                     <button class="mood-sticker" onclick="window.selectMood(this, '🌱')">🌱</button>
                     <input type="hidden" id="note-mood">
                 </div>
-                <div class="flex-1 overflow-y-auto p-8 space-y-10 pb-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+                <div class="flex-1 overflow-y-auto p-8 space-y-10 pb-20">
                     <!-- 靈修筆記 (Devotion) -->
                     <div id="journal-devotion-fields" class="space-y-8">
                         <!-- 自動抓取今日進度 -->
                         <div>
-                            <label class="block text-sm font-bold text-[#8C867D] mb-2 uppercase tracking-widest hand-font">📖 Reading / 今日進度</label>
-                            <input type="text" id="note-devotion-progress" readonly class="w-full bg-[#FAF9F7] border border-[#E0DBD3] rounded-lg p-3 text-sm text-[#59544D] outline-none select-none cursor-default" value="載入中...">
+                            <label class="block text-sm font-bold text-[#333] mb-2 uppercase tracking-widest pixel-font bg-[#FFD500] w-fit px-2 rounded shadow-sm">📖 Reading</label>
+                            <input type="text" id="note-devotion-progress" readonly class="w-full p-3 text-sm text-[#333] font-bold" value="Loading...">
                         </div>
 
                         <div>
-                            <label class="block text-sm font-bold text-[#C2A695] mb-2 uppercase tracking-widest hand-font">✨ Rhema / 觸動金句</label>
-                            <textarea id="note-rhema" placeholder="記下今天最觸動你的經文..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#C2A695] outline-none min-h-[80px] resize-none p-2 text-lg leading-relaxed"></textarea>
+                            <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#0055BF] w-fit px-2 rounded shadow-sm">✨ Rhema</label>
+                            <textarea id="note-rhema" placeholder="記下今天最觸動你的經文..." class="w-full min-h-[80px] resize-none p-3 text-lg leading-relaxed"></textarea>
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-[#94A698] mb-2 uppercase tracking-widest hand-font">📝 Reflection / 靈修心得</label>
-                            <textarea id="note-reflection" placeholder="你的看見、體會，或是天父對你說的話..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#94A698] outline-none min-h-[150px] resize-none p-2 text-lg leading-relaxed"></textarea>
+                            <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#008F39] w-fit px-2 rounded shadow-sm">📝 Reflection</label>
+                            <textarea id="note-reflection" placeholder="你的看見、體會，或是天父對你說的話..." class="w-full min-h-[150px] resize-none p-3 text-lg leading-relaxed"></textarea>
                         </div>
                         
                         <!-- 新增：生活應用 -->
                         <div>
-                            <label class="block text-sm font-bold text-[#8C867D] mb-2 uppercase tracking-widest hand-font">🌱 Action / 生活應用</label>
-                            <textarea id="note-application" placeholder="具體可以行出來的小練習..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#8C867D] outline-none min-h-[80px] resize-none p-2 text-lg leading-relaxed"></textarea>
+                            <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#6D6E71] w-fit px-2 rounded shadow-sm">🌱 Action</label>
+                            <textarea id="note-application" placeholder="具體可以行出來的小練習..." class="w-full min-h-[80px] resize-none p-3 text-lg leading-relaxed"></textarea>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-bold text-[#C2A695] mb-2 uppercase tracking-widest hand-font">💌 Response / 禱告回應</label>
-                            <textarea id="note-prayer-devotion" placeholder="寫給神的回信..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#C2A695] outline-none min-h-[100px] resize-none p-2 text-lg leading-relaxed"></textarea>
+                            <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#E3000B] w-fit px-2 rounded shadow-sm">💌 Response</label>
+                            <textarea id="note-prayer-devotion" placeholder="寫給神的回信..." class="w-full min-h-[100px] resize-none p-3 text-lg leading-relaxed"></textarea>
                         </div>
                     </div>
                     
                     <!-- 跟神聊聊 (Prayer) -->
                     <div id="journal-prayer-fields" class="space-y-8 hidden">
                         <div>
-                            <label class="block text-sm font-bold text-[#C2A695] mb-2 uppercase tracking-widest hand-font">🎯 Wish / 許願池</label>
-                            <textarea id="note-topic" placeholder="想要什麼？大膽跟神求..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#C2A695] outline-none min-h-[60px] resize-none p-2 text-lg leading-relaxed"></textarea>
+                            <label class="block text-sm font-bold text-[#333] mb-2 uppercase tracking-widest pixel-font bg-[#FFD500] w-fit px-2 rounded shadow-sm">🎯 Wish</label>
+                            <textarea id="note-topic" placeholder="想要什麼？大膽跟神求..." class="w-full min-h-[60px] resize-none p-3 text-lg leading-relaxed"></textarea>
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-[#94A698] mb-2 uppercase tracking-widest hand-font">💬 Murmur / 碎碎唸</label>
-                            <textarea id="note-content" placeholder="把心裡話都倒出來吧..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#94A698] outline-none min-h-[200px] resize-none p-2 text-lg leading-relaxed"></textarea>
+                            <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#0055BF] w-fit px-2 rounded shadow-sm">💬 Murmur</label>
+                            <textarea id="note-content" placeholder="把心裡話都倒出來吧..." class="w-full min-h-[200px] resize-none p-3 text-lg leading-relaxed"></textarea>
                         </div>
                     </div>
 
                     <!-- 感恩日記 (Gratitude) -->
                     <div id="journal-gratitude-fields" class="space-y-8 hidden">
                         <div>
-                            <label class="block text-sm font-bold text-[#C2A695] mb-2 uppercase tracking-widest hand-font">💖 Gratitude / 感恩事項</label>
-                            <textarea id="note-thanks" placeholder="今天發生了什麼好事？..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#C2A695] outline-none min-h-[120px] resize-none p-2 text-lg leading-relaxed"></textarea>
+                            <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#E3000B] w-fit px-2 rounded shadow-sm">💖 Gratitude</label>
+                            <textarea id="note-thanks" placeholder="今天發生了什麼好事？..." class="w-full min-h-[120px] resize-none p-3 text-lg leading-relaxed"></textarea>
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-[#94A698] mb-2 uppercase tracking-widest hand-font">✨ Grace / 恩典記號</label>
-                            <textarea id="note-grace" placeholder="哪裡看見神的作為？..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#94A698] outline-none min-h-[120px] resize-none p-2 text-lg leading-relaxed"></textarea>
+                            <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#008F39] w-fit px-2 rounded shadow-sm">✨ Grace</label>
+                            <textarea id="note-grace" placeholder="哪裡看見神的作為？..." class="w-full min-h-[120px] resize-none p-3 text-lg leading-relaxed"></textarea>
                         </div>
                     </div>
 
                     <!-- 內心戲 (Mood) -->
                     <div id="journal-mood-fields" class="space-y-8 hidden">
-                        <div class="p-5 bg-[#FAF9F7] rounded-3xl border border-dashed border-[#E0DBD3]">
-                            <label class="block text-base font-bold text-[#59544D] mb-3 uppercase hand-font">🎬 Event / 發生了什麼事？</label>
-                            <textarea id="note-mood-event" placeholder="記錄事件與感受..." class="w-full bg-white border border-[#E0DBD3] rounded-xl p-4 text-base outline-none resize-none h-28 focus:border-[#C2A695] leading-relaxed"></textarea>
+                        <div class="p-5 bg-[#FAFAFA] rounded-lg border-2 border-gray-200 border-t-4 border-gray-300">
+                            <label class="block text-base font-bold text-[#333] mb-3 uppercase pixel-font">🎬 Event / 發生了什麼事？</label>
+                            <textarea id="note-mood-event" placeholder="記錄事件與感受..." class="w-full bg-white border-2 border-[#ddd] rounded p-4 text-base outline-none resize-none h-28 focus:border-[#FFD500] leading-relaxed shadow-none"></textarea>
                         </div>
 
                         <!-- 情緒標註區塊 -->
                         <div>
-                            <label class="block text-lg font-bold text-[#8C867D] mb-2 hand-font">🏷️ Emotions / 情緒標籤</label>
-                            <textarea id="note-mood-tags" placeholder="把所有能感受到的情緒從最強列的情緒開始一個一個寫下來..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#8C867D] outline-none min-h-[60px] resize-none p-2 text-lg"></textarea>
+                            <label class="block text-lg font-bold text-[#333] mb-2 pixel-font">🏷️ Emotions</label>
+                            <textarea id="note-mood-tags" placeholder="把所有能感受到的情緒從最強列的情緒開始一個一個寫下來..." class="w-full min-h-[60px] resize-none p-3 text-lg"></textarea>
                         </div>
 
                         <div class="grid grid-cols-1 gap-8">
                             <div>
-                                <label class="block text-lg font-bold text-[#C2A695] mb-2 hand-font">🤥 Lie / 我相信了什麼謊言？</label>
-                                <textarea id="note-mood-lie" placeholder="我認為這件事是因為什麼..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#C2A695] outline-none min-h-[50px] resize-none p-2 text-lg"></textarea>
+                                <label class="block text-lg font-bold text-white mb-2 pixel-font bg-[#333] w-fit px-2 rounded">🤥 Lie</label>
+                                <textarea id="note-mood-lie" placeholder="我認為這件事是因為什麼..." class="w-full min-h-[50px] resize-none p-3 text-lg"></textarea>
                             </div>
                             <div>
-                                <label class="block text-lg font-bold text-[#94A698] mb-2 hand-font">👓 Truth / 神怎麼看這件事？</label>
-                                <textarea id="note-mood-god-view" placeholder="在禱告中領受神的眼光..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#94A698] outline-none min-h-[50px] resize-none p-2 text-lg"></textarea>
+                                <label class="block text-lg font-bold text-[#333] mb-2 pixel-font bg-[#FFD500] w-fit px-2 rounded border border-[#ccaa00]">👓 Truth</label>
+                                <textarea id="note-mood-god-view" placeholder="在禱告中領受神的眼光..." class="w-full min-h-[50px] resize-none p-3 text-lg"></textarea>
                             </div>
                         </div>
 
                         <!-- 禱告區塊 -->
                         <div>
-                            <label class="block text-lg font-bold text-[#C2A695] mb-2 hand-font">🙏 Prayer / 禱告 & 領受</label>
-                            <textarea id="note-mood-prayer" placeholder="最後的交託與領受..." class="w-full bg-transparent border-b-2 border-dashed border-[#E0DBD3] focus:border-[#C2A695] outline-none min-h-[100px] resize-none p-2 text-lg leading-relaxed"></textarea>
+                            <label class="block text-lg font-bold text-white mb-2 pixel-font bg-[#0055BF] w-fit px-2 rounded">🙏 Prayer</label>
+                            <textarea id="note-mood-prayer" placeholder="最後的交託與領受..." class="w-full min-h-[100px] resize-none p-3 text-lg leading-relaxed"></textarea>
                         </div>
                     </div>
 
                     <!-- 底部儲存提示 -->
                     <div class="pt-8">
-                        <button onclick="window.backupData()" class="w-full py-4 rounded-xl bg-[#FAF9F7] border border-[#E0DBD3] text-[#8C867D] text-sm font-bold hover:bg-[#C2A695] hover:text-white transition-all flex items-center justify-center gap-3 group shadow-sm">
+                        <button onclick="window.backupData()" class="brick-btn btn-green w-full flex items-center justify-center gap-3 group">
                             <span class="group-hover:scale-110 transition-transform">💾</span> 
-                            <span>Save & Backup</span>
+                            <span>SAVE GAME (Backup)</span>
                         </button>
                     </div>
                 </div>
@@ -496,22 +677,22 @@
     </main>
 
     <!-- Modal -->
-    <div id="export-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-[#59544D]/20 backdrop-blur-sm hidden" onclick="if(event.target===this)window.closeExportModal()">
-        <div class="bg-[#FFFEFA] w-full max-w-sm p-8 rounded-[40px] shadow-2xl m-4 border border-[#E0DBD3]" onclick="event.stopPropagation()">
-            <h3 class="text-2xl font-bold mb-3 font-serif text-[#59544D] text-center">Data Manager</h3>
-            <p class="text-sm text-[#8C867D] mb-8 text-center">筆記儲存在瀏覽器中，記得定期備份。</p>
+    <div id="export-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm hidden" onclick="if(event.target===this)window.closeExportModal()">
+        <div class="bg-white w-full max-w-sm p-8 rounded-lg shadow-[0_12px_0_#ccc] m-4 border-2 border-gray-200" onclick="event.stopPropagation()">
+            <h3 class="text-3xl font-bold mb-3 text-[#333] text-center pixel-font">DATA CENTER</h3>
+            <p class="text-sm text-gray-500 mb-8 text-center font-bold">筆記儲存在瀏覽器中，記得定期存檔！</p>
             <div class="grid grid-cols-1 gap-4">
-                 <button onclick="window.backupData()" class="w-full py-4 rounded-2xl bg-[#C2A695] text-white hover:bg-[#B09280] transition-all text-sm font-bold flex items-center justify-center gap-3 shadow-md">
-                    <svg class="w-5 h-5 icon-sketch" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                    下載備份 (.json)
+                 <button onclick="window.backupData()" class="brick-btn btn-yellow w-full flex items-center justify-center gap-3">
+                    <svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                    下載存檔 (.json)
                  </button>
-                 <button onclick="document.getElementById('restore-input').click()" class="w-full py-4 rounded-2xl border-2 border-[#E0DBD3] hover:border-[#94A698] hover:text-[#94A698] transition-all text-sm font-bold text-[#8C867D] flex items-center justify-center gap-3">
-                    <svg class="w-5 h-5 icon-sketch" stroke="currentColor" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-                    還原資料
+                 <button onclick="document.getElementById('restore-input').click()" class="brick-btn w-full flex items-center justify-center gap-3 border-2 border-gray-100">
+                    <svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                    讀取存檔
                  </button>
                  <input type="file" id="restore-input" class="hidden" accept=".json" onchange="window.restoreData(this)">
             </div>
-            <button onclick="window.closeExportModal()" class="mt-8 text-xs text-[#C2A695] font-bold w-full text-center hover:underline uppercase tracking-widest">Close</button>
+            <button onclick="window.closeExportModal()" class="mt-8 text-xs text-[#333] font-bold w-full text-center hover:underline uppercase tracking-widest pixel-font">Close Window</button>
         </div>
     </div>
 
@@ -560,7 +741,6 @@
                 viewHome: document.getElementById('view-home'),
                 viewWorkspace: document.getElementById('view-workspace'),
                 mainHeader: document.getElementById('main-header'),
-                // 修正：從新的通用 Header 抓取元素
                 readerTitle: document.getElementById('header-main-title'),
                 readerSubtitle: document.getElementById('header-subtitle'),
                 backBtn: document.getElementById('btn-header-back'),
@@ -610,14 +790,86 @@
             canvas.width = 192;
             canvas.height = 192;
             const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#FFFFFF';
+            
+            // --- 3D Lego Brick Logic ---
+            
+            // 1. Base Block (Yellow)
+            const baseColor = '#FFD500';
+            const shadowColor = '#ccaa00';
+            const highlightColor = '#ffe666'; // lighter yellow
+            
+            ctx.fillStyle = baseColor;
             ctx.fillRect(0, 0, 192, 192);
-            ctx.translate(96, 96); 
-            ctx.scale(6.5, 6.5);   
-            ctx.translate(-12, -12); 
+            
+            // Inner shadow/Highlight for plastic block edges
+            // Top/Left Highlight
+            ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+            ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.moveTo(0,192); ctx.lineTo(0,0); ctx.lineTo(192,0); ctx.stroke();
+            
+            // Bottom/Right Shadow
+            ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+            ctx.beginPath(); ctx.moveTo(0,192); ctx.lineTo(192,192); ctx.lineTo(192,0); ctx.stroke();
+
+            // 2. Draw 4 Studs (2x2)
+            const studs = [
+                {x: 48, y: 48}, {x: 144, y: 48},
+                {x: 48, y: 144}, {x: 144, y: 144}
+            ];
+            
+            studs.forEach(pos => {
+                const cx = pos.x;
+                const cy = pos.y;
+                const r = 36; 
+
+                // A. Cast Shadow (Drop shadow on the block)
+                ctx.beginPath();
+                ctx.arc(cx + 6, cy + 6, r, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0,0,0,0.1)'; // Soft shadow
+                ctx.fill();
+
+                // B. Stud Side (The height of the cylinder)
+                ctx.beginPath();
+                ctx.arc(cx, cy + 2, r, 0, Math.PI * 2);
+                ctx.fillStyle = shadowColor; 
+                ctx.fill();
+
+                // C. Stud Top Surface
+                const grad = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+                grad.addColorStop(0, highlightColor); // Highlight side
+                grad.addColorStop(1, shadowColor); // Shadow side
+                
+                ctx.beginPath();
+                ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                ctx.fillStyle = grad; 
+                ctx.fill();
+
+                // D. Plastic Highlight (Glossy reflection)
+                ctx.beginPath();
+                ctx.ellipse(cx - 12, cy - 12, 10, 6, -Math.PI / 4, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                ctx.fill();
+                
+                // E. Embossed logo text simulation
+                ctx.beginPath();
+                ctx.arc(cx, cy, r - 8, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            });
+
+            // 3. Icon Overlay (Toast/Manna)
+            // Scale and Translate context to draw SVG path easily
+            ctx.save();
+            ctx.translate(24, 24); // Center roughly (192 - 144)/2 = 24
+            ctx.scale(6, 6); // 24 * 6 = 144 size
+            
+            ctx.lineWidth = 2.5 / 6; // Maintain relative thickness
+            ctx.strokeStyle = '#333333';
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-            ctx.lineWidth = 1.8; 
+
+            // Draw Toast Shape
             ctx.beginPath();
             ctx.moveTo(4, 14);
             ctx.bezierCurveTo(4, 14, 4, 7, 12, 7);
@@ -628,13 +880,35 @@
             ctx.bezierCurveTo(4.9, 20, 4, 19.1, 4, 18);
             ctx.lineTo(4, 14);
             ctx.closePath();
-            ctx.fillStyle = '#FFF8E7'; 
-            ctx.fill();
-            ctx.strokeStyle = '#8B5E3C'; 
+            
+            // White halo for visibility
+            ctx.shadowColor = "rgba(255,255,255,0.6)";
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 1;
+            ctx.shadowOffsetY = 1;
             ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(4, 14); ctx.lineTo(20, 14); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(9, 11); ctx.bezierCurveTo(9, 11, 9.5, 10, 10.5, 10); ctx.bezierCurveTo(11.5, 10, 12, 11, 12, 11); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(13, 11); ctx.bezierCurveTo(13, 11, 13.5, 10, 14.5, 10); ctx.bezierCurveTo(15.5, 10, 16, 11, 16, 11); ctx.stroke();
+            
+            // Draw Line
+            ctx.beginPath();
+            ctx.moveTo(4, 14);
+            ctx.lineTo(20, 14);
+            ctx.stroke();
+
+            // Draw Eyes (Curved)
+            ctx.beginPath();
+            ctx.moveTo(9, 11);
+            ctx.bezierCurveTo(9, 11, 9.5, 10, 10.5, 10);
+            ctx.bezierCurveTo(11.5, 10, 12, 11, 12, 11);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(13, 11);
+            ctx.bezierCurveTo(13, 11, 13.5, 10, 14.5, 10);
+            ctx.bezierCurveTo(15.5, 10, 16, 11, 16, 11);
+            ctx.stroke();
+
+            ctx.restore();
+
             const dataURL = canvas.toDataURL('image/png');
             const existingIcons = document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]');
             existingIcons.forEach(e => e.remove());
@@ -666,7 +940,7 @@
             } catch(e) { console.error("Table detection failed", e); }
         }
 
-        // 切換模式 (更新版)
+        // 切換模式
         window.switchMode = function(m) {
             currentMode = m;
             els.viewHome.classList.toggle('hidden', m !== 'home');
@@ -681,33 +955,27 @@
             document.getElementById('workspace-tabs').classList.toggle('hidden', !isDevotion);
             document.getElementById('devotion-tabs').classList.toggle('hidden', !isDevotion);
             
-            // 搜尋框只在聖經模式顯示 (其他模式通常不需要)
             document.getElementById('search-box').classList.toggle('invisible', !isBible); 
 
-            // 筆記欄位
             ['journal-devotion-fields', 'journal-prayer-fields', 'journal-gratitude-fields', 'journal-mood-fields']
                 .forEach(id => document.getElementById(id).classList.add('hidden'));
 
             const readerSec = document.getElementById('section-reader');
             const journalSec = document.getElementById('section-journal');
 
-            // 重置區塊寬度
             readerSec.classList.remove('hidden', 'lg:w-1/2');
             journalSec.classList.remove('hidden', 'lg:w-1/2');
             readerSec.classList.add('w-full'); 
             journalSec.classList.add('w-full');
 
-            // 重置 Header 狀態
             els.backBtn.classList.add('hidden');
             els.copyBtn.classList.add('hidden');
 
-            // 複製進度按鈕狀態：只在靈修模式顯示
             if (els.btnCopyProgress) {
                 els.btnCopyProgress.classList.toggle('hidden', !isDevotion);
             }
 
             if (isDevotion) {
-                // 靈修模式 (左右分欄)
                 readerSec.classList.remove('w-full');
                 journalSec.classList.remove('w-full');
                 readerSec.classList.add('lg:w-1/2');
@@ -715,29 +983,20 @@
 
                 document.getElementById('journal-devotion-fields').classList.remove('hidden');
                 els.headerTitle.innerText = "Daily Devotion";
-                
-                // Reader Header for Devotion
                 els.readerTitle.innerText = "Daily Devotion";
                 els.readerSubtitle.innerText = "Reading Plan";
-                
                 window.updateDevotionUI();
                 window.switchWorkspaceTab('reader'); 
             } else if (isBible) {
-                // 聖經模式 (全寬閱讀)
                 journalSec.classList.add('hidden'); 
-                
                 els.headerTitle.innerText = "Bible Reading";
-                // Reader Header for Bible
                 els.readerTitle.innerText = "Bible Reading";
                 els.readerSubtitle.innerText = "Select Book";
-
                 window.renderMainBooks('old');
                 window.goBackToMainBooks();
                 window.switchWorkspaceTab('reader'); 
             } else if (isPureJournal) {
-                // 純筆記模式
                 readerSec.classList.add('hidden'); 
-                
                 const map = {'journal-prayer':'Prayer Journal','journal-gratitude':'Gratitude','journal-mood':'Mood Diary'};
                 const fieldMap = {'journal-prayer':'journal-prayer-fields','journal-gratitude':'journal-gratitude-fields','journal-mood':'journal-mood-fields'};
                 els.headerTitle.innerText = map[m];
@@ -749,11 +1008,9 @@
         window.fetchBibleRef = async function(refInput) {
             if (!sqlDbLoaded || !refInput) return;
             const ref = refInput.trim();
-            // 切換到文字顯示模式
             els.viewBooks.classList.add('hidden');
             els.viewChapters.classList.add('hidden');
             els.viewText.classList.remove('hidden');
-            // 顯示複製按鈕 & 返回按鈕
             els.copyBtn.classList.remove('hidden');
             els.backBtn.classList.remove('hidden');
             
@@ -777,8 +1034,8 @@
                         els.readerTitle.innerText = `${book} ${chapter}`;
                         els.readerSubtitle.innerText = "Scripture";
                         els.viewText.innerHTML = res[0].values.map(v => `
-                            <div class="verse-item mb-4 p-2 rounded-xl" onclick="this.classList.toggle('selected'); window.updateCopyButton()">
-                                <span class="text-[10px] font-bold text-[#C2A695] mr-2 font-mono bg-[#FAF9F7] px-1 rounded select-none">${v[1]}</span>
+                            <div class="verse-item mb-4" onclick="this.classList.toggle('selected'); window.updateCopyButton()">
+                                <span class="text-xs font-bold text-white bg-[#333] mr-2 px-1 rounded-sm select-none inline-block">${v[1]}</span>
                                 <span class="text-verse leading-loose">${v[2]}</span>
                             </div>
                         `).join('');
@@ -787,7 +1044,6 @@
                     }
                 } catch(e) { console.error(e); }
             } else {
-                // 關鍵字搜尋
                 try {
                     els.readerTitle.innerText = `搜尋: "${ref}"`;
                     els.readerSubtitle.innerText = "Search Result";
@@ -797,39 +1053,35 @@
                     if (res.length > 0) {
                         const results = res[0].values;
                         els.viewText.innerHTML = results.map(v => {
-                            const highlightedTxt = v[3].replace(new RegExp(ref, 'g'), `<span class="bg-[#F6E6E6] text-[#59544D] font-bold px-1 rounded">${ref}</span>`);
+                            const highlightedTxt = v[3].replace(new RegExp(ref, 'g'), `<span class="bg-[#FFD500] text-[#333] px-1 font-bold rounded">${ref}</span>`);
                             return `
-                                <div class="verse-item mb-4 p-4 rounded-2xl border border-transparent hover:border-[#E0DBD3] transition-all bg-white shadow-sm cursor-pointer" onclick="this.classList.toggle('selected'); window.updateCopyButton()">
+                                <div class="verse-item mb-4 p-4 border-2 border-transparent hover:border-gray-200 transition-all cursor-pointer" onclick="this.classList.toggle('selected'); window.updateCopyButton()">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <span class="text-[10px] font-bold text-white bg-[#C2A695] px-2 py-1 rounded-md tracking-wider">${v[0]} ${v[1]}:${v[2]}</span>
+                                        <span class="text-[10px] font-bold text-white bg-[#0055BF] px-2 py-1 tracking-wider rounded">${v[0]} ${v[1]}:${v[2]}</span>
                                     </div>
-                                    <span class="text-verse text-[#59544D] leading-relaxed block">${highlightedTxt}</span>
+                                    <span class="text-verse text-[#333] leading-relaxed block">${highlightedTxt}</span>
                                 </div>
                             `;
                         }).join('');
                     } else {
-                        els.viewText.innerHTML = `<div class="flex flex-col items-center justify-center py-12 opacity-60"><span class="text-4xl mb-4">🍂</span><p class="text-sm font-serif">找不到包含「${ref}」的經文</p></div>`;
+                        els.viewText.innerHTML = `<div class="flex flex-col items-center justify-center py-12"><span class="text-4xl mb-4">👾</span><p class="text-lg font-bold">找不到「${ref}」</p></div>`;
                     }
                 } catch(e) { console.error(e); }
             }
         }
 
-        // 進度計算 (1年 365 天)
         window.updateDevotionUI = function() {
             const start = new Date(calendarDate.getFullYear(), 0, 0);
             const diff = calendarDate - start;
             const dayOfYear = Math.floor(diff / 86400000);
             
-            // 用來收集今日進度的文字陣列
             let progressTexts = [];
 
             const container = document.getElementById('devotion-tabs');
             container.innerHTML = planTracks.map((track, idx) => {
-                // 簡單的分發邏輯
                 const totalChapters = track.books.reduce((a,b)=>a+b.c, 0);
                 const chapterIdx = Math.floor((dayOfYear % totalChapters)) || 1;
                 
-                // 找出該 index 對應哪卷書
                 let currentCount = 0, targetBook = track.books[0], targetChapter = 1;
                 for(let b of track.books) {
                     if (currentCount + b.c >= chapterIdx) {
@@ -841,7 +1093,7 @@
                 }
 
                 const ref = `${targetBook.abbr} ${targetChapter}`;
-                progressTexts.push(ref); // 收集進度
+                progressTexts.push(ref);
 
                 return `
                     <div class="devotion-track-card ${idx===0?'active':''}" onclick="window.fetchBibleRef('${ref}'); document.querySelectorAll('.devotion-track-card').forEach(c=>c.classList.remove('active')); this.classList.add('active');">
@@ -851,30 +1103,25 @@
                 `;
             }).join('');
             
-            // 更新「今日進度」欄位
             const progressField = document.getElementById('note-devotion-progress');
             if(progressField) {
                 progressField.value = progressTexts.join(' / ');
             }
 
-            // 預設載入第一軌
             const firstRef = container.querySelector('.track-ref').innerText;
             window.fetchBibleRef(firstRef);
         }
 
-        // 日期處理
         window.handleDateChange = function(val) {
             calendarDate = new Date(val);
             if(els.datePicker) els.datePicker.value = val;
             if(els.homeDatePicker) els.homeDatePicker.value = val;
             
-            // 隨機今日嗎哪
             const daySeed = val.split('-').reduce((a,b)=>a+parseInt(b), 0);
             const m = mannaVerses[daySeed % mannaVerses.length];
             document.getElementById('manna-text').innerText = m.t;
             document.getElementById('manna-ref').innerText = m.r;
 
-            // 載入筆記 (新增 note-application)
             const fields = [
                 'note-rhema', 'note-reflection', 'note-application', 'note-prayer-devotion',
                 'note-topic', 'note-content', 
@@ -892,7 +1139,6 @@
                 }
             });
             
-            // 更新進度顯示 (如果是靈修模式)
             if(currentMode === 'devotion') {
                 window.updateDevotionUI();
             }
@@ -902,7 +1148,7 @@
 
         window.renderCalendar = function() {
             const y = calendarDate.getFullYear(), m = calendarDate.getMonth();
-            els.calendarMonthLabel.innerText = `${y} . ${m+1}`;
+            els.calendarMonthLabel.innerText = `${y}.${m+1}`;
             els.calendarGrid.innerHTML = "";
             const startDay = new Date(y, m, 1).getDay();
             const totalDays = new Date(y, m + 1, 0).getDate();
@@ -934,8 +1180,8 @@
         }
 
         window.renderMainBooks = function(t) {
-            els.viewBooks.innerHTML = `<div class="flex gap-4 mb-6 shrink-0"><button onclick="window.renderMainBooks('old')" class="flex-1 py-3 text-sm font-bold rounded-lg border-2 border-[#C2A695] ${t==='old'?'bg-[#C2A695] text-white':'bg-white text-[#C2A695]'} transition-all">舊約 Old Testament</button><button onclick="window.renderMainBooks('new')" class="flex-1 py-3 text-sm font-bold rounded-lg border-2 border-[#C2A695] ${t==='new'?'bg-[#C2A695] text-white':'bg-white text-[#C2A695]'} transition-all">新約 New Testament</button></div>` +
-            `<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 content-start pb-10">` + bibleBooks[t].map(b => `<button class="px-3 py-3 text-sm border border-[#E0DBD3] rounded-lg bg-white hover:border-[#C2A695] text-left shadow-sm transition-all" onclick='window.showMainChapters(${JSON.stringify(b)})'>${b.n}</button>`).join('') + `</div>`;
+            els.viewBooks.innerHTML = `<div class="flex gap-4 mb-6 shrink-0"><button onclick="window.renderMainBooks('old')" class="brick-btn btn-yellow flex-1 text-sm">舊約 Old Testament</button><button onclick="window.renderMainBooks('new')" class="brick-btn flex-1 text-sm border-2 border-gray-100">新約 New Testament</button></div>` +
+            `<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 content-start pb-10">` + bibleBooks[t].map(b => `<button class="px-3 py-3 text-sm border-2 border-gray-100 rounded bg-white hover:bg-gray-50 text-left font-bold shadow-[0_3px_0_#ddd] active:translate-y-1 active:shadow-none transition-all" onclick='window.showMainChapters(${JSON.stringify(b)})'>${b.n}</button>`).join('') + `</div>`;
         }
 
         window.showMainChapters = function(b) {
@@ -943,7 +1189,6 @@
             els.viewChapters.classList.remove('hidden');
             els.viewText.classList.add('hidden');
             
-            // Header Update
             els.readerTitle.innerText = b.n;
             els.readerSubtitle.innerText = "Select Chapter";
             els.backBtn.classList.remove('hidden');
@@ -951,15 +1196,12 @@
 
             document.getElementById('main-chapter-title').innerText = b.n;
             document.getElementById('main-chapter-grid').innerHTML = Array.from({length:b.c}, (_,i)=> `
-                <button class="aspect-square border border-[#E0DBD3] rounded-xl hover:bg-[#C2A695] hover:text-white transition-all flex items-center justify-center font-mono text-sm bg-white shadow-sm" onclick="window.fetchBibleRef('${b.abbr}${i+1}')">${i+1}</button>
+                <button class="aspect-square border-2 border-gray-100 rounded bg-white hover:bg-[#0055BF] hover:text-white flex items-center justify-center font-bold text-sm shadow-[0_3px_0_#ddd] active:translate-y-1 active:shadow-none transition-all" onclick="window.fetchBibleRef('${b.abbr}${i+1}')">${i+1}</button>
             `).join('');
         }
 
         window.goBackToMainBooks = function() {
-            // 如果目前是在閱讀經文 (viewText)，返回章節選擇 (viewChapters)；如果是在章節選擇，返回書卷 (viewBooks)
             if (!els.viewText.classList.contains('hidden')) {
-                // 從經文返回章節 (簡單處理：直接回書卷列表，因為狀態沒存那麼細)
-                // 或者我們可以檢查 readerTitle 判斷，但為了流暢直接回書卷最單純
                 els.viewText.classList.add('hidden');
                 els.viewChapters.classList.add('hidden');
                 els.viewBooks.classList.remove('hidden');
@@ -968,7 +1210,6 @@
                 els.backBtn.classList.add('hidden');
                 els.copyBtn.classList.add('hidden');
             } else {
-                // 從章節返回書卷
                 els.viewChapters.classList.add('hidden');
                 els.viewBooks.classList.remove('hidden');
                 els.readerTitle.innerText = "Bible Reading";
@@ -979,7 +1220,7 @@
 
         window.copyDevotionProgress = function() {
             const progressText = document.getElementById('note-devotion-progress').value;
-            if(!progressText || progressText === "載入中...") return;
+            if(!progressText || progressText === "Loading...") return;
             
             const t = document.createElement('textarea'); 
             t.value = progressText; 
@@ -992,12 +1233,12 @@
             const originalText = btn.innerText;
             const originalClass = btn.className;
             
-            btn.innerText = "已複製!";
-            btn.classList.add('bg-[#94A698]', 'text-white', 'border-transparent');
+            btn.innerText = "COPIED!";
+            btn.classList.replace('bg-[#333]', 'bg-[#008F39]');
             
             setTimeout(() => {
                 btn.innerText = originalText;
-                btn.className = originalClass;
+                btn.classList.replace('bg-[#008F39]', 'bg-[#333]');
             }, 1500);
         }
 
@@ -1010,7 +1251,7 @@
         window.performSearch = function() { window.fetchBibleRef(els.inlineSearch.value); }
         window.updateCopyButton = function() {
             const count = document.querySelectorAll('.verse-item.selected').length;
-            els.copyBtn.innerHTML = count > 0 ? `<span class='text-[10px] font-bold'>${count}</span>` : `<svg class="w-5 h-5 icon-sketch" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>`;
+            els.copyBtn.innerHTML = count > 0 ? `<span class='text-[10px] font-bold'>${count}</span>` : `<svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>`;
         }
         
         window.copySelectedVerses = function() {
@@ -1018,7 +1259,7 @@
             if (sel.length === 0) return;
             const text = Array.from(sel).map(v => v.innerText.trim()).join('\n');
             const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t);
-            els.copyBtn.innerHTML = "✅";
+            els.copyBtn.innerHTML = "OK!";
             setTimeout(() => { sel.forEach(v=>v.classList.remove('selected')); window.updateCopyButton(); }, 1000);
         }
 
