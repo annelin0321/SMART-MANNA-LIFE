@@ -571,48 +571,74 @@
             canvas.height = 192;
             const ctx = canvas.getContext('2d');
             
-            // 背景色 (紙張白)
-            ctx.fillStyle = '#F9F8F4';
-            ctx.fillRect(0, 0, 192, 192);
+            // 清除背景 (透明)
+            ctx.clearRect(0, 0, 192, 192);
             
-            // 圖示樣式 (土司線條)
-            ctx.strokeStyle = '#C2A695';
-            ctx.lineWidth = 12;
+            // 設定繪圖座標系統 (配合 SVG 的 24x24 座標，放大 8 倍填滿 192x192)
+            ctx.translate(96, 96); // 移動到中心
+            ctx.scale(7, 7);       // 放大
+            ctx.translate(-12, -12); // 回推到左上角
+            
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
+            ctx.lineWidth = 1.5;
             
-            // 繪製土司 (放大 6 倍)
-            ctx.translate(24, 24);
-            ctx.scale(6, 6);
-            
-            // 外輪廓
+            // 1. 繪製吐司輪廓 (Body)
             ctx.beginPath();
             ctx.moveTo(4, 14);
+            // 左上曲線 (頭)
             ctx.bezierCurveTo(4, 14, 4, 7, 12, 7);
+            // 右上曲線 (頭)
             ctx.bezierCurveTo(20, 7, 20, 14, 20, 14);
+            // 右側直線
             ctx.lineTo(20, 18);
+            // 右下圓角
             ctx.bezierCurveTo(20, 19.1, 19.1, 20, 18, 20);
+            // 底部直線
             ctx.lineTo(6, 20);
+            // 左下圓角
             ctx.bezierCurveTo(4.9, 20, 4, 19.1, 4, 18);
+            ctx.lineTo(4, 14);
             ctx.closePath();
+
+            // 填色 (吐司本體色 - 避免透明看不見)
+            ctx.fillStyle = '#FFFEFA'; 
+            ctx.fill();
+            
+            // 描邊 (線條色)
+            ctx.strokeStyle = '#C2A695';
             ctx.stroke();
             
-            // 底部線條
+            // 2. 中間分隔線
             ctx.beginPath();
             ctx.moveTo(4, 14);
             ctx.lineTo(20, 14);
             ctx.stroke();
             
-            // 眼睛 (實心圓)
-            ctx.fillStyle = '#C2A695';
-            ctx.beginPath(); ctx.arc(10.5, 10.5, 1, 0, Math.PI * 2); ctx.fill();
-            ctx.beginPath(); ctx.arc(14.5, 10.5, 1, 0, Math.PI * 2); ctx.fill();
+            // 3. 眼睛 (左眼) - 笑眼弧線
+            ctx.beginPath();
+            ctx.moveTo(9, 11);
+            ctx.bezierCurveTo(9, 11, 9.5, 10, 10.5, 10);
+            ctx.bezierCurveTo(11.5, 10, 12, 11, 12, 11);
+            ctx.stroke();
+
+            // 4. 眼睛 (右眼) - 笑眼弧線
+            ctx.beginPath();
+            ctx.moveTo(13, 11);
+            ctx.bezierCurveTo(13, 11, 13.5, 10, 14.5, 10);
+            ctx.bezierCurveTo(15.5, 10, 16, 11, 16, 11);
+            ctx.stroke();
 
             const dataURL = canvas.toDataURL('image/png');
             
             // 設定為 Favicon 和 Apple Icon
+            // 移除舊的 (如果有的話)
+            const existingIcons = document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]');
+            existingIcons.forEach(e => e.remove());
+
             const linkIcon = document.createElement('link');
             linkIcon.rel = 'icon';
+            linkIcon.type = 'image/png';
             linkIcon.href = dataURL;
             document.head.appendChild(linkIcon);
             
