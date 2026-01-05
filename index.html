@@ -571,10 +571,12 @@
             canvas.height = 192;
             const ctx = canvas.getContext('2d');
             
-            // 清除背景 (透明)
-            ctx.clearRect(0, 0, 192, 192);
+            // 1. 填滿背景色 (解決 iOS/Android 透明背景變黑色的問題)
+            // 使用網頁的紙張背景色，讓圖示看起來一體成型
+            ctx.fillStyle = '#F9F8F4';
+            ctx.fillRect(0, 0, 192, 192);
             
-            // 設定繪圖座標系統 (配合 SVG 的 24x24 座標，放大 8 倍填滿 192x192)
+            // 設定繪圖座標系統 (配合 SVG 的 24x24 座標，放大 7 倍填滿 192x192)
             ctx.translate(96, 96); // 移動到中心
             ctx.scale(7, 7);       // 放大
             ctx.translate(-12, -12); // 回推到左上角
@@ -583,7 +585,7 @@
             ctx.lineJoin = 'round';
             ctx.lineWidth = 1.5;
             
-            // 1. 繪製吐司輪廓 (Body)
+            // 2. 繪製吐司輪廓 (Body)
             ctx.beginPath();
             ctx.moveTo(4, 14);
             // 左上曲線 (頭)
@@ -601,7 +603,7 @@
             ctx.lineTo(4, 14);
             ctx.closePath();
 
-            // 填色 (吐司本體色 - 避免透明看不見)
+            // 填色 (吐司本體色 - 使用稍亮的卡片色，製造微微的層次感)
             ctx.fillStyle = '#FFFEFA'; 
             ctx.fill();
             
@@ -609,20 +611,20 @@
             ctx.strokeStyle = '#C2A695';
             ctx.stroke();
             
-            // 2. 中間分隔線
+            // 3. 中間分隔線
             ctx.beginPath();
             ctx.moveTo(4, 14);
             ctx.lineTo(20, 14);
             ctx.stroke();
             
-            // 3. 眼睛 (左眼) - 笑眼弧線
+            // 4. 眼睛 (左眼) - 笑眼弧線
             ctx.beginPath();
             ctx.moveTo(9, 11);
             ctx.bezierCurveTo(9, 11, 9.5, 10, 10.5, 10);
             ctx.bezierCurveTo(11.5, 10, 12, 11, 12, 11);
             ctx.stroke();
 
-            // 4. 眼睛 (右眼) - 笑眼弧線
+            // 5. 眼睛 (右眼) - 笑眼弧線
             ctx.beginPath();
             ctx.moveTo(13, 11);
             ctx.bezierCurveTo(13, 11, 13.5, 10, 14.5, 10);
