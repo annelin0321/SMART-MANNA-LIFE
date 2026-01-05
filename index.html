@@ -571,19 +571,19 @@
             canvas.height = 192;
             const ctx = canvas.getContext('2d');
             
-            // 1. 填滿背景色 (解決 iOS/Android 透明背景變黑色的問題)
-            // 使用網頁的紙張背景色，讓圖示看起來一體成型
-            ctx.fillStyle = '#F9F8F4';
+            // 1. 強制填滿背景色為純白 (解決 iOS/Android 透明背景變黑色的問題)
+            // 這會讓圖示變成一個乾淨的白色方塊貼紙，中間有圖案
+            ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, 192, 192);
             
-            // 設定繪圖座標系統 (配合 SVG 的 24x24 座標，放大 7 倍填滿 192x192)
+            // 設定繪圖座標系統 (配合 SVG 的 24x24 座標，放大並置中)
             ctx.translate(96, 96); // 移動到中心
-            ctx.scale(7, 7);       // 放大
+            ctx.scale(6.5, 6.5);   // 稍微縮小一點，留白邊距
             ctx.translate(-12, -12); // 回推到左上角
             
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = 1.8; // 線條稍微加粗，縮小看更清楚
             
             // 2. 繪製吐司輪廓 (Body)
             ctx.beginPath();
@@ -603,12 +603,12 @@
             ctx.lineTo(4, 14);
             ctx.closePath();
 
-            // 填色 (吐司本體色 - 使用稍亮的卡片色，製造微微的層次感)
-            ctx.fillStyle = '#FFFEFA'; 
+            // 填色 (吐司本體色 - 暖奶油色，與白底區分)
+            ctx.fillStyle = '#FFF8E7'; 
             ctx.fill();
             
-            // 描邊 (線條色)
-            ctx.strokeStyle = '#C2A695';
+            // 描邊 (線條色 - 深咖啡，增加對比)
+            ctx.strokeStyle = '#8B5E3C'; 
             ctx.stroke();
             
             // 3. 中間分隔線
@@ -633,17 +633,18 @@
 
             const dataURL = canvas.toDataURL('image/png');
             
-            // 設定為 Favicon 和 Apple Icon
-            // 移除舊的 (如果有的話)
+            // 移除舊的 icon 宣告 (如果有的話)
             const existingIcons = document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]');
             existingIcons.forEach(e => e.remove());
 
+            // 設定 Favicon (瀏覽器分頁)
             const linkIcon = document.createElement('link');
             linkIcon.rel = 'icon';
             linkIcon.type = 'image/png';
             linkIcon.href = dataURL;
             document.head.appendChild(linkIcon);
             
+            // 設定 Apple Touch Icon (iOS 主畫面)
             const linkApple = document.createElement('link');
             linkApple.rel = 'apple-touch-icon';
             linkApple.href = dataURL;
