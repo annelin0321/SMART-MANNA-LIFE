@@ -313,7 +313,7 @@
         }
 
         /* 輸入框 - 凹陷區塊 */
-        textarea, input[type="text"], input[type="date"] {
+        textarea, input[type="text"], input[type="date"], input[type="search"] {
             background-color: #FAFAFA;
             border: 2px solid #ddd;
             border-top: 4px solid #ccc; /* 頂部陰影加深，製造凹陷感 */
@@ -361,8 +361,10 @@
             <div id="header-title" class="flex-1 text-center pixel-font text-2xl text-[#333] font-bold tracking-widest uppercase truncate">HOME</div>
             
             <div class="flex items-center gap-2">
-                <button onclick="window.openExportModal()" class="brick-btn p-2 hover:bg-gray-50">
-                    <svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                <!-- 修正：備份按鈕加入文字 -->
+                <button onclick="window.openExportModal()" class="brick-btn px-3 py-2 hover:bg-gray-50 flex items-center gap-2">
+                    <svg class="w-4 h-4" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    <span class="text-sm font-bold hidden sm:inline">備份</span>
                 </button>
                 <input type="date" id="date-picker" class="border-2 border-[#ddd] rounded px-2 py-1 text-sm font-bold outline-none text-[#333] cursor-pointer" onchange="window.handleDateChange(this.value)">
             </div>
@@ -534,11 +536,15 @@
                     </div>
                     <!-- Right: Actions -->
                     <div class="flex items-center gap-2">
-                         <!-- Search -->
-                         <div class="relative" id="search-box">
-                             <input type="text" id="inline-search" placeholder="Search..." class="pl-3 pr-8 py-1.5 rounded bg-gray-50 text-xs w-28 focus:w-48 transition-all outline-none border-2 border-gray-200 focus:border-[#0055BF]" onkeyup="if(event.key==='Enter') window.performSearch()">
-                             <button onclick="window.performSearch()" class="absolute right-2 top-2 text-gray-400"><svg class="w-4 h-4" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
-                         </div>
+                         <!-- 修正：搜尋區塊 -->
+                         <!-- 1. 改為 <form> 讓手機鍵盤顯示「搜尋」 -->
+                         <!-- 2. input type="search" 優化手機體驗 -->
+                         <!-- 3. button 加入 z-10 與 type="button" 避免被遮擋或誤送出 -->
+                         <form class="relative" id="search-box" onsubmit="event.preventDefault(); window.performSearch();">
+                             <input type="search" id="inline-search" placeholder="Search..." class="pl-3 pr-8 py-1.5 rounded bg-gray-50 text-xs w-28 focus:w-48 transition-all outline-none border-2 border-gray-200 focus:border-[#0055BF]">
+                             <button type="button" onclick="window.performSearch()" class="absolute right-2 top-2 z-10 text-gray-400"><svg class="w-4 h-4" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
+                         </form>
+                         
                          <!-- Copy -->
                          <button id="btn-copy-verses" onclick="window.copySelectedVerses()" class="hidden w-9 h-9 flex items-center justify-center rounded bg-[#FFD500] text-[#333] border-none shadow-[0_3px_0_#ccaa00] active:shadow-none active:translate-y-1 transition-all">
                             <svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
