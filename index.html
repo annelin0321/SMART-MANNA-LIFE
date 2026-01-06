@@ -36,11 +36,11 @@
             background-color: var(--bg-baseplate);
             color: #333;
             -webkit-tap-highlight-color: transparent;
-            /* 修改：背景圓點變小變密 (模擬 7 stud 寬度感) */
+            /* 背景圓點變小變密 */
             background-image: 
                 radial-gradient(var(--stud-shadow) 20%, transparent 22%),
                 radial-gradient(var(--stud-shadow) 20%, transparent 22%);
-            background-size: 20px 20px; /* 縮小尺寸 */
+            background-size: 20px 20px; 
             background-position: 0 0, 10px 10px;
         }
         
@@ -49,21 +49,15 @@
         /* 積木卡片 (Brick Card) */
         .brick-card {
             background: var(--lego-white);
-            border-radius: 8px; /* 稍微圓角，像現代樂高磚 */
+            border-radius: 8px;
             border: 2px solid rgba(0,0,0,0.05);
-            /* 積木的立體感：底部厚度陰影 */
             box-shadow: 0 6px 0 #E0E0E0, 0 12px 10px rgba(0,0,0,0.1);
             transition: transform 0.1s;
             position: relative;
             overflow: hidden;
         }
-        /* 頂部裝飾條：模擬積木側面 */
         .brick-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 6px;
-            background: rgba(0,0,0,0.05);
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: rgba(0,0,0,0.05);
         }
 
         /* 通用積木按鈕 */
@@ -75,144 +69,86 @@
             border-radius: 6px;
             padding: 10px 16px;
             position: relative;
-            /* 實體按鈕效果 */
             box-shadow: 0 5px 0 #ccc; 
             transition: all 0.1s;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         .brick-btn:active, .brick-btn.active {
-            transform: translateY(5px); /* 壓下去 */
-            box-shadow: 0 0 0 #ccc; /* 陰影消失 */
+            transform: translateY(5px); box-shadow: 0 0 0 #ccc;
         }
         
         /* 顏色變體 */
         .btn-yellow { background-color: var(--lego-yellow); color: #333; box-shadow: 0 5px 0 var(--lego-yellow-dark); }
         .btn-yellow:active { box-shadow: 0 0 0 var(--lego-yellow-dark); }
-        
         .btn-blue { background-color: var(--lego-blue); color: white; box-shadow: 0 5px 0 var(--lego-blue-dark); }
         .btn-blue:active { box-shadow: 0 0 0 var(--lego-blue-dark); }
-        
         .btn-red { background-color: var(--lego-red); color: white; box-shadow: 0 5px 0 var(--lego-red-dark); }
         .btn-red:active { box-shadow: 0 0 0 var(--lego-red-dark); }
-        
         .btn-green { background-color: var(--lego-green); color: white; box-shadow: 0 5px 0 var(--lego-green-dark); }
         .btn-green:active { box-shadow: 0 0 0 var(--lego-green-dark); }
 
-        /* 真實積木風格按鈕 (用於捷徑) */
+        /* 真實積木風格按鈕 */
         .real-brick-btn {
+            position: relative; border-radius: 4px; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: transform 0.1s; overflow: hidden;
+        }
+        .real-brick-btn::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(rgba(0,0,0,0.2) 20%, transparent 22%); background-size: 16px 16px; background-position: 8px 8px; opacity: 0.5; pointer-events: none;
+        }
+        .real-brick-btn::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 100%; background: linear-gradient(to bottom, rgba(255,255,255,0.3) 0%, transparent 40%); pointer-events: none;
+        }
+        .real-brick-btn:active { transform: translateY(6px); box-shadow: 0 0 0 transparent !important; }
+
+        .brick-bible { background-color: var(--lego-blue); color: white; box-shadow: 0 8px 0 var(--lego-blue-dark), 0 15px 15px rgba(0,0,0,0.2); }
+        .brick-prayer { background-color: var(--lego-green); color: white; box-shadow: 0 8px 0 var(--lego-green-dark), 0 15px 15px rgba(0,0,0,0.2); }
+        .brick-gratitude { background-color: var(--lego-yellow); color: #333; box-shadow: 0 8px 0 var(--lego-yellow-dark), 0 15px 15px rgba(0,0,0,0.2); }
+        .brick-mood { background-color: var(--lego-red); color: white; box-shadow: 0 8px 0 var(--lego-red-dark), 0 15px 15px rgba(0,0,0,0.2); }
+
+        /* 新增：清單項目積木 */
+        .list-brick {
             position: relative;
-            border-radius: 4px;
-            padding: 20px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.1s;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            transition: transform 0.1s;
-            overflow: hidden;
+            gap: 4px;
         }
-        /* 表面凸粒紋理 */
-        .real-brick-btn::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: radial-gradient(rgba(0,0,0,0.2) 20%, transparent 22%);
-            background-size: 16px 16px; /* 凸粒大小 */
-            background-position: 8px 8px;
-            opacity: 0.5;
-            pointer-events: none;
-        }
-        /* 頂部反光效果 */
-        .real-brick-btn::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 100%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.3) 0%, transparent 40%);
-            pointer-events: none;
-        }
-        .real-brick-btn:active {
-            transform: translateY(6px);
-            box-shadow: 0 0 0 transparent !important;
-        }
-
-        /* 捷徑積木顏色定義 */
-        .brick-bible {
-            background-color: var(--lego-blue);
-            color: white;
-            box-shadow: 0 8px 0 var(--lego-blue-dark), 0 15px 15px rgba(0,0,0,0.2);
-        }
-        .brick-prayer {
-            background-color: var(--lego-green);
-            color: white;
-            box-shadow: 0 8px 0 var(--lego-green-dark), 0 15px 15px rgba(0,0,0,0.2);
-        }
-        .brick-gratitude {
-            background-color: var(--lego-yellow);
-            color: #333;
-            box-shadow: 0 8px 0 var(--lego-yellow-dark), 0 15px 15px rgba(0,0,0,0.2);
-        }
-        .brick-mood {
-            background-color: var(--lego-red);
-            color: white;
-            box-shadow: 0 8px 0 var(--lego-red-dark), 0 15px 15px rgba(0,0,0,0.2);
-        }
-
-        /* 新增：小型積木紋理 (用於圖示) */
-        .mini-brick {
-            position: relative;
-            overflow: hidden;
-        }
-        .mini-brick::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            /* 3x3 凸粒 (更密集) */
+        .list-brick:active { transform: translateY(4px); margin-bottom: 8px; }
+        /* 側邊凸粒裝飾 */
+        .list-brick::before {
+            content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 24px;
             background-image: radial-gradient(rgba(0,0,0,0.15) 25%, transparent 28%);
-            background-size: 13.33px 13.33px; 
-            background-position: 0 0;
+            background-size: 12px 12px; background-position: 6px 6px;
+            border-right: 2px solid rgba(0,0,0,0.05);
         }
-        .mini-brick::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 100%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, transparent 50%);
-            pointer-events: none;
-        }
+        .list-brick-content { margin-left: 24px; }
+        .list-brick-title { font-weight: 900; font-size: 1rem; }
+        .list-brick-preview { font-size: 0.85rem; opacity: 0.9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* 經文樣式 */
-        .bible-text {
-            line-height: 2.2;
-            font-size: 1.15rem;
-            letter-spacing: 0.05em;
-            font-weight: 500;
-        }
+        .list-brick-green { background: var(--lego-green); color: white; box-shadow: 0 4px 0 var(--lego-green-dark); }
+        .list-brick-green:active { box-shadow: none; }
+        .list-brick-yellow { background: var(--lego-yellow); color: #333; box-shadow: 0 4px 0 var(--lego-yellow-dark); }
+        .list-brick-yellow:active { box-shadow: none; }
+        .list-brick-red { background: var(--lego-red); color: white; box-shadow: 0 4px 0 var(--lego-red-dark); }
+        .list-brick-red:active { box-shadow: none; }
 
-        /* 經文選取 - 積木堆疊感 */
-        .verse-item {
-            padding: 8px 12px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            border-radius: 6px;
-            border: 2px solid transparent;
-            background: #FAFAFA;
-            transition: all 0.1s;
-        }
-        .verse-item:hover {
-            border-color: var(--lego-yellow);
-            background: #fff;
-        }
-        .verse-item.selected {
-            background-color: var(--lego-yellow);
-            color: #333;
-            border-bottom: 4px solid var(--lego-yellow-dark);
-            transform: translateY(-2px);
-            font-weight: 700;
-        }
+        /* 圖示小積木 */
+        .mini-brick { position: relative; overflow: hidden; }
+        .mini-brick::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(rgba(0,0,0,0.15) 25%, transparent 28%); background-size: 13.33px 13.33px; background-position: 0 0; }
+        .mini-brick::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 100%; background: linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, transparent 50%); pointer-events: none; }
 
-        /* 隱藏卷軸 */
+        .bible-text { line-height: 2.2; font-size: 1.15rem; letter-spacing: 0.05em; font-weight: 500; }
+        .verse-item { padding: 8px 12px; margin-bottom: 8px; cursor: pointer; border-radius: 6px; border: 2px solid transparent; background: #FAFAFA; transition: all 0.1s; }
+        .verse-item:hover { border-color: var(--lego-yellow); background: #fff; }
+        .verse-item.selected { background-color: var(--lego-yellow); color: #333; border-bottom: 4px solid var(--lego-yellow-dark); transform: translateY(-2px); font-weight: 700; }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
         ::-webkit-scrollbar { width: 12px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: var(--lego-grey); border-radius: 6px; border: 3px solid #f1f1f1; }
@@ -220,133 +156,40 @@
         .fade-in { animation: fadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* 閱讀進度條 - 積木條 */
-        .devotion-track-card {
-            background: white;
-            border-radius: 6px;
-            cursor: pointer;
-            padding: 8px 4px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.1s;
-            border-bottom: 4px solid #ddd;
-        }
+        .devotion-track-card { background: white; border-radius: 6px; cursor: pointer; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.1s; border-bottom: 4px solid #ddd; }
         .devotion-track-card:hover { transform: translateY(-2px); border-bottom-width: 6px; }
-        .devotion-track-card.active {
-            background: var(--lego-blue);
-            color: white;
-            border-bottom-color: var(--lego-blue-dark);
-            transform: translateY(1px);
-            border-bottom-width: 2px;
-        }
+        .devotion-track-card.active { background: var(--lego-blue); color: white; border-bottom-color: var(--lego-blue-dark); transform: translateY(1px); border-bottom-width: 2px; }
         .devotion-track-card.active .track-tag { color: rgba(255,255,255,0.9); }
-
         .track-tag { font-size: 12px; font-weight: 700; color: #888; margin-bottom: 2px; }
         .track-ref { font-size: 14px; font-weight: 700; font-family: 'VT323', monospace; letter-spacing: 1px;}
 
-        /* 分頁按鈕 - 積木接合處 */
-        .workspace-tab-btn {
-            flex: 1; text-align: center; padding: 12px 10px; font-size: 16px; font-weight: 700; 
-            color: #888; border-radius: 8px 8px 0 0;
-            transition: all 0.1s;
-            position: relative;
-            background: #eee;
-            margin-right: 4px;
-        }
-        .workspace-tab-btn.active { 
-            background-color: var(--lego-white);
-            color: var(--lego-blue); 
-            box-shadow: 0 -3px 0 var(--lego-blue) inset; /* 頂部亮條 */
-            z-index: 10;
-            margin-bottom: -2px; /* 連接下方 */
-            padding-bottom: 14px;
-        }
+        .workspace-tab-btn { flex: 1; text-align: center; padding: 12px 10px; font-size: 16px; font-weight: 700; color: #888; border-radius: 8px 8px 0 0; transition: all 0.1s; position: relative; background: #eee; margin-right: 4px; }
+        .workspace-tab-btn.active { background-color: var(--lego-white); color: var(--lego-blue); box-shadow: 0 -3px 0 var(--lego-blue) inset; z-index: 10; margin-bottom: -2px; padding-bottom: 14px; }
 
-        /* 心情貼紙 - 圓形積木 (Round Plate 1x1) */
-        .mood-sticker {
-            font-size: 1.5rem; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; cursor: pointer; transition: all 0.1s; background-color: #fff; 
-            border-bottom: 4px solid #ddd;
-        }
-        .mood-sticker:active, .mood-sticker.selected { 
-            transform: translateY(3px);
-            border-bottom-width: 0;
-            background-color: var(--lego-yellow);
-        }
+        .mood-sticker { font-size: 1.5rem; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; transition: all 0.1s; background-color: #fff; border-bottom: 4px solid #ddd; }
+        .mood-sticker:active, .mood-sticker.selected { transform: translateY(3px); border-bottom-width: 0; background-color: var(--lego-yellow); }
 
-        /* 月曆樣式 - 像 1x1 拼貼磚 */
-        .calendar-day {
-            aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 4px;
-            font-size: 1rem; cursor: pointer; transition: all 0.1s; position: relative; font-weight: 700;
-            background: #fff;
-            border-bottom: 3px solid #ddd;
-            font-family: 'VT323', monospace; font-size: 1.4rem;
-        }
+        .calendar-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 1rem; cursor: pointer; transition: all 0.1s; position: relative; font-weight: 700; background: #fff; border-bottom: 3px solid #ddd; font-family: 'VT323', monospace; font-size: 1.4rem; }
         .calendar-day:active { transform: translateY(3px); border-bottom: 0; }
-        .calendar-day.has-entry::after {
-            content: ''; position: absolute; bottom: 4px; width: 6px; height: 6px; background: var(--lego-green); 
-            border-radius: 50%;
-        }
-        .calendar-day.selected-day { 
-            background-color: var(--lego-blue) !important; 
-            color: white !important; 
-            border-bottom-color: var(--lego-blue-dark);
-        }
-        .calendar-day.today { 
-            border: 2px dashed var(--lego-red); 
-            color: var(--lego-red); 
-            border-bottom: 2px dashed var(--lego-red); /* Reset shadow style */
-        }
+        .calendar-day.has-entry::after { content: ''; position: absolute; bottom: 4px; width: 6px; height: 6px; background: var(--lego-green); border-radius: 50%; }
+        .calendar-day.selected-day { background-color: var(--lego-blue) !important; color: white !important; border-bottom-color: var(--lego-blue-dark); }
+        .calendar-day.today { border: 2px dashed var(--lego-red); color: var(--lego-red); border-bottom: 2px dashed var(--lego-red); }
 
-        .loader {
-            width: 40px; height: 40px; 
-            background-color: var(--lego-yellow);
-            box-shadow: 0 4px 0 var(--lego-yellow-dark);
-            border-radius: 4px;
-            animation: bounce 0.6s infinite alternate;
-        }
-        @keyframes bounce { 
-            from { transform: translateY(0); } 
-            to { transform: translateY(-10px); } 
-        }
+        .loader { width: 40px; height: 40px; background-color: var(--lego-yellow); box-shadow: 0 4px 0 var(--lego-yellow-dark); border-radius: 4px; animation: bounce 0.6s infinite alternate; }
+        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
 
-        /* 輸入框 - 凹陷區塊 */
-        textarea, input[type="text"], input[type="date"], input[type="search"] {
-            background-color: #FAFAFA;
-            border: 2px solid #ddd;
-            border-top: 4px solid #ccc; /* 頂部陰影加深，製造凹陷感 */
-            border-radius: 6px;
-            font-family: 'Noto Sans TC', sans-serif;
-            transition: all 0.2s;
-        }
-        textarea:focus, input:focus {
-            outline: none;
-            background-color: white;
-            border-color: var(--lego-blue);
-            border-top-color: var(--lego-blue);
-        }
+        textarea, input[type="text"], input[type="date"], input[type="search"] { background-color: #FAFAFA; border: 2px solid #ddd; border-top: 4px solid #ccc; border-radius: 6px; font-family: 'Noto Sans TC', sans-serif; transition: all 0.2s; }
+        textarea:focus, input:focus { outline: none; background-color: white; border-color: var(--lego-blue); border-top-color: var(--lego-blue); }
         
-        /* 標籤 Badge */
-        .badge {
-            background: var(--lego-red);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            box-shadow: 0 2px 0 var(--lego-red-dark);
-        }
+        .badge { background: var(--lego-red); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 0 var(--lego-red-dark); }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden selection:bg-[#FFD500] selection:text-black">
 
-    <!-- 頂部導覽列：像一條長積木 -->
+    <!-- 頂部導覽列 (Workspace 頁面使用) -->
     <header id="main-header" class="bg-white/95 backdrop-blur-none border-b-4 border-[#eee] sticky top-0 z-30 shrink-0 hidden">
         <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center gap-4">
             <div class="flex items-center gap-2 cursor-pointer group" onclick="window.goHome()">
-                <!-- Game Icon: Yellow Brick -->
                 <div class="w-10 h-10 bg-[#FFD500] rounded flex items-center justify-center shadow-[0_4px_0_#ccaa00] active:shadow-none active:translate-y-1 transition-all mini-brick border border-yellow-400">
                      <svg class="w-6 h-6 text-[#333] relative z-10" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5">
                         <path d="M4 14C4 14 4 7 12 7C20 7 20 14 20 14V18C20 19.1 19.1 20 18 20H6C4.9 20 4 19.1 4 18V14Z"></path>
@@ -361,10 +204,10 @@
             <div id="header-title" class="flex-1 text-center pixel-font text-2xl text-[#333] font-bold tracking-widest uppercase truncate">HOME</div>
             
             <div class="flex items-center gap-2">
-                <!-- 修正：備份按鈕加入文字 (移除 hidden sm:inline 讓手機也能顯示) -->
+                <!-- 備份按鈕 (Header) -->
                 <button onclick="window.openExportModal()" class="brick-btn px-3 py-2 hover:bg-gray-50 flex items-center gap-2">
                     <svg class="w-4 h-4" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                    <span class="text-sm font-bold">備份</span>
+                    <span class="text-sm font-bold">備份/匯入</span>
                 </button>
                 <input type="date" id="date-picker" class="border-2 border-[#ddd] rounded px-2 py-1 text-sm font-bold outline-none text-[#333] cursor-pointer" onchange="window.handleDateChange(this.value)">
             </div>
@@ -386,8 +229,17 @@
                     </div>
                 </h1>
             </div>
-            <div class="hidden sm:block">
-                <input type="date" id="home-date-picker" class="bg-white border-2 border-[#ddd] rounded px-4 py-2 text-sm font-bold outline-none shadow-[0_4px_0_#ccc] active:shadow-none active:translate-y-1 transition-all text-[#333]" onchange="window.handleDateChange(this.value)">
+            
+            <div class="flex items-center gap-2">
+                <!-- 備份按鈕 (Home Page) -->
+                <button onclick="window.openExportModal()" class="brick-btn px-3 py-2 bg-white text-[#333] border-2 border-[#333] hover:bg-gray-50 shadow-[2px_2px_0px_0px_#333] active:shadow-none active:translate-y-1 transition-all flex items-center gap-2">
+                     <svg class="w-4 h-4" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                     <span class="text-xs font-bold">備份/匯入</span>
+                </button>
+                
+                <div class="hidden sm:block">
+                    <input type="date" id="home-date-picker" class="bg-white border-2 border-[#ddd] rounded px-4 py-2 text-sm font-bold outline-none shadow-[0_4px_0_#ccc] active:shadow-none active:translate-y-1 transition-all text-[#333]" onchange="window.handleDateChange(this.value)">
+                </div>
             </div>
         </div>
 
@@ -585,15 +437,14 @@
                     <button class="mood-sticker" onclick="window.selectMood(this, '🌱')">🌱</button>
                     <input type="hidden" id="note-mood">
                 </div>
-                <div class="flex-1 overflow-y-auto p-8 space-y-10 pb-20">
-                    <!-- 靈修筆記 (Devotion) -->
+                <div class="flex-1 overflow-y-auto p-8 space-y-10 pb-20 relative">
+                    
+                    <!-- 靈修筆記 (保持單篇模式，因通常每日一篇) -->
                     <div id="journal-devotion-fields" class="space-y-8">
-                        <!-- 自動抓取今日進度 -->
                         <div>
                             <label class="block text-sm font-bold text-[#333] mb-2 uppercase tracking-widest pixel-font bg-[#FFD500] w-fit px-2 rounded shadow-sm">📖 Reading</label>
                             <input type="text" id="note-devotion-progress" readonly class="w-full p-3 text-sm text-[#333] font-bold" value="Loading...">
                         </div>
-
                         <div>
                             <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#0055BF] w-fit px-2 rounded shadow-sm">✨ Rhema</label>
                             <textarea id="note-rhema" placeholder="記下今天最觸動你的經文..." class="w-full min-h-[80px] resize-none p-3 text-lg leading-relaxed"></textarea>
@@ -602,80 +453,115 @@
                             <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#008F39] w-fit px-2 rounded shadow-sm">📝 Reflection</label>
                             <textarea id="note-reflection" placeholder="你的看見、體會，或是天父對你說的話..." class="w-full min-h-[150px] resize-none p-3 text-lg leading-relaxed"></textarea>
                         </div>
-                        
-                        <!-- 新增：生活應用 -->
                         <div>
                             <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#6D6E71] w-fit px-2 rounded shadow-sm">🌱 Action</label>
                             <textarea id="note-application" placeholder="具體可以行出來的小練習..." class="w-full min-h-[80px] resize-none p-3 text-lg leading-relaxed"></textarea>
                         </div>
-
                         <div>
                             <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#E3000B] w-fit px-2 rounded shadow-sm">💌 Response</label>
                             <textarea id="note-prayer-devotion" placeholder="寫給神的回信..." class="w-full min-h-[100px] resize-none p-3 text-lg leading-relaxed"></textarea>
                         </div>
+                        <div class="pt-4">
+                            <button onclick="window.saveSingleEntry('devotion')" class="brick-btn btn-blue w-full flex items-center justify-center gap-3">💾 儲存靈修筆記</button>
+                        </div>
                     </div>
                     
-                    <!-- 跟神聊聊 (Prayer) -->
-                    <div id="journal-prayer-fields" class="space-y-8 hidden">
-                        <div>
-                            <label class="block text-sm font-bold text-[#333] mb-2 uppercase tracking-widest pixel-font bg-[#FFD500] w-fit px-2 rounded shadow-sm">🎯 Wish</label>
-                            <textarea id="note-topic" placeholder="想要什麼？大膽跟神求..." class="w-full min-h-[60px] resize-none p-3 text-lg leading-relaxed"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#0055BF] w-fit px-2 rounded shadow-sm">💬 Murmur</label>
-                            <textarea id="note-content" placeholder="把心裡話都倒出來吧..." class="w-full min-h-[200px] resize-none p-3 text-lg leading-relaxed"></textarea>
-                        </div>
-                    </div>
-
-                    <!-- 感恩日記 (Gratitude) -->
-                    <div id="journal-gratitude-fields" class="space-y-8 hidden">
-                        <div>
-                            <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#E3000B] w-fit px-2 rounded shadow-sm">💖 Gratitude</label>
-                            <textarea id="note-thanks" placeholder="今天發生了什麼好事？..." class="w-full min-h-[120px] resize-none p-3 text-lg leading-relaxed"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#008F39] w-fit px-2 rounded shadow-sm">✨ Grace</label>
-                            <textarea id="note-grace" placeholder="哪裡看見神的作為？..." class="w-full min-h-[120px] resize-none p-3 text-lg leading-relaxed"></textarea>
-                        </div>
-                    </div>
-
-                    <!-- 內心戲 (Mood) -->
-                    <div id="journal-mood-fields" class="space-y-8 hidden">
-                        <div class="p-5 bg-[#FAFAFA] rounded-lg border-2 border-gray-200 border-t-4 border-gray-300">
-                            <label class="block text-base font-bold text-[#333] mb-3 uppercase pixel-font">🎬 Event / 發生了什麼事？</label>
-                            <textarea id="note-mood-event" placeholder="記錄事件與感受..." class="w-full bg-white border-2 border-[#ddd] rounded p-4 text-base outline-none resize-none h-28 focus:border-[#FFD500] leading-relaxed shadow-none"></textarea>
-                        </div>
-
-                        <!-- 情緒標註區塊 -->
-                        <div>
-                            <label class="block text-lg font-bold text-[#333] mb-2 pixel-font">🏷️ Emotions</label>
-                            <textarea id="note-mood-tags" placeholder="把所有能感受到的情緒從最強列的情緒開始一個一個寫下來..." class="w-full min-h-[60px] resize-none p-3 text-lg"></textarea>
-                        </div>
-
-                        <div class="grid grid-cols-1 gap-8">
+                    <!-- 跟神聊聊 (多篇模式) -->
+                    <div id="journal-prayer-fields" class="hidden">
+                        <div id="list-prayer" class="space-y-4 mb-8"></div> <!-- 清單容器 -->
+                        <div id="form-prayer" class="space-y-8 hidden bg-white p-4 rounded-lg border-2 border-[#eee] mb-8">
+                            <h3 class="font-bold text-lg text-[#008F39]">✍️ 新增/編輯禱告</h3>
                             <div>
-                                <label class="block text-lg font-bold text-white mb-2 pixel-font bg-[#333] w-fit px-2 rounded">🤥 Lie</label>
-                                <textarea id="note-mood-lie" placeholder="我認為這件事是因為什麼..." class="w-full min-h-[50px] resize-none p-3 text-lg"></textarea>
+                                <label class="block text-sm font-bold text-[#333] mb-2 uppercase tracking-widest pixel-font bg-[#FFD500] w-fit px-2 rounded shadow-sm">🎯 Wish</label>
+                                <textarea id="note-topic" placeholder="想要什麼？大膽跟神求..." class="w-full min-h-[60px] resize-none p-3 text-lg leading-relaxed"></textarea>
                             </div>
                             <div>
-                                <label class="block text-lg font-bold text-[#333] mb-2 pixel-font bg-[#FFD500] w-fit px-2 rounded border border-[#ccaa00]">👓 Truth</label>
-                                <textarea id="note-mood-god-view" placeholder="在禱告中領受神的眼光..." class="w-full min-h-[50px] resize-none p-3 text-lg"></textarea>
+                                <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#0055BF] w-fit px-2 rounded shadow-sm">💬 Murmur</label>
+                                <textarea id="note-content" placeholder="把心裡話都倒出來吧..." class="w-full min-h-[200px] resize-none p-3 text-lg leading-relaxed"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#008F39] w-fit px-2 rounded shadow-sm">👣 Tracking</label>
+                                <textarea id="note-prayer-tracking" placeholder="記錄禱告的成就、進度或應允..." class="w-full min-h-[150px] resize-none p-3 text-lg leading-relaxed"></textarea>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.saveListEntry('prayer')" class="brick-btn btn-green flex-1">儲存</button>
+                                <button onclick="window.hideEntryForm('prayer')" class="brick-btn flex-1">取消</button>
                             </div>
                         </div>
-
-                        <!-- 禱告區塊 -->
-                        <div>
-                            <label class="block text-lg font-bold text-white mb-2 pixel-font bg-[#0055BF] w-fit px-2 rounded">🙏 Prayer</label>
-                            <textarea id="note-mood-prayer" placeholder="最後的交託與領受..." class="w-full min-h-[100px] resize-none p-3 text-lg leading-relaxed"></textarea>
-                        </div>
-                    </div>
-
-                    <!-- 底部儲存提示 -->
-                    <div class="pt-8">
-                        <button onclick="window.backupData()" class="brick-btn btn-green w-full flex items-center justify-center gap-3 group">
-                            <span class="group-hover:scale-110 transition-transform">💾</span> 
-                            <span>SAVE GAME (Backup)</span>
+                        <button id="btn-add-prayer" onclick="window.showEntryForm('prayer')" class="brick-btn w-full py-4 text-[#008F39] border-2 border-[#008F39] hover:bg-[#008F39] hover:text-white transition-colors border-dashed flex items-center justify-center gap-2">
+                            <span class="text-2xl font-black">+</span> 新增一則禱告
                         </button>
+                    </div>
+
+                    <!-- 感恩日記 (多篇模式) -->
+                    <div id="journal-gratitude-fields" class="hidden">
+                        <div id="list-gratitude" class="space-y-4 mb-8"></div>
+                        <div id="form-gratitude" class="space-y-8 hidden bg-white p-4 rounded-lg border-2 border-[#eee] mb-8">
+                            <h3 class="font-bold text-lg text-[#FFD500]">✍️ 新增/編輯感恩</h3>
+                            <div>
+                                <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#E3000B] w-fit px-2 rounded shadow-sm">💖 Gratitude</label>
+                                <textarea id="note-thanks" placeholder="今天發生了什麼好事？..." class="w-full min-h-[120px] resize-none p-3 text-lg leading-relaxed"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#008F39] w-fit px-2 rounded shadow-sm">✨ Grace</label>
+                                <textarea id="note-grace" placeholder="哪裡看見神的作為？..." class="w-full min-h-[120px] resize-none p-3 text-lg leading-relaxed"></textarea>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.saveListEntry('gratitude')" class="brick-btn btn-yellow flex-1">儲存</button>
+                                <button onclick="window.hideEntryForm('gratitude')" class="brick-btn flex-1">取消</button>
+                            </div>
+                        </div>
+                        <button id="btn-add-gratitude" onclick="window.showEntryForm('gratitude')" class="brick-btn w-full py-4 text-[#FFD500] border-2 border-[#FFD500] hover:bg-[#FFD500] hover:text-[#333] transition-colors border-dashed flex items-center justify-center gap-2">
+                            <span class="text-2xl font-black">+</span> 新增一則感恩
+                        </button>
+                    </div>
+
+                    <!-- 內心戲 (多篇模式) -->
+                    <div id="journal-mood-fields" class="hidden">
+                        <div id="list-mood" class="space-y-4 mb-8"></div>
+                        <div id="form-mood" class="space-y-8 hidden bg-white p-4 rounded-lg border-2 border-[#eee] mb-8">
+                            <h3 class="font-bold text-lg text-[#E3000B]">✍️ 新增/編輯內心戲</h3>
+                            <div class="p-5 bg-[#FAFAFA] rounded-lg border-2 border-gray-200 border-t-4 border-gray-300">
+                                <label class="block text-base font-bold text-[#333] mb-3 uppercase pixel-font">🎬 Event</label>
+                                <textarea id="note-mood-event" placeholder="記錄事件與感受..." class="w-full bg-white border-2 border-[#ddd] rounded p-4 text-base outline-none resize-none h-28 focus:border-[#FFD500] leading-relaxed shadow-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-lg font-bold text-[#333] mb-2 pixel-font">🏷️ Emotions</label>
+                                <textarea id="note-mood-tags" placeholder="情緒標籤..." class="w-full min-h-[60px] resize-none p-3 text-lg"></textarea>
+                            </div>
+                            <div class="grid grid-cols-1 gap-8">
+                                <div>
+                                    <label class="block text-lg font-bold text-white mb-2 pixel-font bg-[#333] w-fit px-2 rounded">🤥 Lie</label>
+                                    <textarea id="note-mood-lie" placeholder="我相信了什麼謊言..." class="w-full min-h-[50px] resize-none p-3 text-lg"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-lg font-bold text-[#333] mb-2 pixel-font bg-[#FFD500] w-fit px-2 rounded border border-[#ccaa00]">👓 Truth</label>
+                                    <textarea id="note-mood-god-view" placeholder="神的眼光..." class="w-full min-h-[50px] resize-none p-3 text-lg"></textarea>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-lg font-bold text-white mb-2 pixel-font bg-[#0055BF] w-fit px-2 rounded">🙏 Prayer</label>
+                                <textarea id="note-mood-prayer" placeholder="交託與領受..." class="w-full min-h-[100px] resize-none p-3 text-lg leading-relaxed"></textarea>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.saveListEntry('mood')" class="brick-btn btn-red flex-1">儲存</button>
+                                <button onclick="window.hideEntryForm('mood')" class="brick-btn flex-1">取消</button>
+                            </div>
+                        </div>
+                        <button id="btn-add-mood" onclick="window.showEntryForm('mood')" class="brick-btn w-full py-4 text-[#E3000B] border-2 border-[#E3000B] hover:bg-[#E3000B] hover:text-white transition-colors border-dashed flex items-center justify-center gap-2">
+                            <span class="text-2xl font-black">+</span> 新增一則內心戲
+                        </button>
+                    </div>
+
+                    <!-- 底部儲存提示 (已優化) -->
+                    <div class="mt-10 p-4 bg-[#FFFDE7] border-2 border-[#FFD500] rounded-lg text-center shadow-[0_4px_0_rgba(0,0,0,0.05)]">
+                        <p class="text-sm font-black text-[#F57F17] mb-3 flex items-center justify-center gap-2">
+                            <span class="text-lg">⚠️</span> 資料僅儲存於此瀏覽器
+                        </p>
+                        <button onclick="window.backupData()" class="brick-btn btn-yellow w-full py-3 text-xs flex items-center justify-center gap-2 mb-2">
+                            <span class="text-lg">💾</span> 點此下載備份檔案 (.json)
+                        </button>
+                        <p class="text-[10px] text-[#F9A825] font-bold">請定期備份，以免清除瀏覽器紀錄後資料遺失</p>
                     </div>
                 </div>
             </section>
@@ -688,13 +574,16 @@
             <h3 class="text-3xl font-bold mb-3 text-[#333] text-center pixel-font">DATA CENTER</h3>
             <p class="text-sm text-gray-500 mb-8 text-center font-bold">筆記儲存在瀏覽器中，記得定期存檔！</p>
             <div class="grid grid-cols-1 gap-4">
+                 <!-- 下載按鈕 -->
                  <button onclick="window.backupData()" class="brick-btn btn-yellow w-full flex items-center justify-center gap-3">
                     <svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                    下載存檔 (.json)
+                    下載存檔 (Export)
                  </button>
-                 <button onclick="document.getElementById('restore-input').click()" class="brick-btn w-full flex items-center justify-center gap-3 border-2 border-gray-100">
+                 
+                 <!-- 匯入按鈕 (已更名) -->
+                 <button onclick="document.getElementById('restore-input').click()" class="brick-btn w-full flex items-center justify-center gap-3 border-2 border-gray-300 hover:border-gray-400">
                     <svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-                    讀取存檔
+                    匯入備份 (Import)
                  </button>
                  <input type="file" id="restore-input" class="hidden" accept=".json" onchange="window.restoreData(this)">
             </div>
@@ -703,15 +592,16 @@
     </div>
 
     <script>
-        // --- 設定 ---
+        // ... existing config ...
         const REMOTE_DB_URL = "https://raw.githubusercontent.com/annelin0321/bible-zh/main/bible_complete.db";
         let sqlDb = null, sqlDbLoaded = false, SQL = null, els = {};
         let dbTable = "verses";
         let dbCols = { book: "book", chapter: "chapter", verse: "verse", text: "text" };
         let currentMode = 'home';
         let calendarDate = new Date();
-        let currentDailyPlan = []; 
+        let currentEditingId = null; // 用於追蹤正在編輯的 ID
 
+        // ... existing arrays (mannaVerses, bibleBooks, planTracks, bookMap, mockVerses) ...
         const mannaVerses = [
             { t: "「敬畏耶和華是智慧的開端。」", r: "— 箴言 9:10" },
             { t: "「耶和華是我的牧者，我必不致缺乏。」", r: "— 詩篇 23:1" },
@@ -739,7 +629,6 @@
             bookMap[b.n.replace("書","")] = b.n;
         });
 
-        // 模擬數據 (Fallback Mock Data)
         const mockVerses = {
             "創世記": {1: {1: "起初，神創造天地。", 2: "地是空虛混沌，淵面黑暗；神的靈運行在水面上。", 3: "神說：「要有光」，就有了光。"}},
             "馬太福音": {1: {1: "亞伯拉罕的後裔，大衛的子孫，耶穌基督的家譜。", 18: "耶穌基督降生的事記在下面：他母親馬利亞已經許配了約瑟，還沒有迎娶，馬利亞就從聖靈懷了孕。"}},
@@ -747,9 +636,7 @@
             "箴言": {1: {7: "敬畏耶和華是知識的開端；愚妄人藐視智慧和訓誨。"}}
         };
 
-        // --- 核心功能 ---
-
-        // 初始化
+        // --- 初始化與基礎功能 ---
         async function initApp() {
             els = {
                 viewHome: document.getElementById('view-home'),
@@ -760,7 +647,6 @@
                 backBtn: document.getElementById('btn-header-back'),
                 copyBtn: document.getElementById('btn-copy-verses'),
                 btnCopyProgress: document.getElementById('btn-copy-progress'),
-                
                 headerTitle: document.getElementById('header-title'),
                 datePicker: document.getElementById('date-picker'),
                 homeDatePicker: document.getElementById('home-date-picker'),
@@ -769,8 +655,6 @@
                 calendarMonthLabel: document.getElementById('calendar-month-label'),
                 streakCount: document.getElementById('streak-count'),
                 streakBadge: document.getElementById('streak-badge'),
-                
-                // Content Views
                 viewBooks: document.getElementById('view-bible-books'),
                 viewChapters: document.getElementById('view-bible-chapters'),
                 viewText: document.getElementById('view-bible-text')
@@ -782,7 +666,6 @@
             window.setAppIcon();
 
             try {
-                // 嘗試載入 SQL
                 if (typeof window.initSqlJs === 'function') {
                     SQL = await window.initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${f}` });
                     const res = await fetch(REMOTE_DB_URL);
@@ -792,400 +675,176 @@
                     sqlDbLoaded = true;
                     window.detectTableStructure();
                     els.inlineSearch.placeholder = "🔍 搜尋經文...";
-                } else {
-                    throw new Error("SQL.js not loaded");
-                }
+                } else { throw new Error("SQL.js not loaded"); }
             } catch(e) {
-                console.warn("DB Load Failed, using fallback mode.", e);
-                els.inlineSearch.placeholder = "⚠️ 連線失敗 (僅供試閱)";
+                console.warn("DB Load Failed", e);
+                els.inlineSearch.placeholder = "⚠️ 連線失敗";
             }
 
             window.renderCalendar();
             window.calculateStreak();
         }
 
-        window.setAppIcon = function() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 192;
-            canvas.height = 192;
-            const ctx = canvas.getContext('2d');
+        // --- 多篇筆記邏輯 (Multi-Entry Logic) ---
+        // 欄位定義
+        const journalFields = {
+            'prayer': ['note-topic', 'note-content', 'note-prayer-tracking'],
+            'gratitude': ['note-thanks', 'note-grace'],
+            'mood': ['note-mood-event', 'note-mood-tags', 'note-mood-lie', 'note-mood-god-view', 'note-mood-prayer']
+        };
+
+        // 讀取某類型當日的所有筆記
+        window.getJournalEntries = function(type) {
+            const dateKey = els.datePicker.value;
+            const listKey = `${dateKey}-journal-${type}-entries`;
+            let entries = [];
             
-            // --- 3D Lego Brick Logic ---
-            
-            // 1. Base Block (Yellow)
-            const baseColor = '#FFD500';
-            const shadowColor = '#ccaa00';
-            const highlightColor = '#ffe666'; 
-            
-            ctx.fillStyle = baseColor;
-            ctx.fillRect(0, 0, 192, 192);
-            
-            // Inner shadow/Highlight
-            ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-            ctx.lineWidth = 4;
-            ctx.beginPath(); ctx.moveTo(0,192); ctx.lineTo(0,0); ctx.lineTo(192,0); ctx.stroke();
-            
-            ctx.strokeStyle = 'rgba(0,0,0,0.1)';
-            ctx.beginPath(); ctx.moveTo(0,192); ctx.lineTo(192,192); ctx.lineTo(192,0); ctx.stroke();
-
-            // 2. Draw Studs (3x3 Grid = 9 dots, smaller and cleaner)
-            const gridSize = 3;
-            const cellSize = 192 / gridSize; // 64
-            const studRadius = 22; // Smaller radius for 3x3 layout
-            
-            for(let row=0; row<gridSize; row++) {
-                for(let col=0; col<gridSize; col++) {
-                    const cx = cellSize/2 + col*cellSize;
-                    const cy = cellSize/2 + row*cellSize;
-                    
-                    // A. Cast Shadow
-                    ctx.beginPath();
-                    ctx.arc(cx + 4, cy + 4, studRadius, 0, Math.PI * 2);
-                    ctx.fillStyle = 'rgba(0,0,0,0.1)'; 
-                    ctx.fill();
-
-                    // B. Stud Side
-                    ctx.beginPath();
-                    ctx.arc(cx, cy + 2, studRadius, 0, Math.PI * 2);
-                    ctx.fillStyle = shadowColor; 
-                    ctx.fill();
-
-                    // C. Stud Top
-                    const grad = ctx.createLinearGradient(cx - studRadius, cy - studRadius, cx + studRadius, cy + studRadius);
-                    grad.addColorStop(0, highlightColor);
-                    grad.addColorStop(1, shadowColor);
-                    
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, studRadius, 0, Math.PI * 2);
-                    ctx.fillStyle = grad; 
-                    ctx.fill();
-
-                    // D. Highlight
-                    ctx.beginPath();
-                    ctx.ellipse(cx - 8, cy - 8, 7, 4, -Math.PI / 4, 0, Math.PI * 2);
-                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
-                    ctx.fill();
-                    
-                    // E. Emboss
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, studRadius - 5, 0, Math.PI * 2);
-                    ctx.strokeStyle = 'rgba(0,0,0,0.05)';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                }
-            }
-
-            // 3. Icon Overlay (Toast/Manna) - Thicker Lines
-            ctx.save();
-            ctx.translate(24, 24); 
-            ctx.scale(6, 6); 
-            
-            // 關鍵修改：將線條加粗
-            ctx.lineWidth = 5.5 / 6; // Much bolder (was 2.5/6)
-            ctx.strokeStyle = '#333333';
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-
-            // Draw Toast Shape
-            ctx.beginPath();
-            ctx.moveTo(4, 14);
-            ctx.bezierCurveTo(4, 14, 4, 7, 12, 7);
-            ctx.bezierCurveTo(20, 7, 20, 14, 20, 14);
-            ctx.lineTo(20, 18);
-            ctx.bezierCurveTo(20, 19.1, 19.1, 20, 18, 20);
-            ctx.lineTo(6, 20);
-            ctx.bezierCurveTo(4.9, 20, 4, 19.1, 4, 18);
-            ctx.lineTo(4, 14);
-            ctx.closePath();
-            
-            // White halo for visibility against studs
-            ctx.shadowColor = "rgba(255,255,255,0.8)";
-            ctx.shadowBlur = 0;
-            ctx.shadowOffsetX = 1.5; // Slightly offset
-            ctx.shadowOffsetY = 1.5;
-            ctx.stroke();
-            
-            // Reset shadow to draw the dark line clearly
-            ctx.shadowColor = "transparent"; 
-            ctx.stroke(); // Stroke again to be sharp
-
-            // Draw Line (Toast Crust)
-            ctx.beginPath();
-            ctx.moveTo(4, 14);
-            ctx.lineTo(20, 14);
-            ctx.stroke();
-
-            // Draw Eyes (Curved)
-            ctx.beginPath();
-            ctx.moveTo(9, 11);
-            ctx.bezierCurveTo(9, 11, 9.5, 10, 10.5, 10);
-            ctx.bezierCurveTo(11.5, 10, 12, 11, 12, 11);
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.moveTo(13, 11);
-            ctx.bezierCurveTo(13, 11, 13.5, 10, 14.5, 10);
-            ctx.bezierCurveTo(15.5, 10, 16, 11, 16, 11);
-            ctx.stroke();
-
-            ctx.restore();
-
-            const dataURL = canvas.toDataURL('image/png');
-            const existingIcons = document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]');
-            existingIcons.forEach(e => e.remove());
-            const linkIcon = document.createElement('link'); linkIcon.rel = 'icon'; linkIcon.type = 'image/png'; linkIcon.href = dataURL; document.head.appendChild(linkIcon);
-            const linkApple = document.createElement('link'); linkApple.rel = 'apple-touch-icon'; linkApple.href = dataURL; document.head.appendChild(linkApple);
-        }
-
-        window.detectTableStructure = function() {
-            if(!sqlDb) return;
             try {
-                const tables = sqlDb.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
-                if(tables[0] && tables[0].values.length > 0) {
-                    const names = tables[0].values.flat();
-                    dbTable = names.includes('verses') ? 'verses' : (names.includes('bible') ? 'bible' : names[0]);
+                const stored = localStorage.getItem(listKey);
+                if (stored) entries = JSON.parse(stored);
+            } catch(e) { console.error("Parse error", e); }
+
+            // 自動遷移舊資料：如果列表是空的，但有舊格式的資料
+            if (entries.length === 0) {
+                const fields = journalFields[type];
+                let hasLegacyData = false;
+                let legacyEntry = { id: Date.now() };
+                
+                fields.forEach(f => {
+                    const val = localStorage.getItem(`${dateKey}-${f}`);
+                    if (val) {
+                        hasLegacyData = true;
+                        legacyEntry[f] = val;
+                    }
+                });
+
+                if (hasLegacyData) {
+                    entries.push(legacyEntry);
+                    // 存回新格式
+                    localStorage.setItem(listKey, JSON.stringify(entries));
                 }
-                const cols = sqlDb.exec(`PRAGMA table_info(${dbTable})`);
-                if(cols.length > 0) {
-                    const colNames = cols[0].values.map(r => r[1]);
-                    if(colNames.includes('content')) dbCols.text = 'content';
-                    else if(colNames.includes('scripture')) dbCols.text = 'scripture';
-                    else if(colNames.includes('text')) dbCols.text = 'text';
-                    if(colNames.includes('book_name')) dbCols.book = 'book_name';
-                    else if(colNames.includes('book')) dbCols.book = 'book';
-                    if(colNames.includes('chapter_number')) dbCols.chapter = 'chapter_number';
-                    else if(colNames.includes('chapter')) dbCols.chapter = 'chapter';
-                    if(colNames.includes('verse_number')) dbCols.verse = 'verse_number';
-                    else if(colNames.includes('verse')) dbCols.verse = 'verse';
-                }
-            } catch(e) { console.error("Table detection failed", e); }
+            }
+            return entries;
         }
 
-        // 切換模式
-        window.switchMode = function(m) {
-            currentMode = m;
-            els.viewHome.classList.toggle('hidden', m !== 'home');
-            els.viewWorkspace.classList.toggle('hidden', m === 'home');
-            els.mainHeader.classList.toggle('hidden', m === 'home');
-
-            const isDevotion = m === 'devotion';
-            const isPureJournal = ['journal-prayer','journal-gratitude','journal-mood'].includes(m);
-            const isBible = m === 'bible';
-
-            // 1. UI 元素切換
-            document.getElementById('workspace-tabs').classList.toggle('hidden', !isDevotion);
-            document.getElementById('devotion-tabs').classList.toggle('hidden', !isDevotion);
+        // 渲染列表介面
+        window.renderJournalList = function(type) {
+            const listEl = document.getElementById(`list-${type}`);
+            const entries = window.getJournalEntries(type);
             
-            document.getElementById('search-box').classList.toggle('invisible', !isBible); 
-
-            ['journal-devotion-fields', 'journal-prayer-fields', 'journal-gratitude-fields', 'journal-mood-fields']
-                .forEach(id => document.getElementById(id).classList.add('hidden'));
-
-            const readerSec = document.getElementById('section-reader');
-            const journalSec = document.getElementById('section-journal');
-
-            readerSec.classList.remove('hidden', 'lg:w-1/2');
-            journalSec.classList.remove('hidden', 'lg:w-1/2');
-            readerSec.classList.add('w-full'); 
-            journalSec.classList.add('w-full');
-
-            els.backBtn.classList.add('hidden');
-            els.copyBtn.classList.add('hidden');
-
-            if (els.btnCopyProgress) {
-                els.btnCopyProgress.classList.toggle('hidden', !isDevotion);
-            }
-
-            if (isDevotion) {
-                readerSec.classList.remove('w-full');
-                journalSec.classList.remove('w-full');
-                readerSec.classList.add('lg:w-1/2');
-                journalSec.classList.add('lg:w-1/2');
-
-                document.getElementById('journal-devotion-fields').classList.remove('hidden');
-                els.headerTitle.innerText = "Daily Devotion";
-                els.readerTitle.innerText = "Daily Devotion";
-                els.readerSubtitle.innerText = "Reading Plan";
-                window.updateDevotionUI();
-                window.switchWorkspaceTab('reader'); 
-            } else if (isBible) {
-                journalSec.classList.add('hidden'); 
-                els.headerTitle.innerText = "Bible Reading";
-                els.readerTitle.innerText = "Bible Reading";
-                els.readerSubtitle.innerText = "Select Book";
-                window.renderMainBooks('old');
-                window.goBackToMainBooks();
-                window.switchWorkspaceTab('reader'); 
-            } else if (isPureJournal) {
-                readerSec.classList.add('hidden'); 
-                const map = {'journal-prayer':'Prayer Journal','journal-gratitude':'Gratitude','journal-mood':'Mood Diary'};
-                const fieldMap = {'journal-prayer':'journal-prayer-fields','journal-gratitude':'journal-gratitude-fields','journal-mood':'journal-mood-fields'};
-                els.headerTitle.innerText = map[m];
-                document.getElementById(fieldMap[m]).classList.remove('hidden');
-                window.switchWorkspaceTab('journal'); 
-            }
-        }
-
-        window.fetchBibleRef = async function(refInput) {
-            const ref = refInput ? refInput.trim() : "";
-            if(!ref) return;
-
-            // UI 狀態切換
-            els.viewBooks.classList.add('hidden');
-            els.viewChapters.classList.add('hidden');
-            els.viewText.classList.remove('hidden');
-            els.copyBtn.classList.remove('hidden');
-            els.backBtn.classList.remove('hidden');
+            listEl.innerHTML = '';
             
-            els.viewText.innerHTML = '<div class="flex justify-center py-10"><div class="loader"></div></div>';
-            
-            // 解析經文引用
-            const match = ref.match(/^([\u4e00-\u9fa5]+|[a-zA-Z]+)\s*(\d+)(?::(\d+)(?:-(\d+))?)?$/);
-            const bookKey = match ? match[1] : null;
-            const isBookRef = bookKey && (bookMap[bookKey] || bookMap[bookKey.replace("書","")]);
+            if (entries.length === 0) {
+                listEl.innerHTML = `<div class="text-center text-gray-400 py-4 font-bold">還沒有紀錄，新增一則吧！</div>`;
+            } else {
+                entries.forEach((entry, index) => {
+                    // 根據不同類型決定標題顯示什麼
+                    let title = "", preview = "";
+                    if (type === 'prayer') {
+                        title = entry['note-topic'] || "未命名禱告";
+                        preview = entry['note-content'] || "無內容";
+                    } else if (type === 'gratitude') {
+                        title = entry['note-thanks'] || "感恩事項";
+                        preview = entry['note-grace'] || "";
+                    } else if (type === 'mood') {
+                        title = entry['note-mood-event'] || "心情事件";
+                        preview = entry['note-mood-tags'] || "";
+                    }
 
-            // === 優先嘗試從 SQL 資料庫讀取 ===
-            if (sqlDbLoaded) {
-                if (match && isBookRef) {
-                    const book = bookMap[bookKey] || bookKey; 
-                    const chapter = parseInt(match[2]);
-                    const startV = match[3] ? parseInt(match[3]) : 1;
-                    const endV = match[4] ? parseInt(match[4]) : (match[3] ? parseInt(match[3]) : 200); 
+                    // 顏色樣式
+                    const colorClass = type === 'prayer' ? 'list-brick-green' : (type === 'gratitude' ? 'list-brick-yellow' : 'list-brick-red');
 
-                    try {
-                        const query = `SELECT ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.book} = ? AND ${dbCols.chapter} = ? AND ${dbCols.verse} >= ? AND ${dbCols.verse} <= ?`;
-                        const res = sqlDb.exec(query, [book, chapter, startV, endV]);
-                        
-                        if (res.length > 0) {
-                            els.readerTitle.innerText = `${book} ${chapter}`;
-                            els.readerSubtitle.innerText = "Scripture";
-                            els.viewText.innerHTML = res[0].values.map(v => `
-                                <div class="verse-item mb-4" onclick="this.classList.toggle('selected'); window.updateCopyButton()">
-                                    <span class="text-xs font-bold text-white bg-[#333] mr-2 px-1 rounded-sm select-none inline-block">${v[1]}</span>
-                                    <span class="text-verse leading-loose">${v[2]}</span>
-                                </div>
-                            `).join('');
-                            return; // 成功讀取，結束
-                        } else {
-                            els.viewText.innerHTML = "<p class='p-8 opacity-50 text-center text-sm'>此章節查無內容。</p>";
-                            return;
-                        }
-                    } catch(e) { console.error(e); }
-                } else {
-                    // 關鍵字搜尋
-                    try {
-                        els.readerTitle.innerText = `搜尋: "${ref}"`;
-                        els.readerSubtitle.innerText = "Search Result";
-                        const query = `SELECT ${dbCols.book}, ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.text} LIKE ? LIMIT 50`;
-                        const res = sqlDb.exec(query, [`%${ref}%`]);
-
-                        if (res.length > 0) {
-                            const results = res[0].values;
-                            els.viewText.innerHTML = results.map(v => {
-                                const highlightedTxt = v[3].replace(new RegExp(ref, 'g'), `<span class="bg-[#FFD500] text-[#333] px-1 font-bold rounded">${ref}</span>`);
-                                return `
-                                    <div class="verse-item mb-4 p-4 border-2 border-transparent hover:border-gray-200 transition-all cursor-pointer" onclick="this.classList.toggle('selected'); window.updateCopyButton()">
-                                        <div class="flex items-center gap-2 mb-2">
-                                            <span class="text-[10px] font-bold text-white bg-[#0055BF] px-2 py-1 tracking-wider rounded">${v[0]} ${v[1]}:${v[2]}</span>
-                                        </div>
-                                        <span class="text-verse text-[#333] leading-relaxed block">${highlightedTxt}</span>
-                                    </div>
-                                `;
-                            }).join('');
-                            return;
-                        } else {
-                            els.viewText.innerHTML = `<div class="flex flex-col items-center justify-center py-12"><span class="text-4xl mb-4">👾</span><p class="text-lg font-bold">找不到「${ref}」</p></div>`;
-                            return;
-                        }
-                    } catch(e) { console.error(e); }
-                }
-            }
-
-            // === 備用方案 (Fallback Mode) ===
-            // 當 SQL 資料庫載入失敗時，嘗試從內建的 Mock Data 尋找
-            if (match && isBookRef) {
-                const book = bookMap[bookKey] || bookKey; 
-                const chapter = parseInt(match[2]);
-                const verseData = mockVerses[book]?.[chapter];
-
-                els.readerTitle.innerText = `${book} ${chapter}`;
-                els.readerSubtitle.innerText = "Fallback Mode";
-
-                if (verseData) {
-                    els.viewText.innerHTML = `
-                        <div class="p-3 bg-red-50 text-red-600 rounded mb-4 text-xs font-bold border border-red-200">
-                            ⚠️ 遠端資料庫未連線，僅顯示試閱內容。
-                        </div>
-                    ` + Object.keys(verseData).map(vNum => `
-                        <div class="verse-item mb-4" onclick="this.classList.toggle('selected'); window.updateCopyButton()">
-                            <span class="text-xs font-bold text-white bg-[#333] mr-2 px-1 rounded-sm select-none inline-block">${vNum}</span>
-                            <span class="text-verse leading-loose">${verseData[vNum]}</span>
-                        </div>
-                    `).join('');
-                } else {
-                    els.viewText.innerHTML = `
-                        <div class="flex flex-col items-center justify-center py-12 text-center">
-                            <span class="text-4xl mb-4">🔌</span>
-                            <p class="text-lg font-bold text-[#333]">資料庫連線中斷</p>
-                            <p class="text-sm text-gray-500 mt-2">無法讀取 ${book} 第 ${chapter} 章。<br>請檢查網路連線或稍後再試。</p>
+                    listEl.innerHTML += `
+                        <div class="list-brick ${colorClass}" onclick="window.editListEntry('${type}', ${entry.id})">
+                            <div class="list-brick-content">
+                                <div class="list-brick-title">${title || (index + 1) + '. 無標題'}</div>
+                                <div class="list-brick-preview">${preview}</div>
+                            </div>
                         </div>
                     `;
+                });
+            }
+        }
+
+        // 顯示表單 (新增或編輯)
+        window.showEntryForm = function(type, entryId = null) {
+            document.getElementById(`list-${type}`).classList.add('hidden');
+            document.getElementById(`btn-add-${type}`).classList.add('hidden');
+            document.getElementById(`form-${type}`).classList.remove('hidden');
+            
+            currentEditingId = entryId;
+            const fields = journalFields[type];
+
+            if (entryId) {
+                // 編輯模式：填入資料
+                const entries = window.getJournalEntries(type);
+                const entry = entries.find(e => e.id === entryId);
+                if (entry) {
+                    fields.forEach(f => {
+                        const el = document.getElementById(f);
+                        if(el) el.value = entry[f] || "";
+                    });
                 }
             } else {
-                els.viewText.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-12 text-center">
-                        <span class="text-4xl mb-4">⚠️</span>
-                        <p class="text-lg font-bold text-[#333]">無法執行搜尋</p>
-                        <p class="text-sm text-gray-500 mt-2">資料庫未連線，搜尋功能暫時無法使用。</p>
-                    </div>
-                `;
+                // 新增模式：清空表單
+                fields.forEach(f => {
+                    const el = document.getElementById(f);
+                    if(el) el.value = "";
+                });
             }
         }
 
-        window.updateDevotionUI = function() {
-            const start = new Date(calendarDate.getFullYear(), 0, 0);
-            const diff = calendarDate - start;
-            const dayOfYear = Math.floor(diff / 86400000);
-            
-            let progressTexts = [];
-
-            const container = document.getElementById('devotion-tabs');
-            container.innerHTML = planTracks.map((track, idx) => {
-                const totalChapters = track.books.reduce((a,b)=>a+b.c, 0);
-                const chapterIdx = Math.floor((dayOfYear % totalChapters)) || 1;
-                
-                let currentCount = 0, targetBook = track.books[0], targetChapter = 1;
-                for(let b of track.books) {
-                    if (currentCount + b.c >= chapterIdx) {
-                        targetBook = b;
-                        targetChapter = chapterIdx - currentCount;
-                        break;
-                    }
-                    currentCount += b.c;
-                }
-
-                const ref = `${targetBook.abbr} ${targetChapter}`;
-                progressTexts.push(ref);
-
-                return `
-                    <div class="devotion-track-card ${idx===0?'active':''}" onclick="window.fetchBibleRef('${ref}'); document.querySelectorAll('.devotion-track-card').forEach(c=>c.classList.remove('active')); this.classList.add('active');">
-                        <span class="track-tag uppercase">${track.t}</span>
-                        <span class="track-ref font-mono">${ref}</span>
-                    </div>
-                `;
-            }).join('');
-            
-            const progressField = document.getElementById('note-devotion-progress');
-            if(progressField) {
-                progressField.value = progressTexts.join(' / ');
-            }
-
-            // 安全獲取第一個經文引用
-            const firstRefEl = container.querySelector('.track-ref');
-            if(firstRefEl) {
-                window.fetchBibleRef(firstRefEl.innerText);
-            }
+        // 隱藏表單 (取消)
+        window.hideEntryForm = function(type) {
+            document.getElementById(`form-${type}`).classList.add('hidden');
+            document.getElementById(`list-${type}`).classList.remove('hidden');
+            document.getElementById(`btn-add-${type}`).classList.remove('hidden');
+            currentEditingId = null;
         }
+
+        // 儲存列表項目
+        window.saveListEntry = function(type) {
+            const dateKey = els.datePicker.value;
+            const listKey = `${dateKey}-journal-${type}-entries`;
+            let entries = window.getJournalEntries(type);
+            const fields = journalFields[type];
+            
+            const newData = { id: currentEditingId || Date.now() };
+            fields.forEach(f => {
+                const el = document.getElementById(f);
+                if(el) newData[f] = el.value;
+            });
+
+            if (currentEditingId) {
+                // 更新現有
+                const idx = entries.findIndex(e => e.id === currentEditingId);
+                if (idx !== -1) entries[idx] = { ...entries[idx], ...newData };
+            } else {
+                // 新增
+                entries.push(newData);
+            }
+
+            localStorage.setItem(listKey, JSON.stringify(entries));
+            
+            // 為了保持相容性，如果是第一則，同時寫入 legacy 欄位 (可選)
+            // 這裡選擇只更新列表，渲染月曆時會檢查列表
+            
+            window.hideEntryForm(type);
+            window.renderJournalList(type);
+            window.renderCalendar();
+        }
+
+        // 儲存單篇筆記 (靈修用)
+        window.saveSingleEntry = function(type) {
+            // 對於 'devotion'，我們還是使用直接綁定 oninput 儲存，但為了給使用者反饋，這裡做個按鈕效果
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "已儲存！";
+            setTimeout(() => btn.innerText = originalText, 1000);
+            window.renderCalendar();
+        }
+
+        // --- 核心邏輯修改 ---
 
         window.handleDateChange = function(val) {
             calendarDate = new Date(val);
@@ -1197,21 +856,26 @@
             document.getElementById('manna-text').innerText = m.t;
             document.getElementById('manna-ref').innerText = m.r;
 
-            const fields = [
-                'note-rhema', 'note-reflection', 'note-application', 'note-prayer-devotion',
-                'note-topic', 'note-content', 
-                'note-thanks', 'note-grace', 
-                'note-mood-event', 'note-mood-tags', 'note-mood-lie', 'note-mood-god-view', 'note-mood-prayer'
+            // 1. 處理靈修筆記 (單篇模式)
+            const devotionFields = [
+                'note-rhema', 'note-reflection', 'note-application', 'note-prayer-devotion'
             ];
-            fields.forEach(f => {
+            devotionFields.forEach(f => {
                 const el = document.getElementById(f);
                 if(el) {
                     el.value = localStorage.getItem(`${val}-${f}`) || "";
+                    // 靈修筆記依然即時儲存
                     el.oninput = () => {
                         localStorage.setItem(`${val}-${f}`, el.value);
-                        window.renderCalendar();
                     };
                 }
+            });
+
+            // 2. 處理多篇模式的清單渲染
+            // 每次換日期，都要重置 UI 為列表狀態
+            ['prayer', 'gratitude', 'mood'].forEach(type => {
+                window.hideEntryForm(type);
+                window.renderJournalList(type);
             });
             
             if(currentMode === 'devotion') {
@@ -1221,6 +885,12 @@
             window.renderCalendar();
         }
 
+        // 編輯列表項目入口
+        window.editListEntry = function(type, id) {
+            window.showEntryForm(type, id);
+        }
+
+        // 月曆渲染 (需同時檢查單篇與列表資料)
         window.renderCalendar = function() {
             const y = calendarDate.getFullYear(), m = calendarDate.getMonth();
             els.calendarMonthLabel.innerText = `${y}.${m+1}`;
@@ -1233,144 +903,71 @@
                 const key = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
                 d.className = "calendar-day"; d.innerText = i;
                 if (key === els.datePicker.value) d.classList.add('selected-day');
-                const hasNote = ['note-rhema', 'note-content', 'note-thanks', 'note-mood-event', 'note-mood-tags'].some(field => localStorage.getItem(`${key}-${field}`));
-                if (hasNote) d.classList.add('has-entry');
+                
+                // 檢查是否有資料
+                let hasEntry = false;
+                // 1. 檢查靈修筆記
+                if (localStorage.getItem(`${key}-note-rhema`)) hasEntry = true;
+                // 2. 檢查列表資料
+                ['prayer', 'gratitude', 'mood'].forEach(type => {
+                    const list = localStorage.getItem(`${key}-journal-${type}-entries`);
+                    if (list && JSON.parse(list).length > 0) hasEntry = true;
+                });
+
+                if (hasEntry) d.classList.add('has-entry');
                 d.onclick = () => window.handleDateChange(key);
                 els.calendarGrid.appendChild(d);
             }
         }
 
-        window.switchWorkspaceTab = function(t) {
-            const r = document.getElementById('section-reader'), j = document.getElementById('section-journal');
-            const tr = document.getElementById('tab-reader'), tj = document.getElementById('tab-journal');
-            if (t === 'reader') {
-                r.classList.replace('opacity-0', 'opacity-100'); r.classList.replace('z-0', 'z-10'); r.style.pointerEvents = "auto";
-                j.classList.replace('opacity-100', 'opacity-0'); j.classList.replace('z-10', 'z-0'); j.style.pointerEvents = "none";
-                tr.classList.add('active'); tj.classList.remove('active');
-            } else {
-                j.classList.replace('opacity-0', 'opacity-100'); j.classList.replace('z-0', 'z-10'); j.style.pointerEvents = "auto";
-                r.classList.replace('opacity-100', 'opacity-0'); r.classList.replace('z-10', 'z-0'); r.style.pointerEvents = "none";
-                tj.classList.add('active'); tr.classList.remove('active');
-            }
+        // --- 其他輔助函式 (保持不變) ---
+        window.setAppIcon = function() { /* ... (保留原有的 setAppIcon 代碼) ... */ 
+            const canvas = document.createElement('canvas'); canvas.width = 192; canvas.height = 192; const ctx = canvas.getContext('2d');
+            const baseColor = '#FFD500'; const shadowColor = '#ccaa00'; const highlightColor = '#ffe666'; 
+            ctx.fillStyle = baseColor; ctx.fillRect(0, 0, 192, 192);
+            ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(0,192); ctx.lineTo(0,0); ctx.lineTo(192,0); ctx.stroke();
+            ctx.strokeStyle = 'rgba(0,0,0,0.1)'; ctx.beginPath(); ctx.moveTo(0,192); ctx.lineTo(192,192); ctx.lineTo(192,0); ctx.stroke();
+            const gridSize = 3; const cellSize = 192 / gridSize; const studRadius = 22; 
+            for(let row=0; row<gridSize; row++) { for(let col=0; col<gridSize; col++) {
+                    const cx = cellSize/2 + col*cellSize; const cy = cellSize/2 + row*cellSize;
+                    ctx.beginPath(); ctx.arc(cx + 4, cy + 4, studRadius, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.1)'; ctx.fill();
+                    ctx.beginPath(); ctx.arc(cx, cy + 2, studRadius, 0, Math.PI * 2); ctx.fillStyle = shadowColor; ctx.fill();
+                    const grad = ctx.createLinearGradient(cx - studRadius, cy - studRadius, cx + studRadius, cy + studRadius); grad.addColorStop(0, highlightColor); grad.addColorStop(1, shadowColor);
+                    ctx.beginPath(); ctx.arc(cx, cy, studRadius, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill();
+                    ctx.beginPath(); ctx.ellipse(cx - 8, cy - 8, 7, 4, -Math.PI / 4, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.fill();
+                    ctx.beginPath(); ctx.arc(cx, cy, studRadius - 5, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(0,0,0,0.05)'; ctx.lineWidth = 1; ctx.stroke();
+            }}
+            ctx.save(); ctx.translate(24, 24); ctx.scale(6, 6); ctx.lineWidth = 5.5 / 6; ctx.strokeStyle = '#333333'; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            ctx.beginPath(); ctx.moveTo(4, 14); ctx.bezierCurveTo(4, 14, 4, 7, 12, 7); ctx.bezierCurveTo(20, 7, 20, 14, 20, 14); ctx.lineTo(20, 18); ctx.bezierCurveTo(20, 19.1, 19.1, 20, 18, 20); ctx.lineTo(6, 20); ctx.bezierCurveTo(4.9, 20, 4, 19.1, 4, 18); ctx.lineTo(4, 14); ctx.closePath();
+            ctx.shadowColor = "rgba(255,255,255,0.8)"; ctx.shadowBlur = 0; ctx.shadowOffsetX = 1.5; ctx.shadowOffsetY = 1.5; ctx.stroke(); ctx.shadowColor = "transparent"; ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(4, 14); ctx.lineTo(20, 14); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(9, 11); ctx.bezierCurveTo(9, 11, 9.5, 10, 10.5, 10); ctx.bezierCurveTo(11.5, 10, 12, 11, 12, 11); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(13, 11); ctx.bezierCurveTo(13, 11, 13.5, 10, 14.5, 10); ctx.bezierCurveTo(15.5, 10, 16, 11, 16, 11); ctx.stroke(); ctx.restore();
+            const dataURL = canvas.toDataURL('image/png');
+            const existingIcons = document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]'); existingIcons.forEach(e => e.remove());
+            const linkIcon = document.createElement('link'); linkIcon.rel = 'icon'; linkIcon.type = 'image/png'; linkIcon.href = dataURL; document.head.appendChild(linkIcon);
+            const linkApple = document.createElement('link'); linkApple.rel = 'apple-touch-icon'; linkApple.href = dataURL; document.head.appendChild(linkApple);
         }
-
-        window.renderMainBooks = function(t) {
-            els.viewBooks.innerHTML = `<div class="flex gap-4 mb-6 shrink-0"><button onclick="window.renderMainBooks('old')" class="brick-btn btn-yellow flex-1 text-sm">舊約 Old Testament</button><button onclick="window.renderMainBooks('new')" class="brick-btn flex-1 text-sm border-2 border-gray-100">新約 New Testament</button></div>` +
-            `<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 content-start pb-10">` + bibleBooks[t].map(b => `<button class="px-3 py-3 text-sm border-2 border-gray-100 rounded bg-white hover:bg-gray-50 text-left font-bold shadow-[0_3px_0_#ddd] active:translate-y-1 active:shadow-none transition-all" onclick='window.showMainChapters(${JSON.stringify(b)})'>${b.n}</button>`).join('') + `</div>`;
-        }
-
-        window.showMainChapters = function(b) {
-            els.viewBooks.classList.add('hidden');
-            els.viewChapters.classList.remove('hidden');
-            els.viewText.classList.add('hidden');
-            
-            els.readerTitle.innerText = b.n;
-            els.readerSubtitle.innerText = "Select Chapter";
-            els.backBtn.classList.remove('hidden');
-            els.copyBtn.classList.add('hidden');
-
-            document.getElementById('main-chapter-title').innerText = b.n;
-            document.getElementById('main-chapter-grid').innerHTML = Array.from({length:b.c}, (_,i)=> `
-                <button class="aspect-square border-2 border-gray-100 rounded bg-white hover:bg-[#0055BF] hover:text-white flex items-center justify-center font-bold text-sm shadow-[0_3px_0_#ddd] active:translate-y-1 active:shadow-none transition-all" onclick="window.fetchBibleRef('${b.abbr}${i+1}')">${i+1}</button>
-            `).join('');
-        }
-
-        window.goBackToMainBooks = function() {
-            if (!els.viewText.classList.contains('hidden')) {
-                els.viewText.classList.add('hidden');
-                els.viewChapters.classList.add('hidden');
-                els.viewBooks.classList.remove('hidden');
-                els.readerTitle.innerText = "Bible Reading";
-                els.readerSubtitle.innerText = "Select Book";
-                els.backBtn.classList.add('hidden');
-                els.copyBtn.classList.add('hidden');
-            } else {
-                els.viewChapters.classList.add('hidden');
-                els.viewBooks.classList.remove('hidden');
-                els.readerTitle.innerText = "Bible Reading";
-                els.readerSubtitle.innerText = "Select Book";
-                els.backBtn.classList.add('hidden');
-            }
-        }
-
-        window.copyDevotionProgress = function() {
-            const progressText = document.getElementById('note-devotion-progress').value;
-            if(!progressText || progressText === "Loading...") return;
-            
-            const t = document.createElement('textarea'); 
-            t.value = progressText; 
-            document.body.appendChild(t); 
-            t.select(); 
-            document.execCommand('copy'); 
-            document.body.removeChild(t);
-            
-            const btn = document.getElementById('btn-copy-progress');
-            const originalText = btn.innerText;
-            const originalClass = btn.className;
-            
-            btn.innerText = "COPIED!";
-            btn.classList.replace('bg-[#333]', 'bg-[#008F39]');
-            
-            setTimeout(() => {
-                btn.innerText = originalText;
-                btn.classList.replace('bg-[#008F39]', 'bg-[#333]');
-            }, 1500);
-        }
-
+        window.detectTableStructure = function() { if(!sqlDb) return; try { const tables = sqlDb.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"); if(tables[0] && tables[0].values.length > 0) { const names = tables[0].values.flat(); dbTable = names.includes('verses') ? 'verses' : (names.includes('bible') ? 'bible' : names[0]); } const cols = sqlDb.exec(`PRAGMA table_info(${dbTable})`); if(cols.length > 0) { const colNames = cols[0].values.map(r => r[1]); if(colNames.includes('content')) dbCols.text = 'content'; else if(colNames.includes('scripture')) dbCols.text = 'scripture'; else if(colNames.includes('text')) dbCols.text = 'text'; if(colNames.includes('book_name')) dbCols.book = 'book_name'; else if(colNames.includes('book')) dbCols.book = 'book'; if(colNames.includes('chapter_number')) dbCols.chapter = 'chapter_number'; else if(colNames.includes('chapter')) dbCols.chapter = 'chapter'; if(colNames.includes('verse_number')) dbCols.verse = 'verse_number'; else if(colNames.includes('verse')) dbCols.verse = 'verse'; } } catch(e) { console.error("Table detection failed", e); } }
+        window.switchMode = function(m) { currentMode = m; els.viewHome.classList.toggle('hidden', m !== 'home'); els.viewWorkspace.classList.toggle('hidden', m === 'home'); els.mainHeader.classList.toggle('hidden', m === 'home'); const isDevotion = m === 'devotion'; const isPureJournal = ['journal-prayer','journal-gratitude','journal-mood'].includes(m); const isBible = m === 'bible'; document.getElementById('workspace-tabs').classList.toggle('hidden', !isDevotion); document.getElementById('devotion-tabs').classList.toggle('hidden', !isDevotion); document.getElementById('search-box').classList.toggle('invisible', !isBible); ['journal-devotion-fields', 'journal-prayer-fields', 'journal-gratitude-fields', 'journal-mood-fields'].forEach(id => document.getElementById(id).classList.add('hidden')); const readerSec = document.getElementById('section-reader'); const journalSec = document.getElementById('section-journal'); readerSec.classList.remove('hidden', 'lg:w-1/2'); journalSec.classList.remove('hidden', 'lg:w-1/2'); readerSec.classList.add('w-full'); journalSec.classList.add('w-full'); els.backBtn.classList.add('hidden'); els.copyBtn.classList.add('hidden'); if (els.btnCopyProgress) { els.btnCopyProgress.classList.toggle('hidden', !isDevotion); } if (isDevotion) { readerSec.classList.remove('w-full'); journalSec.classList.remove('w-full'); readerSec.classList.add('lg:w-1/2'); journalSec.classList.add('lg:w-1/2'); document.getElementById('journal-devotion-fields').classList.remove('hidden'); els.headerTitle.innerText = "Daily Devotion"; els.readerTitle.innerText = "Daily Devotion"; els.readerSubtitle.innerText = "Reading Plan"; window.updateDevotionUI(); window.switchWorkspaceTab('reader'); } else if (isBible) { journalSec.classList.add('hidden'); els.headerTitle.innerText = "Bible Reading"; els.readerTitle.innerText = "Bible Reading"; els.readerSubtitle.innerText = "Select Book"; window.renderMainBooks('old'); window.goBackToMainBooks(); window.switchWorkspaceTab('reader'); } else if (isPureJournal) { readerSec.classList.add('hidden'); const map = {'journal-prayer':'Prayer Journal','journal-gratitude':'Gratitude','journal-mood':'Mood Diary'}; const fieldMap = {'journal-prayer':'journal-prayer-fields','journal-gratitude':'journal-gratitude-fields','journal-mood':'journal-mood-fields'}; els.headerTitle.innerText = map[m]; document.getElementById(fieldMap[m]).classList.remove('hidden'); window.switchWorkspaceTab('journal'); } }
+        window.fetchBibleRef = async function(refInput) { const ref = refInput ? refInput.trim() : ""; if(!ref) return; els.viewBooks.classList.add('hidden'); els.viewChapters.classList.add('hidden'); els.viewText.classList.remove('hidden'); els.copyBtn.classList.remove('hidden'); els.backBtn.classList.remove('hidden'); els.viewText.innerHTML = '<div class="flex justify-center py-10"><div class="loader"></div></div>'; const match = ref.match(/^([\u4e00-\u9fa5]+|[a-zA-Z]+)\s*(\d+)(?::(\d+)(?:-(\d+))?)?$/); const bookKey = match ? match[1] : null; const isBookRef = bookKey && (bookMap[bookKey] || bookMap[bookKey.replace("書","")]); if (sqlDbLoaded) { if (match && isBookRef) { const book = bookMap[bookKey] || bookKey; const chapter = parseInt(match[2]); const startV = match[3] ? parseInt(match[3]) : 1; const endV = match[4] ? parseInt(match[4]) : (match[3] ? parseInt(match[3]) : 200); try { const query = `SELECT ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.book} = ? AND ${dbCols.chapter} = ? AND ${dbCols.verse} >= ? AND ${dbCols.verse} <= ?`; const res = sqlDb.exec(query, [book, chapter, startV, endV]); if (res.length > 0) { els.readerTitle.innerText = `${book} ${chapter}`; els.readerSubtitle.innerText = "Scripture"; els.viewText.innerHTML = res[0].values.map(v => ` <div class="verse-item mb-4" onclick="this.classList.toggle('selected'); window.updateCopyButton()"> <span class="text-xs font-bold text-white bg-[#333] mr-2 px-1 rounded-sm select-none inline-block">${v[1]}</span> <span class="text-verse leading-loose">${v[2]}</span> </div> `).join(''); return; } else { els.viewText.innerHTML = "<p class='p-8 opacity-50 text-center text-sm'>此章節查無內容。</p>"; return; } } catch(e) { console.error(e); } } else { try { els.readerTitle.innerText = `搜尋: "${ref}"`; els.readerSubtitle.innerText = "Search Result"; const query = `SELECT ${dbCols.book}, ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.text} LIKE ? LIMIT 50`; const res = sqlDb.exec(query, [`%${ref}%`]); if (res.length > 0) { const results = res[0].values; els.viewText.innerHTML = results.map(v => { const highlightedTxt = v[3].replace(new RegExp(ref, 'g'), `<span class="bg-[#FFD500] text-[#333] px-1 font-bold rounded">${ref}</span>`); return ` <div class="verse-item mb-4 p-4 border-2 border-transparent hover:border-gray-200 transition-all cursor-pointer" onclick="this.classList.toggle('selected'); window.updateCopyButton()"> <div class="flex items-center gap-2 mb-2"> <span class="text-[10px] font-bold text-white bg-[#0055BF] px-2 py-1 tracking-wider rounded">${v[0]} ${v[1]}:${v[2]}</span> </div> <span class="text-verse text-[#333] leading-relaxed block">${highlightedTxt}</span> </div> `; }).join(''); return; } else { els.viewText.innerHTML = `<div class="flex flex-col items-center justify-center py-12"><span class="text-4xl mb-4">👾</span><p class="text-lg font-bold">找不到「${ref}」</p></div>`; return; } } catch(e) { console.error(e); } } } if (match && isBookRef) { const book = bookMap[bookKey] || bookKey; const chapter = parseInt(match[2]); const verseData = mockVerses[book]?.[chapter]; els.readerTitle.innerText = `${book} ${chapter}`; els.readerSubtitle.innerText = "Fallback Mode"; if (verseData) { els.viewText.innerHTML = ` <div class="p-3 bg-red-50 text-red-600 rounded mb-4 text-xs font-bold border border-red-200"> ⚠️ 遠端資料庫未連線，僅顯示試閱內容。 </div> ` + Object.keys(verseData).map(vNum => ` <div class="verse-item mb-4" onclick="this.classList.toggle('selected'); window.updateCopyButton()"> <span class="text-xs font-bold text-white bg-[#333] mr-2 px-1 rounded-sm select-none inline-block">${vNum}</span> <span class="text-verse leading-loose">${verseData[vNum]}</span> </div> `).join(''); } else { els.viewText.innerHTML = ` <div class="flex flex-col items-center justify-center py-12 text-center"> <span class="text-4xl mb-4">🔌</span> <p class="text-lg font-bold text-[#333]">資料庫連線中斷</p> <p class="text-sm text-gray-500 mt-2">無法讀取 ${book} 第 ${chapter} 章。<br>請檢查網路連線或稍後再試。</p> </div> `; } } else { els.viewText.innerHTML = ` <div class="flex flex-col items-center justify-center py-12 text-center"> <span class="text-4xl mb-4">⚠️</span> <p class="text-lg font-bold text-[#333]">無法執行搜尋</p> <p class="text-sm text-gray-500 mt-2">資料庫未連線，搜尋功能暫時無法使用。</p> </div> `; } }
+        window.updateDevotionUI = function() { const start = new Date(calendarDate.getFullYear(), 0, 0); const diff = calendarDate - start; const dayOfYear = Math.floor(diff / 86400000); let progressTexts = []; const container = document.getElementById('devotion-tabs'); container.innerHTML = planTracks.map((track, idx) => { const totalChapters = track.books.reduce((a,b)=>a+b.c, 0); const chapterIdx = Math.floor((dayOfYear % totalChapters)) || 1; let currentCount = 0, targetBook = track.books[0], targetChapter = 1; for(let b of track.books) { if (currentCount + b.c >= chapterIdx) { targetBook = b; targetChapter = chapterIdx - currentCount; break; } currentCount += b.c; } const ref = `${targetBook.abbr} ${targetChapter}`; progressTexts.push(ref); return ` <div class="devotion-track-card ${idx===0?'active':''}" onclick="window.fetchBibleRef('${ref}'); document.querySelectorAll('.devotion-track-card').forEach(c=>c.classList.remove('active')); this.classList.add('active');"> <span class="track-tag uppercase">${track.t}</span> <span class="track-ref font-mono">${ref}</span> </div> `; }).join(''); const progressField = document.getElementById('note-devotion-progress'); if(progressField) { progressField.value = progressTexts.join(' / '); } const firstRefEl = container.querySelector('.track-ref'); if(firstRefEl) { window.fetchBibleRef(firstRefEl.innerText); } }
+        window.switchWorkspaceTab = function(t) { const r = document.getElementById('section-reader'), j = document.getElementById('section-journal'); const tr = document.getElementById('tab-reader'), tj = document.getElementById('tab-journal'); if (t === 'reader') { r.classList.replace('opacity-0', 'opacity-100'); r.classList.replace('z-0', 'z-10'); r.style.pointerEvents = "auto"; j.classList.replace('opacity-100', 'opacity-0'); j.classList.replace('z-10', 'z-0'); j.style.pointerEvents = "none"; tr.classList.add('active'); tj.classList.remove('active'); } else { j.classList.replace('opacity-0', 'opacity-100'); j.classList.replace('z-0', 'z-10'); j.style.pointerEvents = "auto"; r.classList.replace('opacity-100', 'opacity-0'); r.classList.replace('z-10', 'z-0'); r.style.pointerEvents = "none"; tj.classList.add('active'); tr.classList.remove('active'); } }
+        window.renderMainBooks = function(t) { els.viewBooks.innerHTML = `<div class="flex gap-4 mb-6 shrink-0"><button onclick="window.renderMainBooks('old')" class="brick-btn btn-yellow flex-1 text-sm">舊約 Old Testament</button><button onclick="window.renderMainBooks('new')" class="brick-btn flex-1 text-sm border-2 border-gray-100">新約 New Testament</button></div>` + `<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 content-start pb-10">` + bibleBooks[t].map(b => `<button class="px-3 py-3 text-sm border-2 border-gray-100 rounded bg-white hover:bg-gray-50 text-left font-bold shadow-[0_3px_0_#ddd] active:translate-y-1 active:shadow-none transition-all" onclick='window.showMainChapters(${JSON.stringify(b)})'>${b.n}</button>`).join('') + `</div>`; }
+        window.showMainChapters = function(b) { els.viewBooks.classList.add('hidden'); els.viewChapters.classList.remove('hidden'); els.viewText.classList.add('hidden'); els.readerTitle.innerText = b.n; els.readerSubtitle.innerText = "Select Chapter"; els.backBtn.classList.remove('hidden'); els.copyBtn.classList.add('hidden'); document.getElementById('main-chapter-title').innerText = b.n; document.getElementById('main-chapter-grid').innerHTML = Array.from({length:b.c}, (_,i)=> ` <button class="aspect-square border-2 border-gray-100 rounded bg-white hover:bg-[#0055BF] hover:text-white flex items-center justify-center font-bold text-sm shadow-[0_3px_0_#ddd] active:translate-y-1 active:shadow-none transition-all" onclick="window.fetchBibleRef('${b.abbr}${i+1}')">${i+1}</button> `).join(''); }
+        window.goBackToMainBooks = function() { if (!els.viewText.classList.contains('hidden')) { els.viewText.classList.add('hidden'); els.viewChapters.classList.add('hidden'); els.viewBooks.classList.remove('hidden'); els.readerTitle.innerText = "Bible Reading"; els.readerSubtitle.innerText = "Select Book"; els.backBtn.classList.add('hidden'); els.copyBtn.classList.add('hidden'); } else { els.viewChapters.classList.add('hidden'); els.viewBooks.classList.remove('hidden'); els.readerTitle.innerText = "Bible Reading"; els.readerSubtitle.innerText = "Select Book"; els.backBtn.classList.add('hidden'); } }
+        window.copyDevotionProgress = function() { const progressText = document.getElementById('note-devotion-progress').value; if(!progressText || progressText === "Loading...") return; const t = document.createElement('textarea'); t.value = progressText; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); const btn = document.getElementById('btn-copy-progress'); const originalText = btn.innerText; const originalClass = btn.className; btn.innerText = "COPIED!"; btn.classList.replace('bg-[#333]', 'bg-[#008F39]'); setTimeout(() => { btn.innerText = originalText; btn.classList.replace('bg-[#008F39]', 'bg-[#333]'); }, 1500); }
         window.changeCalendarMonth = function(n) { calendarDate.setMonth(calendarDate.getMonth()+n); window.renderCalendar(); }
         window.goHome = function() { window.switchMode('home'); }
         window.openExportModal = function() { document.getElementById('export-modal').classList.remove('hidden'); }
         window.closeExportModal = function() { document.getElementById('export-modal').classList.add('hidden'); }
         window.selectMood = function(el, m) { document.getElementById('note-mood').value = m; document.querySelectorAll('.mood-sticker').forEach(s=>s.classList.remove('selected')); el.classList.add('selected'); }
-        
         window.performSearch = function() { window.fetchBibleRef(els.inlineSearch.value); }
-        window.updateCopyButton = function() {
-            const count = document.querySelectorAll('.verse-item.selected').length;
-            els.copyBtn.innerHTML = count > 0 ? `<span class='text-[10px] font-bold'>${count}</span>` : `<svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>`;
-        }
-        
-        window.copySelectedVerses = function() {
-            const sel = document.querySelectorAll('.verse-item.selected');
-            if (sel.length === 0) return;
-            const text = Array.from(sel).map(v => v.innerText.trim()).join('\n');
-            const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t);
-            els.copyBtn.innerHTML = "OK!";
-            setTimeout(() => { sel.forEach(v=>v.classList.remove('selected')); window.updateCopyButton(); }, 1000);
-        }
-
-        window.backupData = function() {
-            const data = {};
-            for(let i=0; i<localStorage.length; i++){
-                const k = localStorage.key(i);
-                if(k.includes('note-')) data[k] = localStorage.getItem(k);
-            }
-            const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = `manna-backup-${new Date().toISOString().split('T')[0]}.json`; a.click();
-        }
-
-        window.restoreData = function(input) {
-            const r = new FileReader();
-            r.onload = e => {
-                const data = JSON.parse(e.target.result);
-                Object.keys(data).forEach(k => localStorage.setItem(k, data[k]));
-                location.reload();
-            }
-            r.readAsText(input.files[0]);
-        }
-
-        window.calculateStreak = function() {
-            let s = 0, d = new Date();
-            while(true) {
-                const k = d.toISOString().split('T')[0];
-                if (localStorage.getItem(`${k}-note-rhema`) || localStorage.getItem(`${k}-note-content`)) {
-                    s++; d.setDate(d.getDate()-1);
-                } else break;
-            }
-            els.streakCount.innerText = s;
-            els.streakBadge.classList.toggle('hidden', s === 0);
-            els.streakBadge.classList.add('inline-flex');
-        }
+        window.updateCopyButton = function() { const count = document.querySelectorAll('.verse-item.selected').length; els.copyBtn.innerHTML = count > 0 ? `<span class='text-[10px] font-bold'>${count}</span>` : `<svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>`; }
+        window.copySelectedVerses = function() { const sel = document.querySelectorAll('.verse-item.selected'); if (sel.length === 0) return; const text = Array.from(sel).map(v => v.innerText.trim()).join('\n'); const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); els.copyBtn.innerHTML = "OK!"; setTimeout(() => { sel.forEach(v=>v.classList.remove('selected')); window.updateCopyButton(); }, 1000); }
+        window.backupData = function() { const data = {}; for(let i=0; i<localStorage.length; i++){ const k = localStorage.key(i); if(k.includes('note-')) data[k] = localStorage.getItem(k); } const blob = new Blob([JSON.stringify(data)], {type: 'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `manna-backup-${new Date().toISOString().split('T')[0]}.json`; a.click(); }
+        window.restoreData = function(input) { const r = new FileReader(); r.onload = e => { const data = JSON.parse(e.target.result); Object.keys(data).forEach(k => localStorage.setItem(k, data[k])); location.reload(); }; r.readAsText(input.files[0]); }
+        window.calculateStreak = function() { let s = 0, d = new Date(); while(true) { const k = d.toISOString().split('T')[0]; if (localStorage.getItem(`${k}-note-rhema`) || localStorage.getItem(`${k}-note-content`)) { s++; d.setDate(d.getDate()-1); } else break; } els.streakCount.innerText = s; els.streakBadge.classList.toggle('hidden', s === 0); els.streakBadge.classList.add('inline-flex'); }
 
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
