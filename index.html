@@ -23,6 +23,8 @@
             --lego-yellow-dark: #ccaa00;
             --lego-green: #008F39;
             --lego-green-dark: #006b2b;
+            --lego-orange: #FE8A18; /* 新增橘色 */
+            --lego-orange-dark: #d97310;
             --lego-white: #FFFFFF;
             --lego-grey: #A0A5A9;
             --lego-dark-grey: #6D6E71;
@@ -87,10 +89,12 @@
         .btn-red:active { box-shadow: 0 0 0 var(--lego-red-dark); }
         .btn-green { background-color: var(--lego-green); color: white; box-shadow: 0 5px 0 var(--lego-green-dark); }
         .btn-green:active { box-shadow: 0 0 0 var(--lego-green-dark); }
+        .btn-orange { background-color: var(--lego-orange); color: white; box-shadow: 0 5px 0 var(--lego-orange-dark); }
+        .btn-orange:active { box-shadow: 0 0 0 var(--lego-orange-dark); }
 
         /* 真實積木風格按鈕 */
         .real-brick-btn {
-            position: relative; border-radius: 4px; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: transform 0.1s; overflow: hidden;
+            position: relative; border-radius: 4px; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; transition: transform 0.1s; overflow: hidden;
         }
         .real-brick-btn::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(rgba(0,0,0,0.2) 20%, transparent 22%); background-size: 16px 16px; background-position: 8px 8px; opacity: 0.5; pointer-events: none;
@@ -104,6 +108,7 @@
         .brick-prayer { background-color: var(--lego-green); color: white; box-shadow: 0 8px 0 var(--lego-green-dark), 0 15px 15px rgba(0,0,0,0.2); }
         .brick-gratitude { background-color: var(--lego-yellow); color: #333; box-shadow: 0 8px 0 var(--lego-yellow-dark), 0 15px 15px rgba(0,0,0,0.2); }
         .brick-mood { background-color: var(--lego-red); color: white; box-shadow: 0 8px 0 var(--lego-red-dark), 0 15px 15px rgba(0,0,0,0.2); }
+        .brick-freewrite { background-color: var(--lego-orange); color: white; box-shadow: 0 8px 0 var(--lego-orange-dark), 0 15px 15px rgba(0,0,0,0.2); }
 
         /* 清單項目積木 */
         .list-brick {
@@ -151,6 +156,29 @@
         .delete-btn:hover { background: rgba(0,0,0,0.3); opacity: 1; transform: scale(1.1); }
         .delete-btn:active { transform: scale(0.9); }
 
+        /* 橫線筆記本樣式 */
+        .notebook-paper {
+            background-color: #fff;
+            background-image: linear-gradient(#E0E0E0 1px, transparent 1px);
+            background-size: 100% 2rem; /* 行高 */
+            line-height: 2rem;
+            padding: 0 1rem;
+            border: 2px solid #ddd;
+            border-left: 6px solid var(--lego-orange); /* 左側加粗橘線 */
+            border-radius: 4px;
+            font-size: 1.1rem;
+            color: #333;
+            width: 100%;
+            resize: none;
+            outline: none;
+            transition: border-color 0.2s;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .notebook-paper:focus {
+            border-color: var(--lego-orange);
+            background-color: #fffcf5; /* 微微泛黃 */
+        }
+        
         /* 圖示小積木 */
         .mini-brick { position: relative; overflow: hidden; }
         .mini-brick::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(rgba(0,0,0,0.15) 25%, transparent 28%); background-size: 13.33px 13.33px; background-position: 0 0; }
@@ -192,8 +220,8 @@
         .loader { width: 40px; height: 40px; background-color: var(--lego-yellow); box-shadow: 0 4px 0 var(--lego-yellow-dark); border-radius: 4px; animation: bounce 0.6s infinite alternate; }
         @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
 
-        textarea, input[type="text"], input[type="date"], input[type="search"] { background-color: #FAFAFA; border: 2px solid #ddd; border-top: 4px solid #ccc; border-radius: 6px; font-family: 'Noto Sans TC', sans-serif; transition: all 0.2s; }
-        textarea:focus, input:focus { outline: none; background-color: white; border-color: var(--lego-blue); border-top-color: var(--lego-blue); }
+        textarea:not(.notebook-paper), input[type="text"], input[type="date"], input[type="search"] { background-color: #FAFAFA; border: 2px solid #ddd; border-top: 4px solid #ccc; border-radius: 6px; font-family: 'Noto Sans TC', sans-serif; transition: all 0.2s; }
+        textarea:not(.notebook-paper):focus, input:focus { outline: none; background-color: white; border-color: var(--lego-blue); border-top-color: var(--lego-blue); }
         
         .badge { background: var(--lego-red); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 0 var(--lego-red-dark); }
     </style>
@@ -260,7 +288,6 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 fade-in">
             <!-- 今日嗎哪卡片 -->
             <div class="md:col-span-1 flex flex-col brick-card p-6 relative group cursor-pointer" onclick="window.switchMode('devotion')">
-                <!-- 裝飾用圖案 -->
                 <div class="absolute top-4 right-4 p-2 opacity-10 rotate-12">
                     <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.8L18.4 19H5.6L12 5.8z"/></svg>
                 </div>
@@ -308,10 +335,26 @@
             </div>
         </div>
 
-        <!-- 捷徑區域 (積木風格) -->
+        <!-- 捷徑區域 (積木風格 4欄位 -> 5個按鈕) -->
+        <!-- Desktop: 4 columns. Row1: [1][1][2][2][3][3][3][3] No.
+             Use grid-cols-2 (Mobile) / md:grid-cols-4 (Desktop). 
+             Items need col-span to fit.
+             
+             Layout Strategy:
+             Grid-cols-2 (Mobile) -> 4 cells wide effectively? No standard tailwind is fixed cols.
+             Let's use md:grid-cols-4.
+             Bible: col-span-1
+             Prayer: col-span-1
+             Gratitude: col-span-2 (Long)
+             Row 2:
+             Mood: col-span-2 (Long)
+             FreeWrite: col-span-2 (Long)
+             
+             Total cells: 4 (row1) + 4 (row2) = 8 cells.
+        -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10 fade-in">
-            <!-- 藍色積木：聖經閱讀 -->
-            <div onclick="window.switchMode('bible')" class="real-brick-btn brick-bible cursor-pointer group h-auto">
+            <!-- 藍色積木：聖經閱讀 (1x1) -->
+            <div onclick="window.switchMode('bible')" class="real-brick-btn brick-bible cursor-pointer group h-auto col-span-1">
                 <svg class="w-10 h-10 text-white opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
                     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                     <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
@@ -319,31 +362,50 @@
                 <h3 class="text-base font-bold text-white tracking-widest mt-auto">聖經閱讀</h3>
             </div>
             
-            <!-- 綠色積木：跟神聊聊 -->
-            <div onclick="window.switchMode('journal-prayer')" class="real-brick-btn brick-prayer cursor-pointer group h-auto">
+            <!-- 綠色積木：跟神聊聊 (1x1) -->
+            <div onclick="window.switchMode('journal-prayer')" class="real-brick-btn brick-prayer cursor-pointer group h-auto col-span-1">
                 <svg class="w-10 h-10 text-white opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
                     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
                 </svg>
                 <h3 class="text-base font-bold text-white tracking-widest mt-auto">跟神聊聊</h3>
             </div>
             
-            <!-- 黃色積木：感恩日記 -->
-            <div onclick="window.switchMode('journal-gratitude')" class="real-brick-btn brick-gratitude cursor-pointer group h-auto">
-                <svg class="w-10 h-10 text-[#333] opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                </svg>
-                <h3 class="text-base font-bold text-[#333] tracking-widest mt-auto">感恩日記</h3>
+            <!-- 黃色積木：感恩日記 (2x1 長條 - Desktop / 1x1 - Mobile) -->
+            <!-- Mobile: col-span-2 to make it a full row bar, or keep 1? User asked for 2 rows. 
+                 If Mobile 2 cols: [1][2], [3][4], [5]. 5 items.
+                 Let's make desktop layout: [1][2][3(long)]. [4(long)][5(long)].
+            -->
+            <div onclick="window.switchMode('journal-gratitude')" class="real-brick-btn brick-gratitude cursor-pointer group h-auto col-span-2 md:col-span-2">
+                <div class="flex items-center gap-3">
+                     <svg class="w-10 h-10 text-[#333] opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                    <h3 class="text-base font-bold text-[#333] tracking-widest">感恩日記</h3>
+                </div>
             </div>
             
-            <!-- 紅色積木：內心戲 -->
-            <div onclick="window.switchMode('journal-mood')" class="real-brick-btn brick-mood cursor-pointer group h-auto">
-                <svg class="w-10 h-10 text-white opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-                    <line x1="9" y1="9" x2="9.01" y2="9"></line>
-                    <line x1="15" y1="9" x2="15.01" y2="9"></line>
-                </svg>
-                <h3 class="text-base font-bold text-white tracking-widest mt-auto">內心戲</h3>
+            <!-- 紅色積木：內心戲 (2x1 長條) -->
+            <div onclick="window.switchMode('journal-mood')" class="real-brick-btn brick-mood cursor-pointer group h-auto col-span-2 md:col-span-2">
+                <div class="flex items-center gap-3">
+                    <svg class="w-10 h-10 text-white opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                        <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                        <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                    </svg>
+                    <h3 class="text-base font-bold text-white tracking-widest">內心戲</h3>
+                </div>
+            </div>
+
+            <!-- 橘色積木：隨便寫 (新功能 - 2x1 長條) -->
+            <div onclick="window.switchMode('journal-freewrite')" class="real-brick-btn brick-freewrite cursor-pointer group h-auto col-span-2 md:col-span-2">
+                <div class="flex items-center gap-3">
+                    <svg class="w-10 h-10 text-white opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                    <h3 class="text-base font-bold text-white tracking-widest">隨便寫</h3>
+                </div>
             </div>
         </div>
 
@@ -403,9 +465,6 @@
                     <!-- Right: Actions -->
                     <div class="flex items-center gap-2">
                          <!-- 修正：搜尋區塊 -->
-                         <!-- 1. 改為 <form> 讓手機鍵盤顯示「搜尋」 -->
-                         <!-- 2. input type="search" 優化手機體驗 -->
-                         <!-- 3. button 加入 z-10 與 type="button" 避免被遮擋或誤送出 -->
                          <form class="relative" id="search-box" onsubmit="event.preventDefault(); window.performSearch();">
                              <input type="search" id="inline-search" placeholder="Search..." class="pl-3 pr-8 py-1.5 rounded bg-gray-50 text-xs w-28 focus:w-48 transition-all outline-none border-2 border-gray-200 focus:border-[#0055BF]">
                              <button type="button" onclick="window.performSearch()" class="absolute right-2 top-2 z-10 text-gray-400"><svg class="w-4 h-4" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
@@ -413,15 +472,13 @@
                          
                          <!-- Copy -->
                          <button id="btn-copy-verses" onclick="window.copySelectedVerses()" class="hidden w-9 h-9 flex items-center justify-center rounded bg-[#FFD500] text-[#333] border-none shadow-[0_3px_0_#ccaa00] active:shadow-none active:translate-y-1 transition-all">
-                            <svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                            <svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
                          </button>
                     </div>
                 </div>
 
                 <!-- C. Scrollable Content Wrapper -->
                 <div id="reader-content-wrapper" class="flex-1 overflow-y-auto relative bg-white">
-                    
-                    <!-- 1. Books View -->
                     <div id="view-bible-books" class="hidden flex-col min-h-full p-6">
                          <div class="flex gap-4 mb-6 shrink-0">
                             <button onclick="window.renderMainBooks('old')" id="btn-old" class="brick-btn btn-yellow flex-1 py-3 text-sm">舊約 Old Testament</button>
@@ -429,14 +486,10 @@
                         </div>
                         <div id="main-book-list" class="grid grid-cols-2 sm:grid-cols-4 gap-3 content-start pb-10"></div>
                     </div>
-
-                    <!-- 2. Chapters View -->
                     <div id="view-bible-chapters" class="hidden flex-col min-h-full p-6">
                         <h3 id="main-chapter-title" class="text-3xl font-bold text-[#333] mb-8 border-b-4 border-[#FFD500] w-fit pb-1 px-2"></h3>
                         <div id="main-chapter-grid" class="grid grid-cols-5 sm:grid-cols-6 gap-3 pb-10"></div>
                     </div>
-
-                    <!-- 3. Text View -->
                     <div id="view-bible-text" class="hidden min-h-full p-6 md:p-10 bible-text text-gray-800"></div>
                 </div>
             </section>
@@ -453,7 +506,7 @@
                 </div>
                 <div class="flex-1 overflow-y-auto p-8 space-y-10 pb-20 relative">
                     
-                    <!-- 靈修筆記 (保持單篇模式，因通常每日一篇) -->
+                    <!-- 靈修筆記 -->
                     <div id="journal-devotion-fields" class="space-y-8">
                         <div>
                             <label class="block text-sm font-bold text-[#333] mb-2 uppercase tracking-widest pixel-font bg-[#FFD500] w-fit px-2 rounded shadow-sm">📖 Reading</label>
@@ -480,9 +533,22 @@
                         </div>
                     </div>
                     
-                    <!-- 跟神聊聊 (多篇模式) -->
+                    <!-- 隨便寫 (新功能) -->
+                    <div id="journal-freewrite-fields" class="hidden">
+                        <div class="mb-4 text-sm text-gray-500 font-bold flex items-center gap-2">
+                             <span class="inline-block w-3 h-3 bg-[#FE8A18] rounded-full"></span>
+                             Free Write / 隨意塗鴉
+                        </div>
+                        <!-- 橫線筆記本風格 -->
+                        <textarea id="note-freewrite" class="notebook-paper w-full min-h-[500px] leading-relaxed" placeholder="在這裡寫下任何心情、靈感或隨筆..."></textarea>
+                        <div class="pt-4">
+                            <button onclick="window.saveSingleEntry('freewrite')" class="brick-btn btn-orange w-full flex items-center justify-center gap-3">💾 儲存隨筆</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 跟神聊聊 -->
                     <div id="journal-prayer-fields" class="hidden">
-                        <div id="list-prayer" class="space-y-4 mb-8"></div> <!-- 清單容器 -->
+                        <div id="list-prayer" class="space-y-4 mb-8"></div> 
                         <div id="form-prayer" class="space-y-8 hidden bg-white p-4 rounded-lg border-2 border-[#eee] mb-8">
                             <h3 class="font-bold text-lg text-[#008F39]">✍️ 新增/編輯禱告</h3>
                             <div>
@@ -507,7 +573,7 @@
                         </button>
                     </div>
 
-                    <!-- 感恩日記 (多篇模式) -->
+                    <!-- 感恩日記 -->
                     <div id="journal-gratitude-fields" class="hidden">
                         <div id="list-gratitude" class="space-y-4 mb-8"></div>
                         <div id="form-gratitude" class="space-y-8 hidden bg-white p-4 rounded-lg border-2 border-[#eee] mb-8">
@@ -530,7 +596,7 @@
                         </button>
                     </div>
 
-                    <!-- 內心戲 (多篇模式) -->
+                    <!-- 內心戲 -->
                     <div id="journal-mood-fields" class="hidden">
                         <div id="list-mood" class="space-y-4 mb-8"></div>
                         <div id="form-mood" class="space-y-8 hidden bg-white p-4 rounded-lg border-2 border-[#eee] mb-8">
@@ -629,11 +695,11 @@
         let dbCols = { book: "book", chapter: "chapter", verse: "verse", text: "text" };
         let currentMode = 'home';
         let calendarDate = new Date();
-        let currentEditingId = null; // 用於追蹤正在編輯的 ID
+        let currentEditingId = null; 
         let pendingDeleteType = null;
         let pendingDeleteId = null;
 
-        // ... existing arrays (mannaVerses, bibleBooks, planTracks, bookMap, mockVerses) ...
+        // ... existing arrays ...
         const mannaVerses = [
             { t: "「敬畏耶和華是智慧的開端。」", r: "— 箴言 9:10" },
             { t: "「耶和華是我的牧者，我必不致缺乏。」", r: "— 詩篇 23:1" },
@@ -717,15 +783,13 @@
             window.calculateStreak();
         }
 
-        // --- 多篇筆記邏輯 (Multi-Entry Logic) ---
-        // 欄位定義
+        // --- 多篇筆記邏輯 ---
         const journalFields = {
             'prayer': ['note-topic', 'note-content', 'note-prayer-tracking'],
             'gratitude': ['note-thanks', 'note-grace'],
             'mood': ['note-mood-event', 'note-mood-tags', 'note-mood-lie', 'note-mood-god-view', 'note-mood-prayer']
         };
 
-        // 讀取某類型當日的所有筆記
         window.getJournalEntries = function(type) {
             const dateKey = els.datePicker.value;
             const listKey = `${dateKey}-journal-${type}-entries`;
@@ -736,132 +800,75 @@
                 if (stored) entries = JSON.parse(stored);
             } catch(e) { console.error("Parse error", e); }
 
-            // 自動遷移舊資料：如果列表是空的，但有舊格式的資料
-            if (entries.length === 0) {
+            if (entries.length === 0 && journalFields[type]) {
                 const fields = journalFields[type];
                 let hasLegacyData = false;
                 let legacyEntry = { id: Date.now() };
-                
                 fields.forEach(f => {
                     const val = localStorage.getItem(`${dateKey}-${f}`);
-                    if (val) {
-                        hasLegacyData = true;
-                        legacyEntry[f] = val;
-                    }
+                    if (val) { hasLegacyData = true; legacyEntry[f] = val; }
                 });
-
-                if (hasLegacyData) {
-                    entries.push(legacyEntry);
-                    // 存回新格式
-                    localStorage.setItem(listKey, JSON.stringify(entries));
-                }
+                if (hasLegacyData) { entries.push(legacyEntry); localStorage.setItem(listKey, JSON.stringify(entries)); }
             }
             return entries;
         }
 
-        // 渲染列表介面
         window.renderJournalList = function(type) {
             const listEl = document.getElementById(`list-${type}`);
             const entries = window.getJournalEntries(type);
-            
             listEl.innerHTML = '';
-            
             if (entries.length === 0) {
                 listEl.innerHTML = `<div class="text-center text-gray-400 py-4 font-bold">還沒有紀錄，新增一則吧！</div>`;
             } else {
                 entries.forEach((entry, index) => {
-                    // 根據不同類型決定標題顯示什麼
                     let title = "", preview = "";
-                    if (type === 'prayer') {
-                        title = entry['note-topic'] || "未命名禱告";
-                        preview = entry['note-content'] || "無內容";
-                    } else if (type === 'gratitude') {
-                        title = entry['note-thanks'] || "感恩事項";
-                        preview = entry['note-grace'] || "";
-                    } else if (type === 'mood') {
-                        title = entry['note-mood-event'] || "心情事件";
-                        preview = entry['note-mood-tags'] || "";
-                    }
-
-                    // 顏色樣式
+                    if (type === 'prayer') { title = entry['note-topic'] || "未命名禱告"; preview = entry['note-content'] || "無內容"; }
+                    else if (type === 'gratitude') { title = entry['note-thanks'] || "感恩事項"; preview = entry['note-grace'] || ""; }
+                    else if (type === 'mood') { title = entry['note-mood-event'] || "心情事件"; preview = entry['note-mood-tags'] || ""; }
                     const colorClass = type === 'prayer' ? 'list-brick-green' : (type === 'gratitude' ? 'list-brick-yellow' : 'list-brick-red');
-
                     listEl.innerHTML += `
                         <div class="list-brick ${colorClass}" onclick="window.editListEntry('${type}', ${entry.id})">
                             <div class="list-brick-content pr-8">
                                 <div class="list-brick-title">${title || (index + 1) + '. 無標題'}</div>
                                 <div class="list-brick-preview">${preview}</div>
                             </div>
-                            <button class="delete-btn" onclick="event.stopPropagation(); window.requestDelete('${type}', ${entry.id})">
-                                🗑️
-                            </button>
+                            <button class="delete-btn" onclick="event.stopPropagation(); window.requestDelete('${type}', ${entry.id})">🗑️</button>
                         </div>
                     `;
                 });
             }
         }
 
-        // 刪除相關功能
-        window.requestDelete = function(type, id) {
-            pendingDeleteType = type;
-            pendingDeleteId = id;
-            document.getElementById('delete-confirm-modal').classList.remove('hidden');
-        }
-
-        window.closeDeleteModal = function() {
-            document.getElementById('delete-confirm-modal').classList.add('hidden');
-            pendingDeleteType = null;
-            pendingDeleteId = null;
-        }
-
+        // 刪除相關
+        window.requestDelete = function(type, id) { pendingDeleteType = type; pendingDeleteId = id; document.getElementById('delete-confirm-modal').classList.remove('hidden'); }
+        window.closeDeleteModal = function() { document.getElementById('delete-confirm-modal').classList.add('hidden'); pendingDeleteType = null; pendingDeleteId = null; }
         window.confirmDelete = function() {
             if (!pendingDeleteType || !pendingDeleteId) return;
-
             const dateKey = els.datePicker.value;
             const listKey = `${dateKey}-journal-${pendingDeleteType}-entries`;
             let entries = window.getJournalEntries(pendingDeleteType);
-            
-            // 過濾掉要刪除的項目
             const newEntries = entries.filter(e => e.id !== pendingDeleteId);
-            
-            // 存回 localStorage
             localStorage.setItem(listKey, JSON.stringify(newEntries));
-            
-            // 更新 UI
             window.renderJournalList(pendingDeleteType);
             window.renderCalendar();
             window.closeDeleteModal();
         }
 
-        // 顯示表單 (新增或編輯)
         window.showEntryForm = function(type, entryId = null) {
             document.getElementById(`list-${type}`).classList.add('hidden');
             document.getElementById(`btn-add-${type}`).classList.add('hidden');
             document.getElementById(`form-${type}`).classList.remove('hidden');
-            
             currentEditingId = entryId;
             const fields = journalFields[type];
-
             if (entryId) {
-                // 編輯模式：填入資料
                 const entries = window.getJournalEntries(type);
                 const entry = entries.find(e => e.id === entryId);
-                if (entry) {
-                    fields.forEach(f => {
-                        const el = document.getElementById(f);
-                        if(el) el.value = entry[f] || "";
-                    });
-                }
+                if (entry) { fields.forEach(f => { const el = document.getElementById(f); if(el) el.value = entry[f] || ""; }); }
             } else {
-                // 新增模式：清空表單
-                fields.forEach(f => {
-                    const el = document.getElementById(f);
-                    if(el) el.value = "";
-                });
+                fields.forEach(f => { const el = document.getElementById(f); if(el) el.value = ""; });
             }
         }
 
-        // 隱藏表單 (取消)
         window.hideEntryForm = function(type) {
             document.getElementById(`form-${type}`).classList.add('hidden');
             document.getElementById(`list-${type}`).classList.remove('hidden');
@@ -869,49 +876,68 @@
             currentEditingId = null;
         }
 
-        // 儲存列表項目
         window.saveListEntry = function(type) {
             const dateKey = els.datePicker.value;
             const listKey = `${dateKey}-journal-${type}-entries`;
             let entries = window.getJournalEntries(type);
             const fields = journalFields[type];
-            
             const newData = { id: currentEditingId || Date.now() };
-            fields.forEach(f => {
-                const el = document.getElementById(f);
-                if(el) newData[f] = el.value;
-            });
-
-            if (currentEditingId) {
-                // 更新現有
-                const idx = entries.findIndex(e => e.id === currentEditingId);
-                if (idx !== -1) entries[idx] = { ...entries[idx], ...newData };
-            } else {
-                // 新增
-                entries.push(newData);
-            }
-
+            fields.forEach(f => { const el = document.getElementById(f); if(el) newData[f] = el.value; });
+            if (currentEditingId) { const idx = entries.findIndex(e => e.id === currentEditingId); if (idx !== -1) entries[idx] = { ...entries[idx], ...newData }; } 
+            else { entries.push(newData); }
             localStorage.setItem(listKey, JSON.stringify(entries));
-            
-            // 為了保持相容性，如果是第一則，同時寫入 legacy 欄位 (可選)
-            // 這裡選擇只更新列表，渲染月曆時會檢查列表
-            
             window.hideEntryForm(type);
             window.renderJournalList(type);
             window.renderCalendar();
         }
 
-        // 儲存單篇筆記 (靈修用)
         window.saveSingleEntry = function(type) {
-            // 對於 'devotion'，我們還是使用直接綁定 oninput 儲存，但為了給使用者反饋，這裡做個按鈕效果
-            const btn = event.target;
-            const originalText = btn.innerText;
-            btn.innerText = "已儲存！";
-            setTimeout(() => btn.innerText = originalText, 1000);
+            const btn = event.target; const originalText = btn.innerText;
+            btn.innerText = "已儲存！"; setTimeout(() => btn.innerText = originalText, 1000);
             window.renderCalendar();
         }
 
-        // --- 核心邏輯修改 ---
+        window.switchMode = function(m) {
+            currentMode = m;
+            els.viewHome.classList.toggle('hidden', m !== 'home');
+            els.viewWorkspace.classList.toggle('hidden', m === 'home');
+            els.mainHeader.classList.toggle('hidden', m === 'home');
+            const isDevotion = m === 'devotion';
+            const isPureJournal = ['journal-prayer','journal-gratitude','journal-mood','journal-freewrite'].includes(m);
+            const isBible = m === 'bible';
+
+            document.getElementById('workspace-tabs').classList.toggle('hidden', !isDevotion);
+            document.getElementById('devotion-tabs').classList.toggle('hidden', !isDevotion);
+            document.getElementById('search-box').classList.toggle('invisible', !isBible); 
+
+            ['journal-devotion-fields', 'journal-prayer-fields', 'journal-gratitude-fields', 'journal-mood-fields', 'journal-freewrite-fields']
+                .forEach(id => document.getElementById(id).classList.add('hidden'));
+
+            const readerSec = document.getElementById('section-reader');
+            const journalSec = document.getElementById('section-journal');
+            readerSec.classList.remove('hidden', 'lg:w-1/2'); journalSec.classList.remove('hidden', 'lg:w-1/2');
+            readerSec.classList.add('w-full'); journalSec.classList.add('w-full');
+            els.backBtn.classList.add('hidden'); els.copyBtn.classList.add('hidden');
+            if (els.btnCopyProgress) els.btnCopyProgress.classList.toggle('hidden', !isDevotion);
+
+            if (isDevotion) {
+                readerSec.classList.remove('w-full'); journalSec.classList.remove('w-full');
+                readerSec.classList.add('lg:w-1/2'); journalSec.classList.add('lg:w-1/2');
+                document.getElementById('journal-devotion-fields').classList.remove('hidden');
+                els.headerTitle.innerText = "Daily Devotion"; els.readerTitle.innerText = "Daily Devotion"; els.readerSubtitle.innerText = "Reading Plan";
+                window.updateDevotionUI(); window.switchWorkspaceTab('reader'); 
+            } else if (isBible) {
+                journalSec.classList.add('hidden'); els.headerTitle.innerText = "Bible Reading"; els.readerTitle.innerText = "Bible Reading"; els.readerSubtitle.innerText = "Select Book";
+                window.renderMainBooks('old'); window.goBackToMainBooks(); window.switchWorkspaceTab('reader'); 
+            } else if (isPureJournal) {
+                readerSec.classList.add('hidden'); 
+                const map = {'journal-prayer':'Prayer Journal','journal-gratitude':'Gratitude','journal-mood':'Mood Diary', 'journal-freewrite': 'Free Write'};
+                const fieldMap = {'journal-prayer':'journal-prayer-fields','journal-gratitude':'journal-gratitude-fields','journal-mood':'journal-mood-fields', 'journal-freewrite':'journal-freewrite-fields'};
+                els.headerTitle.innerText = map[m];
+                document.getElementById(fieldMap[m]).classList.remove('hidden');
+                window.switchWorkspaceTab('journal'); 
+            }
+        }
 
         window.handleDateChange = function(val) {
             calendarDate = new Date(val);
@@ -923,41 +949,26 @@
             document.getElementById('manna-text').innerText = m.t;
             document.getElementById('manna-ref').innerText = m.r;
 
-            // 1. 處理靈修筆記 (單篇模式)
-            const devotionFields = [
-                'note-rhema', 'note-reflection', 'note-application', 'note-prayer-devotion'
-            ];
-            devotionFields.forEach(f => {
+            // 1. 單篇模式 (Devotion + Freewrite)
+            const singleFields = ['note-rhema', 'note-reflection', 'note-application', 'note-prayer-devotion', 'note-freewrite'];
+            singleFields.forEach(f => {
                 const el = document.getElementById(f);
                 if(el) {
                     el.value = localStorage.getItem(`${val}-${f}`) || "";
-                    // 靈修筆記依然即時儲存
-                    el.oninput = () => {
-                        localStorage.setItem(`${val}-${f}`, el.value);
-                    };
+                    el.oninput = () => { localStorage.setItem(`${val}-${f}`, el.value); };
                 }
             });
 
-            // 2. 處理多篇模式的清單渲染
-            // 每次換日期，都要重置 UI 為列表狀態
+            // 2. 多篇模式
             ['prayer', 'gratitude', 'mood'].forEach(type => {
                 window.hideEntryForm(type);
                 window.renderJournalList(type);
             });
             
-            if(currentMode === 'devotion') {
-                window.updateDevotionUI();
-            }
-            
+            if(currentMode === 'devotion') window.updateDevotionUI();
             window.renderCalendar();
         }
 
-        // 編輯列表項目入口
-        window.editListEntry = function(type, id) {
-            window.showEntryForm(type, id);
-        }
-
-        // 月曆渲染 (需同時檢查單篇與列表資料)
         window.renderCalendar = function() {
             const y = calendarDate.getFullYear(), m = calendarDate.getMonth();
             els.calendarMonthLabel.innerText = `${y}.${m+1}`;
@@ -971,11 +982,9 @@
                 d.className = "calendar-day"; d.innerText = i;
                 if (key === els.datePicker.value) d.classList.add('selected-day');
                 
-                // 檢查是否有資料
                 let hasEntry = false;
-                // 1. 檢查靈修筆記
-                if (localStorage.getItem(`${key}-note-rhema`)) hasEntry = true;
-                // 2. 檢查列表資料
+                // 檢查各類筆記
+                if (localStorage.getItem(`${key}-note-rhema`) || localStorage.getItem(`${key}-note-freewrite`)) hasEntry = true;
                 ['prayer', 'gratitude', 'mood'].forEach(type => {
                     const list = localStorage.getItem(`${key}-journal-${type}-entries`);
                     if (list && JSON.parse(list).length > 0) hasEntry = true;
@@ -987,36 +996,9 @@
             }
         }
 
-        // --- 其他輔助函式 (保持不變) ---
-        window.setAppIcon = function() { /* ... (保留原有的 setAppIcon 代碼) ... */ 
-            const canvas = document.createElement('canvas'); canvas.width = 192; canvas.height = 192; const ctx = canvas.getContext('2d');
-            const baseColor = '#FFD500'; const shadowColor = '#ccaa00'; const highlightColor = '#ffe666'; 
-            ctx.fillStyle = baseColor; ctx.fillRect(0, 0, 192, 192);
-            ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(0,192); ctx.lineTo(0,0); ctx.lineTo(192,0); ctx.stroke();
-            ctx.strokeStyle = 'rgba(0,0,0,0.1)'; ctx.beginPath(); ctx.moveTo(0,192); ctx.lineTo(192,192); ctx.lineTo(192,0); ctx.stroke();
-            const gridSize = 3; const cellSize = 192 / gridSize; const studRadius = 22; 
-            for(let row=0; row<gridSize; row++) { for(let col=0; col<gridSize; col++) {
-                    const cx = cellSize/2 + col*cellSize; const cy = cellSize/2 + row*cellSize;
-                    ctx.beginPath(); ctx.arc(cx + 4, cy + 4, studRadius, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.1)'; ctx.fill();
-                    ctx.beginPath(); ctx.arc(cx, cy + 2, studRadius, 0, Math.PI * 2); ctx.fillStyle = shadowColor; ctx.fill();
-                    const grad = ctx.createLinearGradient(cx - studRadius, cy - studRadius, cx + studRadius, cy + studRadius); grad.addColorStop(0, highlightColor); grad.addColorStop(1, shadowColor);
-                    ctx.beginPath(); ctx.arc(cx, cy, studRadius, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill();
-                    ctx.beginPath(); ctx.ellipse(cx - 8, cy - 8, 7, 4, -Math.PI / 4, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.fill();
-                    ctx.beginPath(); ctx.arc(cx, cy, studRadius - 5, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(0,0,0,0.05)'; ctx.lineWidth = 1; ctx.stroke();
-            }}
-            ctx.save(); ctx.translate(24, 24); ctx.scale(6, 6); ctx.lineWidth = 5.5 / 6; ctx.strokeStyle = '#333333'; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-            ctx.beginPath(); ctx.moveTo(4, 14); ctx.bezierCurveTo(4, 14, 4, 7, 12, 7); ctx.bezierCurveTo(20, 7, 20, 14, 20, 14); ctx.lineTo(20, 18); ctx.bezierCurveTo(20, 19.1, 19.1, 20, 18, 20); ctx.lineTo(6, 20); ctx.bezierCurveTo(4.9, 20, 4, 19.1, 4, 18); ctx.lineTo(4, 14); ctx.closePath();
-            ctx.shadowColor = "rgba(255,255,255,0.8)"; ctx.shadowBlur = 0; ctx.shadowOffsetX = 1.5; ctx.shadowOffsetY = 1.5; ctx.stroke(); ctx.shadowColor = "transparent"; ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(4, 14); ctx.lineTo(20, 14); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(9, 11); ctx.bezierCurveTo(9, 11, 9.5, 10, 10.5, 10); ctx.bezierCurveTo(11.5, 10, 12, 11, 12, 11); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(13, 11); ctx.bezierCurveTo(13, 11, 13.5, 10, 14.5, 10); ctx.bezierCurveTo(15.5, 10, 16, 11, 16, 11); ctx.stroke(); ctx.restore();
-            const dataURL = canvas.toDataURL('image/png');
-            const existingIcons = document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]'); existingIcons.forEach(e => e.remove());
-            const linkIcon = document.createElement('link'); linkIcon.rel = 'icon'; linkIcon.type = 'image/png'; linkIcon.href = dataURL; document.head.appendChild(linkIcon);
-            const linkApple = document.createElement('link'); linkApple.rel = 'apple-touch-icon'; linkApple.href = dataURL; document.head.appendChild(linkApple);
-        }
+        // ... existing helper functions (setAppIcon, detectTableStructure, fetchBibleRef, etc.) ...
+        window.setAppIcon = function() { const canvas = document.createElement('canvas'); canvas.width = 192; canvas.height = 192; const ctx = canvas.getContext('2d'); const baseColor = '#FFD500'; const shadowColor = '#ccaa00'; const highlightColor = '#ffe666'; ctx.fillStyle = baseColor; ctx.fillRect(0, 0, 192, 192); ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(0,192); ctx.lineTo(0,0); ctx.lineTo(192,0); ctx.stroke(); ctx.strokeStyle = 'rgba(0,0,0,0.1)'; ctx.beginPath(); ctx.moveTo(0,192); ctx.lineTo(192,192); ctx.lineTo(192,0); ctx.stroke(); const gridSize = 3; const cellSize = 192 / gridSize; const studRadius = 22; for(let row=0; row<gridSize; row++) { for(let col=0; col<gridSize; col++) { const cx = cellSize/2 + col*cellSize; const cy = cellSize/2 + row*cellSize; ctx.beginPath(); ctx.arc(cx + 4, cy + 4, studRadius, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.1)'; ctx.fill(); ctx.beginPath(); ctx.arc(cx, cy + 2, studRadius, 0, Math.PI * 2); ctx.fillStyle = shadowColor; ctx.fill(); const grad = ctx.createLinearGradient(cx - studRadius, cy - studRadius, cx + studRadius, cy + studRadius); grad.addColorStop(0, highlightColor); grad.addColorStop(1, shadowColor); ctx.beginPath(); ctx.arc(cx, cy, studRadius, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill(); ctx.beginPath(); ctx.ellipse(cx - 8, cy - 8, 7, 4, -Math.PI / 4, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.fill(); ctx.beginPath(); ctx.arc(cx, cy, studRadius - 5, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(0,0,0,0.05)'; ctx.lineWidth = 1; ctx.stroke(); }} ctx.save(); ctx.translate(24, 24); ctx.scale(6, 6); ctx.lineWidth = 5.5 / 6; ctx.strokeStyle = '#333333'; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(4, 14); ctx.bezierCurveTo(4, 14, 4, 7, 12, 7); ctx.bezierCurveTo(20, 7, 20, 14, 20, 14); ctx.lineTo(20, 18); ctx.bezierCurveTo(20, 19.1, 19.1, 20, 18, 20); ctx.lineTo(6, 20); ctx.bezierCurveTo(4.9, 20, 4, 19.1, 4, 18); ctx.lineTo(4, 14); ctx.closePath(); ctx.shadowColor = "rgba(255,255,255,0.8)"; ctx.shadowBlur = 0; ctx.shadowOffsetX = 1.5; ctx.shadowOffsetY = 1.5; ctx.stroke(); ctx.shadowColor = "transparent"; ctx.stroke(); ctx.beginPath(); ctx.moveTo(4, 14); ctx.lineTo(20, 14); ctx.stroke(); ctx.beginPath(); ctx.moveTo(9, 11); ctx.bezierCurveTo(9, 11, 9.5, 10, 10.5, 10); ctx.bezierCurveTo(11.5, 10, 12, 11, 12, 11); ctx.stroke(); ctx.beginPath(); ctx.moveTo(13, 11); ctx.bezierCurveTo(13, 11, 13.5, 10, 14.5, 10); ctx.bezierCurveTo(15.5, 10, 16, 11, 16, 11); ctx.stroke(); ctx.restore(); const dataURL = canvas.toDataURL('image/png'); const existingIcons = document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]'); existingIcons.forEach(e => e.remove()); const linkIcon = document.createElement('link'); linkIcon.rel = 'icon'; linkIcon.type = 'image/png'; linkIcon.href = dataURL; document.head.appendChild(linkIcon); const linkApple = document.createElement('link'); linkApple.rel = 'apple-touch-icon'; linkApple.href = dataURL; document.head.appendChild(linkApple); }
         window.detectTableStructure = function() { if(!sqlDb) return; try { const tables = sqlDb.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"); if(tables[0] && tables[0].values.length > 0) { const names = tables[0].values.flat(); dbTable = names.includes('verses') ? 'verses' : (names.includes('bible') ? 'bible' : names[0]); } const cols = sqlDb.exec(`PRAGMA table_info(${dbTable})`); if(cols.length > 0) { const colNames = cols[0].values.map(r => r[1]); if(colNames.includes('content')) dbCols.text = 'content'; else if(colNames.includes('scripture')) dbCols.text = 'scripture'; else if(colNames.includes('text')) dbCols.text = 'text'; if(colNames.includes('book_name')) dbCols.book = 'book_name'; else if(colNames.includes('book')) dbCols.book = 'book'; if(colNames.includes('chapter_number')) dbCols.chapter = 'chapter_number'; else if(colNames.includes('chapter')) dbCols.chapter = 'chapter'; if(colNames.includes('verse_number')) dbCols.verse = 'verse_number'; else if(colNames.includes('verse')) dbCols.verse = 'verse'; } } catch(e) { console.error("Table detection failed", e); } }
-        window.switchMode = function(m) { currentMode = m; els.viewHome.classList.toggle('hidden', m !== 'home'); els.viewWorkspace.classList.toggle('hidden', m === 'home'); els.mainHeader.classList.toggle('hidden', m === 'home'); const isDevotion = m === 'devotion'; const isPureJournal = ['journal-prayer','journal-gratitude','journal-mood'].includes(m); const isBible = m === 'bible'; document.getElementById('workspace-tabs').classList.toggle('hidden', !isDevotion); document.getElementById('devotion-tabs').classList.toggle('hidden', !isDevotion); document.getElementById('search-box').classList.toggle('invisible', !isBible); ['journal-devotion-fields', 'journal-prayer-fields', 'journal-gratitude-fields', 'journal-mood-fields'].forEach(id => document.getElementById(id).classList.add('hidden')); const readerSec = document.getElementById('section-reader'); const journalSec = document.getElementById('section-journal'); readerSec.classList.remove('hidden', 'lg:w-1/2'); journalSec.classList.remove('hidden', 'lg:w-1/2'); readerSec.classList.add('w-full'); journalSec.classList.add('w-full'); els.backBtn.classList.add('hidden'); els.copyBtn.classList.add('hidden'); if (els.btnCopyProgress) { els.btnCopyProgress.classList.toggle('hidden', !isDevotion); } if (isDevotion) { readerSec.classList.remove('w-full'); journalSec.classList.remove('w-full'); readerSec.classList.add('lg:w-1/2'); journalSec.classList.add('lg:w-1/2'); document.getElementById('journal-devotion-fields').classList.remove('hidden'); els.headerTitle.innerText = "Daily Devotion"; els.readerTitle.innerText = "Daily Devotion"; els.readerSubtitle.innerText = "Reading Plan"; window.updateDevotionUI(); window.switchWorkspaceTab('reader'); } else if (isBible) { journalSec.classList.add('hidden'); els.headerTitle.innerText = "Bible Reading"; els.readerTitle.innerText = "Bible Reading"; els.readerSubtitle.innerText = "Select Book"; window.renderMainBooks('old'); window.goBackToMainBooks(); window.switchWorkspaceTab('reader'); } else if (isPureJournal) { readerSec.classList.add('hidden'); const map = {'journal-prayer':'Prayer Journal','journal-gratitude':'Gratitude','journal-mood':'Mood Diary'}; const fieldMap = {'journal-prayer':'journal-prayer-fields','journal-gratitude':'journal-gratitude-fields','journal-mood':'journal-mood-fields'}; els.headerTitle.innerText = map[m]; document.getElementById(fieldMap[m]).classList.remove('hidden'); window.switchWorkspaceTab('journal'); } }
         window.fetchBibleRef = async function(refInput) { const ref = refInput ? refInput.trim() : ""; if(!ref) return; els.viewBooks.classList.add('hidden'); els.viewChapters.classList.add('hidden'); els.viewText.classList.remove('hidden'); els.copyBtn.classList.remove('hidden'); els.backBtn.classList.remove('hidden'); els.viewText.innerHTML = '<div class="flex justify-center py-10"><div class="loader"></div></div>'; const match = ref.match(/^([\u4e00-\u9fa5]+|[a-zA-Z]+)\s*(\d+)(?::(\d+)(?:-(\d+))?)?$/); const bookKey = match ? match[1] : null; const isBookRef = bookKey && (bookMap[bookKey] || bookMap[bookKey.replace("書","")]); if (sqlDbLoaded) { if (match && isBookRef) { const book = bookMap[bookKey] || bookKey; const chapter = parseInt(match[2]); const startV = match[3] ? parseInt(match[3]) : 1; const endV = match[4] ? parseInt(match[4]) : (match[3] ? parseInt(match[3]) : 200); try { const query = `SELECT ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.book} = ? AND ${dbCols.chapter} = ? AND ${dbCols.verse} >= ? AND ${dbCols.verse} <= ?`; const res = sqlDb.exec(query, [book, chapter, startV, endV]); if (res.length > 0) { els.readerTitle.innerText = `${book} ${chapter}`; els.readerSubtitle.innerText = "Scripture"; els.viewText.innerHTML = res[0].values.map(v => ` <div class="verse-item mb-4" onclick="this.classList.toggle('selected'); window.updateCopyButton()"> <span class="text-xs font-bold text-white bg-[#333] mr-2 px-1 rounded-sm select-none inline-block">${v[1]}</span> <span class="text-verse leading-loose">${v[2]}</span> </div> `).join(''); return; } else { els.viewText.innerHTML = "<p class='p-8 opacity-50 text-center text-sm'>此章節查無內容。</p>"; return; } } catch(e) { console.error(e); } } else { try { els.readerTitle.innerText = `搜尋: "${ref}"`; els.readerSubtitle.innerText = "Search Result"; const query = `SELECT ${dbCols.book}, ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.text} LIKE ? LIMIT 50`; const res = sqlDb.exec(query, [`%${ref}%`]); if (res.length > 0) { const results = res[0].values; els.viewText.innerHTML = results.map(v => { const highlightedTxt = v[3].replace(new RegExp(ref, 'g'), `<span class="bg-[#FFD500] text-[#333] px-1 font-bold rounded">${ref}</span>`); return ` <div class="verse-item mb-4 p-4 border-2 border-transparent hover:border-gray-200 transition-all cursor-pointer" onclick="this.classList.toggle('selected'); window.updateCopyButton()"> <div class="flex items-center gap-2 mb-2"> <span class="text-[10px] font-bold text-white bg-[#0055BF] px-2 py-1 tracking-wider rounded">${v[0]} ${v[1]}:${v[2]}</span> </div> <span class="text-verse text-[#333] leading-relaxed block">${highlightedTxt}</span> </div> `; }).join(''); return; } else { els.viewText.innerHTML = `<div class="flex flex-col items-center justify-center py-12"><span class="text-4xl mb-4">👾</span><p class="text-lg font-bold">找不到「${ref}」</p></div>`; return; } } catch(e) { console.error(e); } } } if (match && isBookRef) { const book = bookMap[bookKey] || bookKey; const chapter = parseInt(match[2]); const verseData = mockVerses[book]?.[chapter]; els.readerTitle.innerText = `${book} ${chapter}`; els.readerSubtitle.innerText = "Fallback Mode"; if (verseData) { els.viewText.innerHTML = ` <div class="p-3 bg-red-50 text-red-600 rounded mb-4 text-xs font-bold border border-red-200"> ⚠️ 遠端資料庫未連線，僅顯示試閱內容。 </div> ` + Object.keys(verseData).map(vNum => ` <div class="verse-item mb-4" onclick="this.classList.toggle('selected'); window.updateCopyButton()"> <span class="text-xs font-bold text-white bg-[#333] mr-2 px-1 rounded-sm select-none inline-block">${vNum}</span> <span class="text-verse leading-loose">${verseData[vNum]}</span> </div> `).join(''); } else { els.viewText.innerHTML = ` <div class="flex flex-col items-center justify-center py-12 text-center"> <span class="text-4xl mb-4">🔌</span> <p class="text-lg font-bold text-[#333]">資料庫連線中斷</p> <p class="text-sm text-gray-500 mt-2">無法讀取 ${book} 第 ${chapter} 章。<br>請檢查網路連線或稍後再試。</p> </div> `; } } else { els.viewText.innerHTML = ` <div class="flex flex-col items-center justify-center py-12 text-center"> <span class="text-4xl mb-4">⚠️</span> <p class="text-lg font-bold text-[#333]">無法執行搜尋</p> <p class="text-sm text-gray-500 mt-2">資料庫未連線，搜尋功能暫時無法使用。</p> </div> `; } }
         window.updateDevotionUI = function() { const start = new Date(calendarDate.getFullYear(), 0, 0); const diff = calendarDate - start; const dayOfYear = Math.floor(diff / 86400000); let progressTexts = []; const container = document.getElementById('devotion-tabs'); container.innerHTML = planTracks.map((track, idx) => { const totalChapters = track.books.reduce((a,b)=>a+b.c, 0); const chapterIdx = Math.floor((dayOfYear % totalChapters)) || 1; let currentCount = 0, targetBook = track.books[0], targetChapter = 1; for(let b of track.books) { if (currentCount + b.c >= chapterIdx) { targetBook = b; targetChapter = chapterIdx - currentCount; break; } currentCount += b.c; } const ref = `${targetBook.abbr} ${targetChapter}`; progressTexts.push(ref); return ` <div class="devotion-track-card ${idx===0?'active':''}" onclick="window.fetchBibleRef('${ref}'); document.querySelectorAll('.devotion-track-card').forEach(c=>c.classList.remove('active')); this.classList.add('active');"> <span class="track-tag uppercase">${track.t}</span> <span class="track-ref font-mono">${ref}</span> </div> `; }).join(''); const progressField = document.getElementById('note-devotion-progress'); if(progressField) { progressField.value = progressTexts.join(' / '); } const firstRefEl = container.querySelector('.track-ref'); if(firstRefEl) { window.fetchBibleRef(firstRefEl.innerText); } }
         window.switchWorkspaceTab = function(t) { const r = document.getElementById('section-reader'), j = document.getElementById('section-journal'); const tr = document.getElementById('tab-reader'), tj = document.getElementById('tab-journal'); if (t === 'reader') { r.classList.replace('opacity-0', 'opacity-100'); r.classList.replace('z-0', 'z-10'); r.style.pointerEvents = "auto"; j.classList.replace('opacity-100', 'opacity-0'); j.classList.replace('z-10', 'z-0'); j.style.pointerEvents = "none"; tr.classList.add('active'); tj.classList.remove('active'); } else { j.classList.replace('opacity-0', 'opacity-100'); j.classList.replace('z-0', 'z-10'); j.style.pointerEvents = "auto"; r.classList.replace('opacity-100', 'opacity-0'); r.classList.replace('z-10', 'z-0'); r.style.pointerEvents = "none"; tj.classList.add('active'); tr.classList.remove('active'); } }
@@ -1030,7 +1012,7 @@
         window.closeExportModal = function() { document.getElementById('export-modal').classList.add('hidden'); }
         window.selectMood = function(el, m) { document.getElementById('note-mood').value = m; document.querySelectorAll('.mood-sticker').forEach(s=>s.classList.remove('selected')); el.classList.add('selected'); }
         window.performSearch = function() { window.fetchBibleRef(els.inlineSearch.value); }
-        window.updateCopyButton = function() { const count = document.querySelectorAll('.verse-item.selected').length; els.copyBtn.innerHTML = count > 0 ? `<span class='text-[10px] font-bold'>${count}</span>` : `<svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>`; }
+        window.updateCopyButton = function() { const count = document.querySelectorAll('.verse-item.selected').length; els.copyBtn.innerHTML = count > 0 ? `<span class='text-[10px] font-bold'>${count}</span>` : `<svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>`; }
         window.copySelectedVerses = function() { const sel = document.querySelectorAll('.verse-item.selected'); if (sel.length === 0) return; const text = Array.from(sel).map(v => v.innerText.trim()).join('\n'); const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); els.copyBtn.innerHTML = "OK!"; setTimeout(() => { sel.forEach(v=>v.classList.remove('selected')); window.updateCopyButton(); }, 1000); }
         window.backupData = function() { const data = {}; for(let i=0; i<localStorage.length; i++){ const k = localStorage.key(i); if(k.includes('note-')) data[k] = localStorage.getItem(k); } const blob = new Blob([JSON.stringify(data)], {type: 'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `manna-backup-${new Date().toISOString().split('T')[0]}.json`; a.click(); }
         window.restoreData = function(input) { const r = new FileReader(); r.onload = e => { const data = JSON.parse(e.target.result); Object.keys(data).forEach(k => localStorage.setItem(k, data[k])); location.reload(); }; r.readAsText(input.files[0]); }
