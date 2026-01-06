@@ -105,7 +105,7 @@
         .brick-gratitude { background-color: var(--lego-yellow); color: #333; box-shadow: 0 8px 0 var(--lego-yellow-dark), 0 15px 15px rgba(0,0,0,0.2); }
         .brick-mood { background-color: var(--lego-red); color: white; box-shadow: 0 8px 0 var(--lego-red-dark), 0 15px 15px rgba(0,0,0,0.2); }
 
-        /* 新增：清單項目積木 */
+        /* 清單項目積木 */
         .list-brick {
             position: relative;
             padding: 16px;
@@ -115,8 +115,9 @@
             transition: all 0.1s;
             overflow: hidden;
             display: flex;
-            flex-direction: column;
-            gap: 4px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
         }
         .list-brick:active { transform: translateY(4px); margin-bottom: 8px; }
         /* 側邊凸粒裝飾 */
@@ -126,7 +127,7 @@
             background-size: 12px 12px; background-position: 6px 6px;
             border-right: 2px solid rgba(0,0,0,0.05);
         }
-        .list-brick-content { margin-left: 24px; }
+        .list-brick-content { margin-left: 24px; flex: 1; min-width: 0; }
         .list-brick-title { font-weight: 900; font-size: 1rem; }
         .list-brick-preview { font-size: 0.85rem; opacity: 0.9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -136,6 +137,19 @@
         .list-brick-yellow:active { box-shadow: none; }
         .list-brick-red { background: var(--lego-red); color: white; box-shadow: 0 4px 0 var(--lego-red-dark); }
         .list-brick-red:active { box-shadow: none; }
+
+        /* 刪除按鈕 */
+        .delete-btn {
+            width: 32px; height: 32px;
+            background: rgba(0,0,0,0.15);
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            color: inherit; opacity: 0.7;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .delete-btn:hover { background: rgba(0,0,0,0.3); opacity: 1; transform: scale(1.1); }
+        .delete-btn:active { transform: scale(0.9); }
 
         /* 圖示小積木 */
         .mini-brick { position: relative; overflow: hidden; }
@@ -399,7 +413,7 @@
                          
                          <!-- Copy -->
                          <button id="btn-copy-verses" onclick="window.copySelectedVerses()" class="hidden w-9 h-9 flex items-center justify-center rounded bg-[#FFD500] text-[#333] border-none shadow-[0_3px_0_#ccaa00] active:shadow-none active:translate-y-1 transition-all">
-                            <svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                            <svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
                          </button>
                     </div>
                 </div>
@@ -568,6 +582,22 @@
         </div>
     </main>
 
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm hidden" onclick="if(event.target===this)window.closeDeleteModal()">
+        <div class="bg-white w-full max-w-xs p-6 rounded-lg shadow-[0_12px_0_#ccc] m-4 border-2 border-gray-200" onclick="event.stopPropagation()">
+            <h3 class="text-xl font-bold mb-4 text-[#333] text-center">確認拆除積木？</h3>
+            <p class="text-sm text-gray-500 mb-6 text-center font-bold">刪除後將無法復原！</p>
+            <div class="flex gap-3">
+                 <button onclick="window.confirmDelete()" class="brick-btn btn-red flex-1 text-sm">
+                    是，拆除
+                 </button>
+                 <button onclick="window.closeDeleteModal()" class="brick-btn flex-1 text-sm border-2 border-gray-300">
+                    取消
+                 </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal -->
     <div id="export-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm hidden" onclick="if(event.target===this)window.closeExportModal()">
         <div class="bg-white w-full max-w-sm p-8 rounded-lg shadow-[0_12px_0_#ccc] m-4 border-2 border-gray-200" onclick="event.stopPropagation()">
@@ -600,6 +630,8 @@
         let currentMode = 'home';
         let calendarDate = new Date();
         let currentEditingId = null; // 用於追蹤正在編輯的 ID
+        let pendingDeleteType = null;
+        let pendingDeleteId = null;
 
         // ... existing arrays (mannaVerses, bibleBooks, planTracks, bookMap, mockVerses) ...
         const mannaVerses = [
@@ -756,14 +788,49 @@
 
                     listEl.innerHTML += `
                         <div class="list-brick ${colorClass}" onclick="window.editListEntry('${type}', ${entry.id})">
-                            <div class="list-brick-content">
+                            <div class="list-brick-content pr-8">
                                 <div class="list-brick-title">${title || (index + 1) + '. 無標題'}</div>
                                 <div class="list-brick-preview">${preview}</div>
                             </div>
+                            <button class="delete-btn" onclick="event.stopPropagation(); window.requestDelete('${type}', ${entry.id})">
+                                🗑️
+                            </button>
                         </div>
                     `;
                 });
             }
+        }
+
+        // 刪除相關功能
+        window.requestDelete = function(type, id) {
+            pendingDeleteType = type;
+            pendingDeleteId = id;
+            document.getElementById('delete-confirm-modal').classList.remove('hidden');
+        }
+
+        window.closeDeleteModal = function() {
+            document.getElementById('delete-confirm-modal').classList.add('hidden');
+            pendingDeleteType = null;
+            pendingDeleteId = null;
+        }
+
+        window.confirmDelete = function() {
+            if (!pendingDeleteType || !pendingDeleteId) return;
+
+            const dateKey = els.datePicker.value;
+            const listKey = `${dateKey}-journal-${pendingDeleteType}-entries`;
+            let entries = window.getJournalEntries(pendingDeleteType);
+            
+            // 過濾掉要刪除的項目
+            const newEntries = entries.filter(e => e.id !== pendingDeleteId);
+            
+            // 存回 localStorage
+            localStorage.setItem(listKey, JSON.stringify(newEntries));
+            
+            // 更新 UI
+            window.renderJournalList(pendingDeleteType);
+            window.renderCalendar();
+            window.closeDeleteModal();
         }
 
         // 顯示表單 (新增或編輯)
@@ -963,7 +1030,7 @@
         window.closeExportModal = function() { document.getElementById('export-modal').classList.add('hidden'); }
         window.selectMood = function(el, m) { document.getElementById('note-mood').value = m; document.querySelectorAll('.mood-sticker').forEach(s=>s.classList.remove('selected')); el.classList.add('selected'); }
         window.performSearch = function() { window.fetchBibleRef(els.inlineSearch.value); }
-        window.updateCopyButton = function() { const count = document.querySelectorAll('.verse-item.selected').length; els.copyBtn.innerHTML = count > 0 ? `<span class='text-[10px] font-bold'>${count}</span>` : `<svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>`; }
+        window.updateCopyButton = function() { const count = document.querySelectorAll('.verse-item.selected').length; els.copyBtn.innerHTML = count > 0 ? `<span class='text-[10px] font-bold'>${count}</span>` : `<svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>`; }
         window.copySelectedVerses = function() { const sel = document.querySelectorAll('.verse-item.selected'); if (sel.length === 0) return; const text = Array.from(sel).map(v => v.innerText.trim()).join('\n'); const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); els.copyBtn.innerHTML = "OK!"; setTimeout(() => { sel.forEach(v=>v.classList.remove('selected')); window.updateCopyButton(); }, 1000); }
         window.backupData = function() { const data = {}; for(let i=0; i<localStorage.length; i++){ const k = localStorage.key(i); if(k.includes('note-')) data[k] = localStorage.getItem(k); } const blob = new Blob([JSON.stringify(data)], {type: 'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `manna-backup-${new Date().toISOString().split('T')[0]}.json`; a.click(); }
         window.restoreData = function(input) { const r = new FileReader(); r.onload = e => { const data = JSON.parse(e.target.result); Object.keys(data).forEach(k => localStorage.setItem(k, data[k])); location.reload(); }; r.readAsText(input.files[0]); }
