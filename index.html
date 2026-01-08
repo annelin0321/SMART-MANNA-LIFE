@@ -142,6 +142,8 @@
         .list-brick-yellow:active { box-shadow: none; }
         .list-brick-red { background: var(--lego-red); color: white; box-shadow: 0 4px 0 var(--lego-red-dark); }
         .list-brick-red:active { box-shadow: none; }
+        .list-brick-orange { background: var(--lego-orange); color: white; box-shadow: 0 4px 0 var(--lego-orange-dark); }
+        .list-brick-orange:active { box-shadow: none; }
 
         /* 刪除按鈕 */
         .delete-btn {
@@ -160,11 +162,11 @@
         .notebook-paper {
             background-color: #fff;
             background-image: linear-gradient(#E0E0E0 1px, transparent 1px);
-            background-size: 100% 2rem; /* 行高 */
+            background-size: 100% 2rem;
             line-height: 2rem;
             padding: 0 1rem;
             border: 2px solid #ddd;
-            border-left: 6px solid var(--lego-orange); /* 左側加粗橘線 */
+            border-left: 6px solid var(--lego-orange);
             border-radius: 4px;
             font-size: 1.1rem;
             color: #333;
@@ -176,7 +178,7 @@
         }
         .notebook-paper:focus {
             border-color: var(--lego-orange);
-            background-color: #fffcf5; /* 微微泛黃 */
+            background-color: #fffcf5;
         }
         
         /* 圖示小積木 */
@@ -228,7 +230,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden selection:bg-[#FFD500] selection:text-black">
 
-    <!-- 頂部導覽列 (Workspace 頁面使用) -->
+    <!-- 頂部導覽列 -->
     <header id="main-header" class="bg-white/95 backdrop-blur-none border-b-4 border-[#eee] sticky top-0 z-30 shrink-0 hidden">
         <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center gap-4">
             <div class="flex items-center gap-2 cursor-pointer group" onclick="window.goHome()">
@@ -246,7 +248,6 @@
             <div id="header-title" class="flex-1 text-center pixel-font text-2xl text-[#333] font-bold tracking-widest uppercase truncate">HOME</div>
             
             <div class="flex items-center gap-2">
-                <!-- 備份按鈕 (Header) -->
                 <button onclick="window.openExportModal()" class="brick-btn px-3 py-2 hover:bg-gray-50 flex items-center gap-2">
                     <svg class="w-4 h-4" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                     <span class="text-sm font-bold">備份/匯入</span>
@@ -258,7 +259,6 @@
 
     <!-- 1. 首頁視圖 -->
     <div id="view-home" class="flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-5xl mx-auto flex flex-col">
-        
         <div class="flex justify-between items-end mb-10 fade-in pt-4">
             <div class="flex flex-col gap-2">
                 <span class="inline-block px-2 py-1 bg-[#333] text-[#FFD500] text-xs font-bold tracking-widest uppercase pixel-font transform -rotate-2 rounded shadow-sm">Smart Manna Life</span>
@@ -273,12 +273,10 @@
             </div>
             
             <div class="flex items-center gap-2">
-                <!-- 備份按鈕 (Home Page) -->
                 <button onclick="window.openExportModal()" class="brick-btn px-3 py-2 bg-white text-[#333] border-2 border-[#333] hover:bg-gray-50 shadow-[2px_2px_0px_0px_#333] active:shadow-none active:translate-y-1 transition-all flex items-center gap-2">
                      <svg class="w-4 h-4" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                      <span class="text-xs font-bold">備份/匯入</span>
                 </button>
-                
                 <div class="hidden sm:block">
                     <input type="date" id="home-date-picker" class="bg-white border-2 border-[#ddd] rounded px-4 py-2 text-sm font-bold outline-none shadow-[0_4px_0_#ccc] active:shadow-none active:translate-y-1 transition-all text-[#333]" onchange="window.handleDateChange(this.value)">
                 </div>
@@ -286,26 +284,19 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 fade-in">
-            <!-- 今日嗎哪卡片 -->
             <div class="md:col-span-1 flex flex-col brick-card p-6 relative group cursor-pointer" onclick="window.switchMode('devotion')">
                 <div class="absolute top-4 right-4 p-2 opacity-10 rotate-12">
                     <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.8L18.4 19H5.6L12 5.8z"/></svg>
                 </div>
-                
                 <div class="inline-block px-3 py-1 bg-[#0055BF] text-white text-sm font-bold mb-6 self-start rounded shadow-[0_3px_0_#004296]">Today's Build</div>
-                
                 <div id="home-manna-display" class="z-10 flex-1 flex flex-col justify-center">
                     <p class="text-2xl font-bold text-[#333] leading-relaxed mb-6 not-italic" id="manna-text">Loading...</p>
                     <p class="text-sm font-bold bg-[#333] text-white px-2 py-1 w-fit self-end pixel-font tracking-wider rounded" id="manna-ref"></p>
                 </div>
-
-                <!-- 行動呼籲區域 -->
                 <div class="flex items-center justify-between mt-8 pt-5 border-t-2 border-dashed border-gray-200 z-10">
                      <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-[#FFD500] rounded flex items-center justify-center text-[#333] shadow-[0_3px_0_#ccaa00]">
-                            <svg class="w-6 h-6" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5">
-                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
-                            </svg>
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
                         </div>
                         <div class="flex flex-col">
                             <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider leading-tight">START BUILDING</span>
@@ -316,7 +307,6 @@
                 </div>
             </div>
 
-            <!-- 靈修足跡月曆 -->
             <div class="md:col-span-2 brick-card p-6">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="font-bold text-[#333] flex items-center gap-2 text-xl">
@@ -335,69 +325,37 @@
             </div>
         </div>
 
-        <!-- 捷徑區域 (積木風格 4欄位 -> 5個按鈕) -->
-        <!-- Desktop: 4 columns. Row1: [1][1][2][2][3][3][3][3] No.
-             Use grid-cols-2 (Mobile) / md:grid-cols-4 (Desktop). 
-             Items need col-span to fit.
-             
-             Layout Strategy:
-             Grid-cols-2 (Mobile) -> 4 cells wide effectively? No standard tailwind is fixed cols.
-             Let's use md:grid-cols-4.
-             Bible: col-span-1
-             Prayer: col-span-1
-             Gratitude: col-span-2 (Long)
-             Row 2:
-             Mood: col-span-2 (Long)
-             FreeWrite: col-span-2 (Long)
-             
-             Total cells: 4 (row1) + 4 (row2) = 8 cells.
-        -->
+        <!-- 捷徑區域 (5個按鈕) -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10 fade-in">
-            <!-- 藍色積木：聖經閱讀 (1x1) -->
+            <!-- 藍色：聖經 -->
             <div onclick="window.switchMode('bible')" class="real-brick-btn brick-bible cursor-pointer group h-auto col-span-1">
-                <svg class="w-10 h-10 text-white opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                </svg>
+                <svg class="w-10 h-10 text-white opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
                 <h3 class="text-base font-bold text-white tracking-widest mt-auto">聖經閱讀</h3>
             </div>
             
-            <!-- 綠色積木：跟神聊聊 (1x1) -->
+            <!-- 綠色：禱告 -->
             <div onclick="window.switchMode('journal-prayer')" class="real-brick-btn brick-prayer cursor-pointer group h-auto col-span-1">
-                <svg class="w-10 h-10 text-white opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
-                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-                </svg>
+                <svg class="w-10 h-10 text-white opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                 <h3 class="text-base font-bold text-white tracking-widest mt-auto">跟神聊聊</h3>
             </div>
             
-            <!-- 黃色積木：感恩日記 (2x1 長條 - Desktop / 1x1 - Mobile) -->
-            <!-- Mobile: col-span-2 to make it a full row bar, or keep 1? User asked for 2 rows. 
-                 If Mobile 2 cols: [1][2], [3][4], [5]. 5 items.
-                 Let's make desktop layout: [1][2][3(long)]. [4(long)][5(long)].
-            -->
+            <!-- 黃色：感恩 -->
             <div onclick="window.switchMode('journal-gratitude')" class="real-brick-btn brick-gratitude cursor-pointer group h-auto col-span-2 md:col-span-2">
                 <div class="flex items-center gap-3">
-                     <svg class="w-10 h-10 text-[#333] opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
+                     <svg class="w-10 h-10 text-[#333] opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                     <h3 class="text-base font-bold text-[#333] tracking-widest">感恩日記</h3>
                 </div>
             </div>
             
-            <!-- 紅色積木：內心戲 (2x1 長條) -->
+            <!-- 紅色：內心戲 -->
             <div onclick="window.switchMode('journal-mood')" class="real-brick-btn brick-mood cursor-pointer group h-auto col-span-2 md:col-span-2">
                 <div class="flex items-center gap-3">
-                    <svg class="w-10 h-10 text-white opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-                        <line x1="9" y1="9" x2="9.01" y2="9"></line>
-                        <line x1="15" y1="9" x2="15.01" y2="9"></line>
-                    </svg>
+                    <svg class="w-10 h-10 text-white opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
                     <h3 class="text-base font-bold text-white tracking-widest">內心戲</h3>
                 </div>
             </div>
 
-            <!-- 橘色積木：隨便寫 (新功能 - 2x1 長條) -->
+            <!-- 橘色：隨便寫 -->
             <div onclick="window.switchMode('journal-freewrite')" class="real-brick-btn brick-freewrite cursor-pointer group h-auto col-span-2 md:col-span-2">
                 <div class="flex items-center gap-3">
                     <svg class="w-10 h-10 text-white opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
@@ -410,21 +368,12 @@
         </div>
 
         <footer class="mt-auto py-10 text-center fade-in border-t-4 border-[#ddd] w-11/12 md:w-2/3 mx-auto">
-            <div class="flex justify-center flex-wrap gap-5 md:gap-6 mb-4">
-                <a href="https://www.facebook.com/profile.php?id=100068500932557" target="_blank" class="text-gray-400 hover:text-[#1877F2] transition-colors p-2 hover:scale-110 transform duration-200"><svg class="w-6 h-6" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
-                <a href="https://www.instagram.com/forever.believe.in.jesus/" target="_blank" class="text-gray-400 hover:text-[#E4405F] transition-colors p-2 hover:scale-110 transform duration-200"><svg class="w-6 h-6" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
-                <a href="https://www.threads.net/@forever.believe.in.jesus" target="_blank" class="text-gray-400 hover:text-black transition-colors p-2 hover:scale-110 transform duration-200"><svg class="w-6 h-6" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M12.27 4.15c-4.46 0-7.85 3.32-7.85 7.85 0 4.54 3.39 7.85 7.85 7.85 2.5 0 4.67-1.16 6.04-2.81l-1.92-1.46c-1 1.15-2.52 1.83-4.12 1.83-2.91 0-5.32-2.31-5.32-5.41s2.41-5.41 5.32-5.41c2.46 0 4.8 1.63 5.24 4.09l.06.35c.19 1.09.08 1.95-.31 2.34-.18.18-.45.26-.81.26-.58 0-1.17-.26-1.54-1.12l-.12-.27c-.49-1.15-.74-2.42-.74-3.69v-.39h-2.52v.4c0 1.57.34 3.09.98 4.49-.9 1.02-2.22 1.69-3.7 1.69-2.7 0-4.9-2.2-4.9-4.9 0-2.7 2.2-4.9 4.9-4.9 2.59 0 4.86 1.98 5.16 4.53.13 1.14.07 2.01-.17 2.65-.54 1.43-1.69 1.98-2.98 1.98-1.25 0-2.2-.69-2.61-1.91-.45-.87-.45-1.95-.45-2.07 0-.58.11-1.14.32-1.67.58-1.45 2.03-2.46 3.69-2.46z"/></svg></a>
-                <a href="https://line.me/R/ti/p/@469cjlho" target="_blank" class="text-gray-400 hover:text-[#00C300] transition-colors p-2 hover:scale-110 transform duration-200"><svg class="w-6 h-6" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></a>
-                <a href="mailto:newthingsinthelittlelight@gmail.com" class="text-gray-400 hover:text-[#E3000B] transition-colors p-2 hover:scale-110 transform duration-200"><svg class="w-6 h-6" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></a>
-            </div>
             <p class="text-xs text-gray-400 font-bold tracking-widest uppercase pixel-font text-lg">耶穌加油站 x 微光新事 © 2024</p>
         </footer>
     </div>
 
     <!-- 2. 工作區視圖 -->
     <main id="view-workspace" class="hidden flex-1 w-full max-w-7xl mx-auto flex flex-col h-full overflow-hidden bg-transparent">
-        
-        <!-- 全域分頁切換 -->
         <div id="workspace-tabs" class="flex border-b-4 border-[#ccc] shrink-0 bg-[#F4F6F8] z-20 px-4 pt-2 gap-1">
             <button id="tab-reader" class="workspace-tab-btn active" onclick="window.switchWorkspaceTab('reader')">
                 <span class="text-xl mr-1 pixel-font">Read</span> <span id="tab-reader-text">閱讀經文</span>
@@ -434,50 +383,32 @@
             </button>
         </div>
 
-        <!-- 雙欄內容容器 -->
         <div class="flex-1 flex overflow-hidden relative p-0 md:p-4 gap-4">
-            
-            <!-- 閱讀器區塊 (Left) -->
+            <!-- Left: Reader -->
             <section id="section-reader" class="w-full lg:w-1/2 flex flex-col brick-card rounded-none md:rounded-lg transition-all duration-300 absolute lg:relative inset-0 z-10 lg:z-auto shadow-none md:shadow-[0_6px_0_#E0E0E0,0_12px_10px_rgba(0,0,0,0.1)]">
-                
-                <!-- A. Devotion Tabs (Sticky top) -->
                 <div id="devotion-tabs" class="hidden grid grid-cols-4 gap-2 p-4 bg-[#F9F9F9] border-b-2 border-gray-100 shrink-0"></div>
-                
-                <!-- B. Universal Header -->
                 <div id="reader-universal-header" class="px-5 py-4 border-b-2 border-gray-100 flex justify-between items-center bg-white shrink-0">
-                    <!-- Left: Nav/Title -->
                     <div class="flex items-center gap-3 flex-1 min-w-0">
-                         <!-- Back Button -->
                          <button id="btn-header-back" onclick="window.goBackToMainBooks()" class="hidden shrink-0 w-8 h-8 rounded bg-[#333] text-white flex items-center justify-center text-xs hover:bg-black transition-colors shadow-[0_3px_0_#000] active:shadow-none active:translate-y-1">◀</button>
-                         
-                         <!-- Title Info -->
                          <div class="min-w-0">
                              <div class="flex items-center gap-2">
                                 <span id="header-subtitle" class="text-[12px] font-bold text-gray-400 uppercase tracking-widest block pixel-font">Scripture</span>
-                                <!-- Copy Progress Button -->
-                                <button id="btn-copy-progress" onclick="window.copyDevotionProgress()" class="hidden text-[10px] bg-[#333] text-white rounded px-2 py-0.5 hover:bg-black transition-colors leading-tight tracking-wider" title="複製今日進度">
-                                    複製進度
-                                </button>
+                                <button id="btn-copy-progress" onclick="window.copyDevotionProgress()" class="hidden text-[10px] bg-[#333] text-white rounded px-2 py-0.5 hover:bg-black transition-colors leading-tight tracking-wider" title="複製今日進度">複製進度</button>
                              </div>
                              <h2 id="header-main-title" class="text-lg text-[#333] font-bold truncate">Bible Reading</h2>
                          </div>
                     </div>
-                    <!-- Right: Actions -->
                     <div class="flex items-center gap-2">
-                         <!-- 修正：搜尋區塊 -->
+                         <!-- 修正: 搜尋框 -->
                          <form class="relative" id="search-box" onsubmit="event.preventDefault(); window.performSearch();">
                              <input type="search" id="inline-search" placeholder="Search..." class="pl-3 pr-8 py-1.5 rounded bg-gray-50 text-xs w-28 focus:w-48 transition-all outline-none border-2 border-gray-200 focus:border-[#0055BF]">
                              <button type="button" onclick="window.performSearch()" class="absolute right-2 top-2 z-10 text-gray-400"><svg class="w-4 h-4" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
                          </form>
-                         
-                         <!-- Copy -->
                          <button id="btn-copy-verses" onclick="window.copySelectedVerses()" class="hidden w-9 h-9 flex items-center justify-center rounded bg-[#FFD500] text-[#333] border-none shadow-[0_3px_0_#ccaa00] active:shadow-none active:translate-y-1 transition-all">
                             <svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
                          </button>
                     </div>
                 </div>
-
-                <!-- C. Scrollable Content Wrapper -->
                 <div id="reader-content-wrapper" class="flex-1 overflow-y-auto relative bg-white">
                     <div id="view-bible-books" class="hidden flex-col min-h-full p-6">
                          <div class="flex gap-4 mb-6 shrink-0">
@@ -494,7 +425,7 @@
                 </div>
             </section>
 
-            <!-- 筆記區塊 (Right) -->
+            <!-- Right: Journal -->
             <section id="section-journal" class="w-full lg:w-1/2 flex flex-col brick-card rounded-none md:rounded-lg transition-all duration-300 absolute lg:relative inset-0 opacity-0 lg:opacity-100 pointer-events-none lg:pointer-events-auto z-0 lg:z-auto shadow-none md:shadow-[0_6px_0_#E0E0E0,0_12px_10px_rgba(0,0,0,0.1)]">
                 <div class="bg-gray-50 px-6 py-4 border-b-2 border-gray-100 flex gap-3 overflow-x-auto no-scrollbar items-center shrink-0">
                     <button class="mood-sticker" onclick="window.selectMood(this, '☀️')">☀️</button>
@@ -533,22 +464,32 @@
                         </div>
                     </div>
                     
-                    <!-- 隨便寫 (新功能) -->
+                    <!-- 隨便寫 (新功能：改為多篇模式) -->
                     <div id="journal-freewrite-fields" class="hidden">
-                        <div class="mb-4 text-sm text-gray-500 font-bold flex items-center gap-2">
-                             <span class="inline-block w-3 h-3 bg-[#FE8A18] rounded-full"></span>
-                             Free Write / 隨意塗鴉
+                        <div id="list-freewrite" class="space-y-4 mb-8"></div>
+                        <div id="form-freewrite" class="space-y-8 hidden bg-white p-4 rounded-lg border-2 border-[#eee] mb-8">
+                            <h3 class="font-bold text-lg text-[#FE8A18]">✍️ 新增/編輯隨筆</h3>
+                            <div>
+                                <div class="mb-2 text-sm text-gray-500 font-bold flex items-center gap-2">
+                                     <span class="inline-block w-3 h-3 bg-[#FE8A18] rounded-full"></span>
+                                     Free Write / 隨意塗鴉
+                                </div>
+                                <!-- 橫線筆記本風格 -->
+                                <textarea id="note-freewrite" class="notebook-paper w-full min-h-[300px] leading-relaxed" placeholder="在這裡寫下任何心情、靈感或隨筆..."></textarea>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.saveListEntry('freewrite')" class="brick-btn btn-orange flex-1">儲存</button>
+                                <button onclick="window.hideEntryForm('freewrite')" class="brick-btn flex-1">取消</button>
+                            </div>
                         </div>
-                        <!-- 橫線筆記本風格 -->
-                        <textarea id="note-freewrite" class="notebook-paper w-full min-h-[500px] leading-relaxed" placeholder="在這裡寫下任何心情、靈感或隨筆..."></textarea>
-                        <div class="pt-4">
-                            <button onclick="window.saveSingleEntry('freewrite')" class="brick-btn btn-orange w-full flex items-center justify-center gap-3">💾 儲存隨筆</button>
-                        </div>
+                        <button id="btn-add-freewrite" onclick="window.showEntryForm('freewrite')" class="brick-btn w-full py-4 text-[#FE8A18] border-2 border-[#FE8A18] hover:bg-[#FE8A18] hover:text-white transition-colors border-dashed flex items-center justify-center gap-2">
+                            <span class="text-2xl font-black">+</span> 新增一則隨筆
+                        </button>
                     </div>
-                    
+
                     <!-- 跟神聊聊 -->
                     <div id="journal-prayer-fields" class="hidden">
-                        <div id="list-prayer" class="space-y-4 mb-8"></div> 
+                        <div id="list-prayer" class="space-y-4 mb-8"></div>
                         <div id="form-prayer" class="space-y-8 hidden bg-white p-4 rounded-lg border-2 border-[#eee] mb-8">
                             <h3 class="font-bold text-lg text-[#008F39]">✍️ 新增/編輯禱告</h3>
                             <div>
@@ -633,7 +574,7 @@
                         </button>
                     </div>
 
-                    <!-- 底部儲存提示 (已優化) -->
+                    <!-- 底部儲存提示 -->
                     <div class="mt-10 p-4 bg-[#FFFDE7] border-2 border-[#FFD500] rounded-lg text-center shadow-[0_4px_0_rgba(0,0,0,0.05)]">
                         <p class="text-sm font-black text-[#F57F17] mb-3 flex items-center justify-center gap-2">
                             <span class="text-lg">⚠️</span> 資料僅儲存於此瀏覽器
@@ -654,29 +595,22 @@
             <h3 class="text-xl font-bold mb-4 text-[#333] text-center">確認拆除積木？</h3>
             <p class="text-sm text-gray-500 mb-6 text-center font-bold">刪除後將無法復原！</p>
             <div class="flex gap-3">
-                 <button onclick="window.confirmDelete()" class="brick-btn btn-red flex-1 text-sm">
-                    是，拆除
-                 </button>
-                 <button onclick="window.closeDeleteModal()" class="brick-btn flex-1 text-sm border-2 border-gray-300">
-                    取消
-                 </button>
+                 <button onclick="window.confirmDelete()" class="brick-btn btn-red flex-1 text-sm">是，拆除</button>
+                 <button onclick="window.closeDeleteModal()" class="brick-btn flex-1 text-sm border-2 border-gray-300">取消</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Export Modal -->
     <div id="export-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm hidden" onclick="if(event.target===this)window.closeExportModal()">
         <div class="bg-white w-full max-w-sm p-8 rounded-lg shadow-[0_12px_0_#ccc] m-4 border-2 border-gray-200" onclick="event.stopPropagation()">
             <h3 class="text-3xl font-bold mb-3 text-[#333] text-center pixel-font">DATA CENTER</h3>
             <p class="text-sm text-gray-500 mb-8 text-center font-bold">筆記儲存在瀏覽器中，記得定期存檔！</p>
             <div class="grid grid-cols-1 gap-4">
-                 <!-- 下載按鈕 -->
                  <button onclick="window.backupData()" class="brick-btn btn-yellow w-full flex items-center justify-center gap-3">
                     <svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
                     下載存檔 (Export)
                  </button>
-                 
-                 <!-- 匯入按鈕 (已更名) -->
                  <button onclick="document.getElementById('restore-input').click()" class="brick-btn w-full flex items-center justify-center gap-3 border-2 border-gray-300 hover:border-gray-400">
                     <svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
                     匯入備份 (Import)
@@ -688,7 +622,6 @@
     </div>
 
     <script>
-        // ... existing config ...
         const REMOTE_DB_URL = "https://raw.githubusercontent.com/annelin0321/bible-zh/main/bible_complete.db";
         let sqlDb = null, sqlDbLoaded = false, SQL = null, els = {};
         let dbTable = "verses";
@@ -699,7 +632,6 @@
         let pendingDeleteType = null;
         let pendingDeleteId = null;
 
-        // ... existing arrays ...
         const mannaVerses = [
             { t: "「敬畏耶和華是智慧的開端。」", r: "— 箴言 9:10" },
             { t: "「耶和華是我的牧者，我必不致缺乏。」", r: "— 詩篇 23:1" },
@@ -734,7 +666,6 @@
             "箴言": {1: {7: "敬畏耶和華是知識的開端；愚妄人藐視智慧和訓誨。"}}
         };
 
-        // --- 初始化與基礎功能 ---
         async function initApp() {
             els = {
                 viewHome: document.getElementById('view-home'),
@@ -783,11 +714,12 @@
             window.calculateStreak();
         }
 
-        // --- 多篇筆記邏輯 ---
+        // 多篇筆記邏輯
         const journalFields = {
             'prayer': ['note-topic', 'note-content', 'note-prayer-tracking'],
             'gratitude': ['note-thanks', 'note-grace'],
-            'mood': ['note-mood-event', 'note-mood-tags', 'note-mood-lie', 'note-mood-god-view', 'note-mood-prayer']
+            'mood': ['note-mood-event', 'note-mood-tags', 'note-mood-lie', 'note-mood-god-view', 'note-mood-prayer'],
+            'freewrite': ['note-freewrite']
         };
 
         window.getJournalEntries = function(type) {
@@ -825,7 +757,13 @@
                     if (type === 'prayer') { title = entry['note-topic'] || "未命名禱告"; preview = entry['note-content'] || "無內容"; }
                     else if (type === 'gratitude') { title = entry['note-thanks'] || "感恩事項"; preview = entry['note-grace'] || ""; }
                     else if (type === 'mood') { title = entry['note-mood-event'] || "心情事件"; preview = entry['note-mood-tags'] || ""; }
-                    const colorClass = type === 'prayer' ? 'list-brick-green' : (type === 'gratitude' ? 'list-brick-yellow' : 'list-brick-red');
+                    else if (type === 'freewrite') { title = "隨筆記錄"; preview = entry['note-freewrite'] || "無內容"; }
+
+                    let colorClass = 'list-brick-yellow';
+                    if (type === 'prayer') colorClass = 'list-brick-green';
+                    else if (type === 'mood') colorClass = 'list-brick-red';
+                    else if (type === 'freewrite') colorClass = 'list-brick-orange';
+
                     listEl.innerHTML += `
                         <div class="list-brick ${colorClass}" onclick="window.editListEntry('${type}', ${entry.id})">
                             <div class="list-brick-content pr-8">
@@ -839,7 +777,6 @@
             }
         }
 
-        // 刪除相關
         window.requestDelete = function(type, id) { pendingDeleteType = type; pendingDeleteId = id; document.getElementById('delete-confirm-modal').classList.remove('hidden'); }
         window.closeDeleteModal = function() { document.getElementById('delete-confirm-modal').classList.add('hidden'); pendingDeleteType = null; pendingDeleteId = null; }
         window.confirmDelete = function() {
@@ -949,8 +886,8 @@
             document.getElementById('manna-text').innerText = m.t;
             document.getElementById('manna-ref').innerText = m.r;
 
-            // 1. 單篇模式 (Devotion + Freewrite)
-            const singleFields = ['note-rhema', 'note-reflection', 'note-application', 'note-prayer-devotion', 'note-freewrite'];
+            // 1. 單篇模式 (Devotion 仍是單篇)
+            const singleFields = ['note-rhema', 'note-reflection', 'note-application', 'note-prayer-devotion'];
             singleFields.forEach(f => {
                 const el = document.getElementById(f);
                 if(el) {
@@ -959,8 +896,8 @@
                 }
             });
 
-            // 2. 多篇模式
-            ['prayer', 'gratitude', 'mood'].forEach(type => {
+            // 2. 多篇模式 (現在包含 freewrite)
+            ['prayer', 'gratitude', 'mood', 'freewrite'].forEach(type => {
                 window.hideEntryForm(type);
                 window.renderJournalList(type);
             });
@@ -983,9 +920,8 @@
                 if (key === els.datePicker.value) d.classList.add('selected-day');
                 
                 let hasEntry = false;
-                // 檢查各類筆記
-                if (localStorage.getItem(`${key}-note-rhema`) || localStorage.getItem(`${key}-note-freewrite`)) hasEntry = true;
-                ['prayer', 'gratitude', 'mood'].forEach(type => {
+                if (localStorage.getItem(`${key}-note-rhema`)) hasEntry = true;
+                ['prayer', 'gratitude', 'mood', 'freewrite'].forEach(type => {
                     const list = localStorage.getItem(`${key}-journal-${type}-entries`);
                     if (list && JSON.parse(list).length > 0) hasEntry = true;
                 });
@@ -999,7 +935,7 @@
         // ... existing helper functions (setAppIcon, detectTableStructure, fetchBibleRef, etc.) ...
         window.setAppIcon = function() { const canvas = document.createElement('canvas'); canvas.width = 192; canvas.height = 192; const ctx = canvas.getContext('2d'); const baseColor = '#FFD500'; const shadowColor = '#ccaa00'; const highlightColor = '#ffe666'; ctx.fillStyle = baseColor; ctx.fillRect(0, 0, 192, 192); ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(0,192); ctx.lineTo(0,0); ctx.lineTo(192,0); ctx.stroke(); ctx.strokeStyle = 'rgba(0,0,0,0.1)'; ctx.beginPath(); ctx.moveTo(0,192); ctx.lineTo(192,192); ctx.lineTo(192,0); ctx.stroke(); const gridSize = 3; const cellSize = 192 / gridSize; const studRadius = 22; for(let row=0; row<gridSize; row++) { for(let col=0; col<gridSize; col++) { const cx = cellSize/2 + col*cellSize; const cy = cellSize/2 + row*cellSize; ctx.beginPath(); ctx.arc(cx + 4, cy + 4, studRadius, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.1)'; ctx.fill(); ctx.beginPath(); ctx.arc(cx, cy + 2, studRadius, 0, Math.PI * 2); ctx.fillStyle = shadowColor; ctx.fill(); const grad = ctx.createLinearGradient(cx - studRadius, cy - studRadius, cx + studRadius, cy + studRadius); grad.addColorStop(0, highlightColor); grad.addColorStop(1, shadowColor); ctx.beginPath(); ctx.arc(cx, cy, studRadius, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill(); ctx.beginPath(); ctx.ellipse(cx - 8, cy - 8, 7, 4, -Math.PI / 4, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.fill(); ctx.beginPath(); ctx.arc(cx, cy, studRadius - 5, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(0,0,0,0.05)'; ctx.lineWidth = 1; ctx.stroke(); }} ctx.save(); ctx.translate(24, 24); ctx.scale(6, 6); ctx.lineWidth = 5.5 / 6; ctx.strokeStyle = '#333333'; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(4, 14); ctx.bezierCurveTo(4, 14, 4, 7, 12, 7); ctx.bezierCurveTo(20, 7, 20, 14, 20, 14); ctx.lineTo(20, 18); ctx.bezierCurveTo(20, 19.1, 19.1, 20, 18, 20); ctx.lineTo(6, 20); ctx.bezierCurveTo(4.9, 20, 4, 19.1, 4, 18); ctx.lineTo(4, 14); ctx.closePath(); ctx.shadowColor = "rgba(255,255,255,0.8)"; ctx.shadowBlur = 0; ctx.shadowOffsetX = 1.5; ctx.shadowOffsetY = 1.5; ctx.stroke(); ctx.shadowColor = "transparent"; ctx.stroke(); ctx.beginPath(); ctx.moveTo(4, 14); ctx.lineTo(20, 14); ctx.stroke(); ctx.beginPath(); ctx.moveTo(9, 11); ctx.bezierCurveTo(9, 11, 9.5, 10, 10.5, 10); ctx.bezierCurveTo(11.5, 10, 12, 11, 12, 11); ctx.stroke(); ctx.beginPath(); ctx.moveTo(13, 11); ctx.bezierCurveTo(13, 11, 13.5, 10, 14.5, 10); ctx.bezierCurveTo(15.5, 10, 16, 11, 16, 11); ctx.stroke(); ctx.restore(); const dataURL = canvas.toDataURL('image/png'); const existingIcons = document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]'); existingIcons.forEach(e => e.remove()); const linkIcon = document.createElement('link'); linkIcon.rel = 'icon'; linkIcon.type = 'image/png'; linkIcon.href = dataURL; document.head.appendChild(linkIcon); const linkApple = document.createElement('link'); linkApple.rel = 'apple-touch-icon'; linkApple.href = dataURL; document.head.appendChild(linkApple); }
         window.detectTableStructure = function() { if(!sqlDb) return; try { const tables = sqlDb.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"); if(tables[0] && tables[0].values.length > 0) { const names = tables[0].values.flat(); dbTable = names.includes('verses') ? 'verses' : (names.includes('bible') ? 'bible' : names[0]); } const cols = sqlDb.exec(`PRAGMA table_info(${dbTable})`); if(cols.length > 0) { const colNames = cols[0].values.map(r => r[1]); if(colNames.includes('content')) dbCols.text = 'content'; else if(colNames.includes('scripture')) dbCols.text = 'scripture'; else if(colNames.includes('text')) dbCols.text = 'text'; if(colNames.includes('book_name')) dbCols.book = 'book_name'; else if(colNames.includes('book')) dbCols.book = 'book'; if(colNames.includes('chapter_number')) dbCols.chapter = 'chapter_number'; else if(colNames.includes('chapter')) dbCols.chapter = 'chapter'; if(colNames.includes('verse_number')) dbCols.verse = 'verse_number'; else if(colNames.includes('verse')) dbCols.verse = 'verse'; } } catch(e) { console.error("Table detection failed", e); } }
-        window.fetchBibleRef = async function(refInput) { const ref = refInput ? refInput.trim() : ""; if(!ref) return; els.viewBooks.classList.add('hidden'); els.viewChapters.classList.add('hidden'); els.viewText.classList.remove('hidden'); els.copyBtn.classList.remove('hidden'); els.backBtn.classList.remove('hidden'); els.viewText.innerHTML = '<div class="flex justify-center py-10"><div class="loader"></div></div>'; const match = ref.match(/^([\u4e00-\u9fa5]+|[a-zA-Z]+)\s*(\d+)(?::(\d+)(?:-(\d+))?)?$/); const bookKey = match ? match[1] : null; const isBookRef = bookKey && (bookMap[bookKey] || bookMap[bookKey.replace("書","")]); if (sqlDbLoaded) { if (match && isBookRef) { const book = bookMap[bookKey] || bookKey; const chapter = parseInt(match[2]); const startV = match[3] ? parseInt(match[3]) : 1; const endV = match[4] ? parseInt(match[4]) : (match[3] ? parseInt(match[3]) : 200); try { const query = `SELECT ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.book} = ? AND ${dbCols.chapter} = ? AND ${dbCols.verse} >= ? AND ${dbCols.verse} <= ?`; const res = sqlDb.exec(query, [book, chapter, startV, endV]); if (res.length > 0) { els.readerTitle.innerText = `${book} ${chapter}`; els.readerSubtitle.innerText = "Scripture"; els.viewText.innerHTML = res[0].values.map(v => ` <div class="verse-item mb-4" onclick="this.classList.toggle('selected'); window.updateCopyButton()"> <span class="text-xs font-bold text-white bg-[#333] mr-2 px-1 rounded-sm select-none inline-block">${v[1]}</span> <span class="text-verse leading-loose">${v[2]}</span> </div> `).join(''); return; } else { els.viewText.innerHTML = "<p class='p-8 opacity-50 text-center text-sm'>此章節查無內容。</p>"; return; } } catch(e) { console.error(e); } } else { try { els.readerTitle.innerText = `搜尋: "${ref}"`; els.readerSubtitle.innerText = "Search Result"; const query = `SELECT ${dbCols.book}, ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.text} LIKE ? LIMIT 50`; const res = sqlDb.exec(query, [`%${ref}%`]); if (res.length > 0) { const results = res[0].values; els.viewText.innerHTML = results.map(v => { const highlightedTxt = v[3].replace(new RegExp(ref, 'g'), `<span class="bg-[#FFD500] text-[#333] px-1 font-bold rounded">${ref}</span>`); return ` <div class="verse-item mb-4 p-4 border-2 border-transparent hover:border-gray-200 transition-all cursor-pointer" onclick="this.classList.toggle('selected'); window.updateCopyButton()"> <div class="flex items-center gap-2 mb-2"> <span class="text-[10px] font-bold text-white bg-[#0055BF] px-2 py-1 tracking-wider rounded">${v[0]} ${v[1]}:${v[2]}</span> </div> <span class="text-verse text-[#333] leading-relaxed block">${highlightedTxt}</span> </div> `; }).join(''); return; } else { els.viewText.innerHTML = `<div class="flex flex-col items-center justify-center py-12"><span class="text-4xl mb-4">👾</span><p class="text-lg font-bold">找不到「${ref}」</p></div>`; return; } } catch(e) { console.error(e); } } } if (match && isBookRef) { const book = bookMap[bookKey] || bookKey; const chapter = parseInt(match[2]); const verseData = mockVerses[book]?.[chapter]; els.readerTitle.innerText = `${book} ${chapter}`; els.readerSubtitle.innerText = "Fallback Mode"; if (verseData) { els.viewText.innerHTML = ` <div class="p-3 bg-red-50 text-red-600 rounded mb-4 text-xs font-bold border border-red-200"> ⚠️ 遠端資料庫未連線，僅顯示試閱內容。 </div> ` + Object.keys(verseData).map(vNum => ` <div class="verse-item mb-4" onclick="this.classList.toggle('selected'); window.updateCopyButton()"> <span class="text-xs font-bold text-white bg-[#333] mr-2 px-1 rounded-sm select-none inline-block">${vNum}</span> <span class="text-verse leading-loose">${verseData[vNum]}</span> </div> `).join(''); } else { els.viewText.innerHTML = ` <div class="flex flex-col items-center justify-center py-12 text-center"> <span class="text-4xl mb-4">🔌</span> <p class="text-lg font-bold text-[#333]">資料庫連線中斷</p> <p class="text-sm text-gray-500 mt-2">無法讀取 ${book} 第 ${chapter} 章。<br>請檢查網路連線或稍後再試。</p> </div> `; } } else { els.viewText.innerHTML = ` <div class="flex flex-col items-center justify-center py-12 text-center"> <span class="text-4xl mb-4">⚠️</span> <p class="text-lg font-bold text-[#333]">無法執行搜尋</p> <p class="text-sm text-gray-500 mt-2">資料庫未連線，搜尋功能暫時無法使用。</p> </div> `; } }
+        window.fetchBibleRef = async function(refInput) { const ref = refInput ? refInput.trim() : ""; if(!ref) return; els.viewBooks.classList.add('hidden'); els.viewChapters.classList.add('hidden'); els.viewText.classList.remove('hidden'); els.copyBtn.classList.remove('hidden'); els.backBtn.classList.remove('hidden'); const wrapper = document.getElementById('reader-content-wrapper'); if(wrapper) wrapper.scrollTop = 0; els.viewText.innerHTML = '<div class="flex justify-center py-10"><div class="loader"></div></div>'; const match = ref.match(/^([\u4e00-\u9fa5]+|[a-zA-Z]+)\s*(\d+)(?::(\d+)(?:-(\d+))?)?$/); const bookKey = match ? match[1] : null; const isBookRef = bookKey && (bookMap[bookKey] || bookMap[bookKey.replace("書","")]); if (sqlDbLoaded) { if (match && isBookRef) { const book = bookMap[bookKey] || bookKey; const chapter = parseInt(match[2]); const startV = match[3] ? parseInt(match[3]) : 1; const endV = match[4] ? parseInt(match[4]) : (match[3] ? parseInt(match[3]) : 200); try { const query = `SELECT ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.book} = ? AND ${dbCols.chapter} = ? AND ${dbCols.verse} >= ? AND ${dbCols.verse} <= ?`; const res = sqlDb.exec(query, [book, chapter, startV, endV]); if (res.length > 0) { els.readerTitle.innerText = `${book} ${chapter}`; els.readerSubtitle.innerText = "Scripture"; els.viewText.innerHTML = res[0].values.map(v => ` <div class="verse-item mb-4" onclick="this.classList.toggle('selected'); window.updateCopyButton()"> <span class="text-xs font-bold text-white bg-[#333] mr-2 px-1 rounded-sm select-none inline-block">${v[1]}</span> <span class="text-verse leading-loose">${v[2]}</span> </div> `).join(''); return; } else { els.viewText.innerHTML = "<p class='p-8 opacity-50 text-center text-sm'>此章節查無內容。</p>"; return; } } catch(e) { console.error(e); } } else { try { els.readerTitle.innerText = `搜尋: "${ref}"`; els.readerSubtitle.innerText = "Search Result"; const query = `SELECT ${dbCols.book}, ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.text} LIKE ? LIMIT 50`; const res = sqlDb.exec(query, [`%${ref}%`]); if (res.length > 0) { const results = res[0].values; els.viewText.innerHTML = results.map(v => { const highlightedTxt = v[3].replace(new RegExp(ref, 'g'), `<span class="bg-[#FFD500] text-[#333] px-1 font-bold rounded">${ref}</span>`); return ` <div class="verse-item mb-4 p-4 border-2 border-transparent hover:border-gray-200 transition-all cursor-pointer" onclick="this.classList.toggle('selected'); window.updateCopyButton()"> <div class="flex items-center gap-2 mb-2"> <span class="text-[10px] font-bold text-white bg-[#0055BF] px-2 py-1 tracking-wider rounded">${v[0]} ${v[1]}:${v[2]}</span> </div> <span class="text-verse text-[#333] leading-relaxed block">${highlightedTxt}</span> </div> `; }).join(''); return; } else { els.viewText.innerHTML = `<div class="flex flex-col items-center justify-center py-12"><span class="text-4xl mb-4">👾</span><p class="text-lg font-bold">找不到「${ref}」</p></div>`; return; } } catch(e) { console.error(e); } } } if (match && isBookRef) { const book = bookMap[bookKey] || bookKey; const chapter = parseInt(match[2]); const verseData = mockVerses[book]?.[chapter]; els.readerTitle.innerText = `${book} ${chapter}`; els.readerSubtitle.innerText = "Fallback Mode"; if (verseData) { els.viewText.innerHTML = ` <div class="p-3 bg-red-50 text-red-600 rounded mb-4 text-xs font-bold border border-red-200"> ⚠️ 遠端資料庫未連線，僅顯示試閱內容。 </div> ` + Object.keys(verseData).map(vNum => ` <div class="verse-item mb-4" onclick="this.classList.toggle('selected'); window.updateCopyButton()"> <span class="text-xs font-bold text-white bg-[#333] mr-2 px-1 rounded-sm select-none inline-block">${vNum}</span> <span class="text-verse leading-loose">${verseData[vNum]}</span> </div> `).join(''); } else { els.viewText.innerHTML = ` <div class="flex flex-col items-center justify-center py-12 text-center"> <span class="text-4xl mb-4">🔌</span> <p class="text-lg font-bold text-[#333]">資料庫連線中斷</p> <p class="text-sm text-gray-500 mt-2">無法讀取 ${book} 第 ${chapter} 章。<br>請檢查網路連線或稍後再試。</p> </div> `; } } else { els.viewText.innerHTML = ` <div class="flex flex-col items-center justify-center py-12 text-center"> <span class="text-4xl mb-4">⚠️</span> <p class="text-lg font-bold text-[#333]">無法執行搜尋</p> <p class="text-sm text-gray-500 mt-2">資料庫未連線，搜尋功能暫時無法使用。</p> </div> `; } }
         window.updateDevotionUI = function() { const start = new Date(calendarDate.getFullYear(), 0, 0); const diff = calendarDate - start; const dayOfYear = Math.floor(diff / 86400000); let progressTexts = []; const container = document.getElementById('devotion-tabs'); container.innerHTML = planTracks.map((track, idx) => { const totalChapters = track.books.reduce((a,b)=>a+b.c, 0); const chapterIdx = Math.floor((dayOfYear % totalChapters)) || 1; let currentCount = 0, targetBook = track.books[0], targetChapter = 1; for(let b of track.books) { if (currentCount + b.c >= chapterIdx) { targetBook = b; targetChapter = chapterIdx - currentCount; break; } currentCount += b.c; } const ref = `${targetBook.abbr} ${targetChapter}`; progressTexts.push(ref); return ` <div class="devotion-track-card ${idx===0?'active':''}" onclick="window.fetchBibleRef('${ref}'); document.querySelectorAll('.devotion-track-card').forEach(c=>c.classList.remove('active')); this.classList.add('active');"> <span class="track-tag uppercase">${track.t}</span> <span class="track-ref font-mono">${ref}</span> </div> `; }).join(''); const progressField = document.getElementById('note-devotion-progress'); if(progressField) { progressField.value = progressTexts.join(' / '); } const firstRefEl = container.querySelector('.track-ref'); if(firstRefEl) { window.fetchBibleRef(firstRefEl.innerText); } }
         window.switchWorkspaceTab = function(t) { const r = document.getElementById('section-reader'), j = document.getElementById('section-journal'); const tr = document.getElementById('tab-reader'), tj = document.getElementById('tab-journal'); if (t === 'reader') { r.classList.replace('opacity-0', 'opacity-100'); r.classList.replace('z-0', 'z-10'); r.style.pointerEvents = "auto"; j.classList.replace('opacity-100', 'opacity-0'); j.classList.replace('z-10', 'z-0'); j.style.pointerEvents = "none"; tr.classList.add('active'); tj.classList.remove('active'); } else { j.classList.replace('opacity-0', 'opacity-100'); j.classList.replace('z-0', 'z-10'); j.style.pointerEvents = "auto"; r.classList.replace('opacity-100', 'opacity-0'); r.classList.replace('z-10', 'z-0'); r.style.pointerEvents = "none"; tj.classList.add('active'); tr.classList.remove('active'); } }
         window.renderMainBooks = function(t) { els.viewBooks.innerHTML = `<div class="flex gap-4 mb-6 shrink-0"><button onclick="window.renderMainBooks('old')" class="brick-btn btn-yellow flex-1 text-sm">舊約 Old Testament</button><button onclick="window.renderMainBooks('new')" class="brick-btn flex-1 text-sm border-2 border-gray-100">新約 New Testament</button></div>` + `<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 content-start pb-10">` + bibleBooks[t].map(b => `<button class="px-3 py-3 text-sm border-2 border-gray-100 rounded bg-white hover:bg-gray-50 text-left font-bold shadow-[0_3px_0_#ddd] active:translate-y-1 active:shadow-none transition-all" onclick='window.showMainChapters(${JSON.stringify(b)})'>${b.n}</button>`).join('') + `</div>`; }
@@ -1016,7 +952,7 @@
         window.copySelectedVerses = function() { const sel = document.querySelectorAll('.verse-item.selected'); if (sel.length === 0) return; const text = Array.from(sel).map(v => v.innerText.trim()).join('\n'); const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); els.copyBtn.innerHTML = "OK!"; setTimeout(() => { sel.forEach(v=>v.classList.remove('selected')); window.updateCopyButton(); }, 1000); }
         window.backupData = function() { const data = {}; for(let i=0; i<localStorage.length; i++){ const k = localStorage.key(i); if(k.includes('note-')) data[k] = localStorage.getItem(k); } const blob = new Blob([JSON.stringify(data)], {type: 'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `manna-backup-${new Date().toISOString().split('T')[0]}.json`; a.click(); }
         window.restoreData = function(input) { const r = new FileReader(); r.onload = e => { const data = JSON.parse(e.target.result); Object.keys(data).forEach(k => localStorage.setItem(k, data[k])); location.reload(); }; r.readAsText(input.files[0]); }
-        window.calculateStreak = function() { let s = 0, d = new Date(); while(true) { const k = d.toISOString().split('T')[0]; if (localStorage.getItem(`${k}-note-rhema`) || localStorage.getItem(`${k}-note-content`)) { s++; d.setDate(d.getDate()-1); } else break; } els.streakCount.innerText = s; els.streakBadge.classList.toggle('hidden', s === 0); els.streakBadge.classList.add('inline-flex'); }
+        window.calculateStreak = function() { let s = 0, d = new Date(); while(true) { const k = d.toISOString().split('T')[0]; if (localStorage.getItem(`${k}-note-rhema`) || localStorage.getItem(`${k}-note-content`) || localStorage.getItem(`${k}-note-freewrite`) || localStorage.getItem(`${k}-journal-prayer-entries`)) { s++; d.setDate(d.getDate()-1); } else break; } els.streakCount.innerText = s; els.streakBadge.classList.toggle('hidden', s === 0); els.streakBadge.classList.add('inline-flex'); }
 
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
