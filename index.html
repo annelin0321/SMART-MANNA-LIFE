@@ -252,6 +252,7 @@
                     <svg class="w-4 h-4" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                     <span class="text-sm font-bold">備份/匯入</span>
                 </button>
+                <!-- 恢復 Header 日期選擇器 -->
                 <input type="date" id="date-picker" class="border-2 border-[#ddd] rounded px-2 py-1 text-sm font-bold outline-none text-[#333] cursor-pointer" onchange="window.handleDateChange(this.value)">
             </div>
         </div>
@@ -278,6 +279,7 @@
                      <span class="text-xs font-bold">備份/匯入</span>
                 </button>
                 <div class="hidden sm:block">
+                    <!-- 恢復首頁日期選擇器 -->
                     <input type="date" id="home-date-picker" class="bg-white border-2 border-[#ddd] rounded px-4 py-2 text-sm font-bold outline-none shadow-[0_4px_0_#ccc] active:shadow-none active:translate-y-1 transition-all text-[#333]" onchange="window.handleDateChange(this.value)">
                 </div>
             </div>
@@ -487,6 +489,26 @@
                             <label class="block text-sm font-bold text-[#333] mb-2 uppercase tracking-widest pixel-font bg-[#FFD500] w-fit px-2 rounded shadow-sm">📖 Reading</label>
                             <input type="text" id="note-devotion-progress" readonly class="w-full p-3 text-sm text-[#333] font-bold" value="Loading...">
                         </div>
+
+                        <!-- 動態載入的靈修內容 (新增區域 - 整合區塊) -->
+                        <div id="devotion-dynamic-content" class="bg-white p-6 rounded-lg border-2 border-[#eee] shadow-[0_4px_0_rgba(0,0,0,0.05)] space-y-6">
+                            <!-- Title -->
+                            <div>
+                                <div id="devotion-title-display" class="font-bold text-base text-[#333] leading-relaxed">Loading...</div>
+                            </div>
+                            <!-- Text -->
+                            <div>
+                                 <div id="devotion-text-display" class="text-base leading-relaxed text-[#444] whitespace-pre-wrap"></div>
+                            </div>
+                            <!-- Song -->
+                            <div>
+                                 <a id="devotion-song-link" href="#" target="_blank" class="group flex items-center gap-3 p-3 rounded-lg border-2 border-[#F4F6F8] hover:border-[#FFD500] hover:bg-[#FFFDE7] transition-all">
+                                    <div class="w-8 h-8 rounded-full bg-[#eee] group-hover:bg-[#FFD500] flex items-center justify-center text-xs transition-colors">🎧</div>
+                                    <span id="devotion-song-title" class="font-bold text-sm text-[#555] group-hover:text-[#333]">No Song Selected</span>
+                                 </a>
+                            </div>
+                        </div>
+
                         <div>
                             <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#0055BF] w-fit px-2 rounded shadow-sm">✨ Rhema</label>
                             <textarea id="note-rhema" placeholder="記下今天最觸動你的經文..." class="w-full min-h-[80px] resize-none p-3 text-lg leading-relaxed"></textarea>
@@ -667,6 +689,9 @@
 
     <script>
         const REMOTE_DB_URL = "https://raw.githubusercontent.com/annelin0321/bible-zh/main/bible_complete.db";
+        // User provided raw link (using the standard raw domain for better CORS handling)
+        const DEVOTIONALS_URL = "https://raw.githubusercontent.com/annelin0321/witty-bible-data/main/devotionals.json";
+        
         let sqlDb = null, sqlDbLoaded = false, SQL = null, els = {};
         let dbTable = "verses";
         let dbCols = { book: "book", chapter: "chapter", verse: "verse", text: "text" };
@@ -675,6 +700,7 @@
         let currentEditingId = null; 
         let pendingDeleteType = null;
         let pendingDeleteId = null;
+        let devotionalsData = [];
 
         const mannaVerses = [
             { t: "「敬畏耶和華是智慧的開端。」", r: "— 箴言 9:10" },
@@ -730,14 +756,33 @@
                 streakBadge: document.getElementById('streak-badge'),
                 viewBooks: document.getElementById('view-bible-books'),
                 viewChapters: document.getElementById('view-bible-chapters'),
-                viewText: document.getElementById('view-bible-text')
+                viewText: document.getElementById('view-bible-text'),
+                // New elements
+                devotionTitle: document.getElementById('devotion-title-display'),
+                devotionText: document.getElementById('devotion-text-display'),
+                devotionSongTitle: document.getElementById('devotion-song-title'),
+                devotionSongLink: document.getElementById('devotion-song-link')
             };
 
             const now = new Date();
             const todayKey = now.toISOString().split('T')[0];
-            window.handleDateChange(todayKey);
-            window.setAppIcon();
+            
+            // 1. Fetch Devotionals Data
+            try {
+                const res = await fetch(DEVOTIONALS_URL);
+                if(res.ok) {
+                    devotionalsData = await res.json();
+                    if(els.devotionTitle) els.devotionTitle.innerText = "資料載入成功...";
+                } else {
+                    console.warn("Failed to fetch devotionals");
+                    if(els.devotionTitle) els.devotionTitle.innerText = "資料庫連線失敗 (404)";
+                }
+            } catch(e) {
+                console.warn("Devotional fetch error", e);
+                if(els.devotionTitle) els.devotionTitle.innerText = "資料庫連線錯誤";
+            }
 
+            // 2. Load SQLite
             try {
                 if (typeof window.initSqlJs === 'function') {
                     SQL = await window.initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${f}` });
@@ -753,7 +798,10 @@
                 console.warn("DB Load Failed", e);
                 els.inlineSearch.placeholder = "⚠️ 連線失敗";
             }
-
+            
+            // 3. Initial Render
+            window.handleDateChange(todayKey);
+            window.setAppIcon();
             window.renderCalendar();
             window.calculateStreak();
         }
@@ -819,6 +867,10 @@
                     `;
                 });
             }
+        }
+
+        window.editListEntry = function(type, id) {
+            window.showEntryForm(type, id);
         }
 
         window.requestDelete = function(type, id) { pendingDeleteType = type; pendingDeleteId = id; document.getElementById('delete-confirm-modal').classList.remove('hidden'); }
@@ -930,6 +982,74 @@
             document.getElementById('manna-text').innerText = m.t;
             document.getElementById('manna-ref').innerText = m.r;
 
+            // Update Devotional Data Fields
+            if (els.devotionTitle && els.devotionText) {
+                let todayDevotional = null;
+                
+                // 改用隨機邏輯 (忽略日期，改用當日日期作為種子)
+                if (Array.isArray(devotionalsData) && devotionalsData.length > 0) {
+                    // Create a deterministic seed from the date string (YYYY-MM-DD)
+                    // Remove dashes to get a number like 20231027
+                    const seed = parseInt(val.replace(/-/g, ''));
+                    // Use modulo to pick an index
+                    const index = seed % devotionalsData.length;
+                    todayDevotional = devotionalsData[index];
+                }
+                
+                if (todayDevotional) {
+                    // Title
+                    els.devotionTitle.innerText = todayDevotional.title || todayDevotional.Title || "今日主題";
+                    
+                    // Text / Content (Handle Array & HTML)
+                    let content = todayDevotional.text || todayDevotional.Text || todayDevotional.content || todayDevotional.Content || "今日內容";
+                    if (Array.isArray(content)) {
+                        content = content.join('<br><br>');
+                    }
+                    // Replace newlines with <br> if it's a plain string to ensure formatting
+                    if (typeof content === 'string' && !content.includes('<') && content.includes('\n')) {
+                         content = content.replace(/\n/g, '<br>');
+                    }
+                    els.devotionText.innerHTML = content;
+
+                    // Song
+                    let songTitle = todayDevotional.song || todayDevotional.Song;
+                    let songLink = todayDevotional.link || todayDevotional.Link;
+
+                    if (songTitle && songLink) {
+                         els.devotionSongTitle.innerText = songTitle;
+                         els.devotionSongLink.href = songLink;
+                         els.devotionSongLink.classList.remove('opacity-50', 'pointer-events-none');
+                    } else {
+                         els.devotionSongTitle.innerText = "No song today";
+                         els.devotionSongLink.href = "#";
+                         els.devotionSongLink.classList.add('opacity-50', 'pointer-events-none');
+                    }
+
+                    // --- 優先使用資料庫中的讀經與金句 ---
+                    
+                    // 覆蓋今日嗎哪 (如果資料庫有 'manna' 或 'verse')
+                    let dbManna = todayDevotional.manna || todayDevotional.verse;
+                    if (dbManna) {
+                        document.getElementById('manna-text').innerText = dbManna;
+                        document.getElementById('manna-ref').innerText = ""; // 如果金句本身已包含出處，這裡清空；或視資料庫結構調整
+                    }
+
+                    // 覆蓋讀經進度 (如果資料庫有 'reading' 或 'scripture')
+                    let dbReading = todayDevotional.reading || todayDevotional.scripture;
+                    if (dbReading) {
+                        const readingField = document.getElementById('note-devotion-progress');
+                        if (readingField) readingField.value = dbReading;
+                    }
+
+                } else {
+                    els.devotionTitle.innerText = "資料載入中或無內容";
+                    els.devotionText.innerText = "請稍候...";
+                    els.devotionSongTitle.innerText = "---";
+                    els.devotionSongLink.href = "#";
+                    els.devotionSongLink.classList.add('opacity-50', 'pointer-events-none');
+                }
+            }
+
             // 1. 單篇模式
             const singleFields = ['note-rhema', 'note-reflection', 'note-application', 'note-prayer-devotion', 'note-freewrite'];
             singleFields.forEach(f => {
@@ -976,7 +1096,6 @@
             }
         }
 
-        // ... existing helper functions (setAppIcon, detectTableStructure, fetchBibleRef, etc.) ...
         window.setAppIcon = function() { const canvas = document.createElement('canvas'); canvas.width = 192; canvas.height = 192; const ctx = canvas.getContext('2d'); const baseColor = '#FFD500'; const shadowColor = '#ccaa00'; const highlightColor = '#ffe666'; ctx.fillStyle = baseColor; ctx.fillRect(0, 0, 192, 192); ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(0,192); ctx.lineTo(0,0); ctx.lineTo(192,0); ctx.stroke(); ctx.strokeStyle = 'rgba(0,0,0,0.1)'; ctx.beginPath(); ctx.moveTo(0,192); ctx.lineTo(192,192); ctx.lineTo(192,0); ctx.stroke(); const gridSize = 3; const cellSize = 192 / gridSize; const studRadius = 22; for(let row=0; row<gridSize; row++) { for(let col=0; col<gridSize; col++) { const cx = cellSize/2 + col*cellSize; const cy = cellSize/2 + row*cellSize; ctx.beginPath(); ctx.arc(cx + 4, cy + 4, studRadius, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.1)'; ctx.fill(); ctx.beginPath(); ctx.arc(cx, cy + 2, studRadius, 0, Math.PI * 2); ctx.fillStyle = shadowColor; ctx.fill(); const grad = ctx.createLinearGradient(cx - studRadius, cy - studRadius, cx + studRadius, cy + studRadius); grad.addColorStop(0, highlightColor); grad.addColorStop(1, shadowColor); ctx.beginPath(); ctx.arc(cx, cy, studRadius, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill(); ctx.beginPath(); ctx.ellipse(cx - 8, cy - 8, 7, 4, -Math.PI / 4, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.fill(); ctx.beginPath(); ctx.arc(cx, cy, studRadius - 5, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(0,0,0,0.05)'; ctx.lineWidth = 1; ctx.stroke(); }} ctx.save(); ctx.translate(24, 24); ctx.scale(6, 6); ctx.lineWidth = 5.5 / 6; ctx.strokeStyle = '#333333'; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(4, 14); ctx.bezierCurveTo(4, 14, 4, 7, 12, 7); ctx.bezierCurveTo(20, 7, 20, 14, 20, 14); ctx.lineTo(20, 18); ctx.bezierCurveTo(20, 19.1, 19.1, 20, 18, 20); ctx.lineTo(6, 20); ctx.bezierCurveTo(4.9, 20, 4, 19.1, 4, 18); ctx.lineTo(4, 14); ctx.closePath(); ctx.shadowColor = "rgba(255,255,255,0.8)"; ctx.shadowBlur = 0; ctx.shadowOffsetX = 1.5; ctx.shadowOffsetY = 1.5; ctx.stroke(); ctx.shadowColor = "transparent"; ctx.stroke(); ctx.beginPath(); ctx.moveTo(4, 14); ctx.lineTo(20, 14); ctx.stroke(); ctx.beginPath(); ctx.moveTo(9, 11); ctx.bezierCurveTo(9, 11, 9.5, 10, 10.5, 10); ctx.bezierCurveTo(11.5, 10, 12, 11, 12, 11); ctx.stroke(); ctx.beginPath(); ctx.moveTo(13, 11); ctx.bezierCurveTo(13, 11, 13.5, 10, 14.5, 10); ctx.bezierCurveTo(15.5, 10, 16, 11, 16, 11); ctx.stroke(); ctx.restore(); const dataURL = canvas.toDataURL('image/png'); const existingIcons = document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]'); existingIcons.forEach(e => e.remove()); const linkIcon = document.createElement('link'); linkIcon.rel = 'icon'; linkIcon.type = 'image/png'; linkIcon.href = dataURL; document.head.appendChild(linkIcon); const linkApple = document.createElement('link'); linkApple.rel = 'apple-touch-icon'; linkApple.href = dataURL; document.head.appendChild(linkApple); }
         window.detectTableStructure = function() { if(!sqlDb) return; try { const tables = sqlDb.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"); if(tables[0] && tables[0].values.length > 0) { const names = tables[0].values.flat(); dbTable = names.includes('verses') ? 'verses' : (names.includes('bible') ? 'bible' : names[0]); } const cols = sqlDb.exec(`PRAGMA table_info(${dbTable})`); if(cols.length > 0) { const colNames = cols[0].values.map(r => r[1]); if(colNames.includes('content')) dbCols.text = 'content'; else if(colNames.includes('scripture')) dbCols.text = 'scripture'; else if(colNames.includes('text')) dbCols.text = 'text'; if(colNames.includes('book_name')) dbCols.book = 'book_name'; else if(colNames.includes('book')) dbCols.book = 'book'; if(colNames.includes('chapter_number')) dbCols.chapter = 'chapter_number'; else if(colNames.includes('chapter')) dbCols.chapter = 'chapter'; if(colNames.includes('verse_number')) dbCols.verse = 'verse_number'; else if(colNames.includes('verse')) dbCols.verse = 'verse'; } } catch(e) { console.error("Table detection failed", e); } }
         window.fetchBibleRef = async function(refInput) { const ref = refInput ? refInput.trim() : ""; if(!ref) return; els.viewBooks.classList.add('hidden'); els.viewChapters.classList.add('hidden'); els.viewText.classList.remove('hidden'); els.copyBtn.classList.remove('hidden'); els.backBtn.classList.remove('hidden'); const wrapper = document.getElementById('reader-content-wrapper'); if(wrapper) wrapper.scrollTop = 0; els.viewText.innerHTML = '<div class="flex justify-center py-10"><div class="loader"></div></div>'; const match = ref.match(/^([\u4e00-\u9fa5]+|[a-zA-Z]+)\s*(\d+)(?::(\d+)(?:-(\d+))?)?$/); const bookKey = match ? match[1] : null; const isBookRef = bookKey && (bookMap[bookKey] || bookMap[bookKey.replace("書","")]); if (sqlDbLoaded) { if (match && isBookRef) { const book = bookMap[bookKey] || bookKey; const chapter = parseInt(match[2]); const startV = match[3] ? parseInt(match[3]) : 1; const endV = match[4] ? parseInt(match[4]) : (match[3] ? parseInt(match[3]) : 200); try { const query = `SELECT ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.book} = ? AND ${dbCols.chapter} = ? AND ${dbCols.verse} >= ? AND ${dbCols.verse} <= ?`; const res = sqlDb.exec(query, [book, chapter, startV, endV]); if (res.length > 0) { els.readerTitle.innerText = `${book} ${chapter}`; els.readerSubtitle.innerText = "Scripture"; els.viewText.innerHTML = res[0].values.map(v => ` <div class="verse-item mb-4" onclick="this.classList.toggle('selected'); window.updateCopyButton()"> <span class="text-xs font-bold text-white bg-[#333] mr-2 px-1 rounded-sm select-none inline-block">${v[1]}</span> <span class="text-verse leading-loose">${v[2]}</span> </div> `).join(''); return; } else { els.viewText.innerHTML = "<p class='p-8 opacity-50 text-center text-sm'>此章節查無內容。</p>"; return; } } catch(e) { console.error(e); } } else { try { els.readerTitle.innerText = `搜尋: "${ref}"`; els.readerSubtitle.innerText = "Search Result"; const query = `SELECT ${dbCols.book}, ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.text} LIKE ? LIMIT 50`; const res = sqlDb.exec(query, [`%${ref}%`]); if (res.length > 0) { const results = res[0].values; els.viewText.innerHTML = results.map(v => { const highlightedTxt = v[3].replace(new RegExp(ref, 'g'), `<span class="bg-[#FFD500] text-[#333] px-1 font-bold rounded">${ref}</span>`); return ` <div class="verse-item mb-4 p-4 border-2 border-transparent hover:border-gray-200 transition-all cursor-pointer" onclick="this.classList.toggle('selected'); window.updateCopyButton()"> <div class="flex items-center gap-2 mb-2"> <span class="text-[10px] font-bold text-white bg-[#0055BF] px-2 py-1 tracking-wider rounded">${v[0]} ${v[1]}:${v[2]}</span> </div> <span class="text-verse text-[#333] leading-relaxed block">${highlightedTxt}</span> </div> `; }).join(''); return; } else { els.viewText.innerHTML = `<div class="flex flex-col items-center justify-center py-12"><span class="text-4xl mb-4">👾</span><p class="text-lg font-bold">找不到「${ref}」</p></div>`; return; } } catch(e) { console.error(e); } } } if (match && isBookRef) { const book = bookMap[bookKey] || bookKey; const chapter = parseInt(match[2]); const verseData = mockVerses[book]?.[chapter]; els.readerTitle.innerText = `${book} ${chapter}`; els.readerSubtitle.innerText = "Fallback Mode"; if (verseData) { els.viewText.innerHTML = ` <div class="p-3 bg-red-50 text-red-600 rounded mb-4 text-xs font-bold border border-red-200"> ⚠️ 遠端資料庫未連線，僅顯示試閱內容。 </div> ` + Object.keys(verseData).map(vNum => ` <div class="verse-item mb-4" onclick="this.classList.toggle('selected'); window.updateCopyButton()"> <span class="text-xs font-bold text-white bg-[#333] mr-2 px-1 rounded-sm select-none inline-block">${vNum}</span> <span class="text-verse leading-loose">${verseData[vNum]}</span> </div> `).join(''); } else { els.viewText.innerHTML = ` <div class="flex flex-col items-center justify-center py-12 text-center"> <span class="text-4xl mb-4">🔌</span> <p class="text-lg font-bold text-[#333]">資料庫連線中斷</p> <p class="text-sm text-gray-500 mt-2">無法讀取 ${book} 第 ${chapter} 章。<br>請檢查網路連線或稍後再試。</p> </div> `; } } else { els.viewText.innerHTML = ` <div class="flex flex-col items-center justify-center py-12 text-center"> <span class="text-4xl mb-4">⚠️</span> <p class="text-lg font-bold text-[#333]">無法執行搜尋</p> <p class="text-sm text-gray-500 mt-2">資料庫未連線，搜尋功能暫時無法使用。</p> </div> `; } }
@@ -986,21 +1105,13 @@
         window.showMainChapters = function(b) { els.viewBooks.classList.add('hidden'); els.viewChapters.classList.remove('hidden'); els.viewText.classList.add('hidden'); els.readerTitle.innerText = b.n; els.readerSubtitle.innerText = "Select Chapter"; els.backBtn.classList.remove('hidden'); els.copyBtn.classList.add('hidden'); document.getElementById('main-chapter-title').innerText = b.n; document.getElementById('main-chapter-grid').innerHTML = Array.from({length:b.c}, (_,i)=> ` <button class="aspect-square border-2 border-gray-100 rounded bg-white hover:bg-[#0055BF] hover:text-white flex items-center justify-center font-bold text-sm shadow-[0_3px_0_#ddd] active:translate-y-1 active:shadow-none transition-all" onclick="window.fetchBibleRef('${b.abbr}${i+1}')">${i+1}</button> `).join(''); }
         window.goBackToMainBooks = function() { if (!els.viewText.classList.contains('hidden')) { els.viewText.classList.add('hidden'); els.viewChapters.classList.add('hidden'); els.viewBooks.classList.remove('hidden'); els.readerTitle.innerText = "Bible Reading"; els.readerSubtitle.innerText = "Select Book"; els.backBtn.classList.add('hidden'); els.copyBtn.classList.add('hidden'); } else { els.viewChapters.classList.add('hidden'); els.viewBooks.classList.remove('hidden'); els.readerTitle.innerText = "Bible Reading"; els.readerSubtitle.innerText = "Select Book"; els.backBtn.classList.add('hidden'); } }
         
-        // 新增：開啟今日嗎哪章節
         window.openMannaChapter = function() {
-            const refText = document.getElementById('manna-ref').innerText; // e.g., "— 箴言 9:10"
+            const refText = document.getElementById('manna-ref').innerText; 
             if (!refText) return;
-            
-            // 1. 去除破折號與空白
             let cleanRef = refText.replace(/^[—\s]+/, '');
-            
-            // 2. 去除冒號後的節數，保留書卷與章節 (例如 "箴言 9:10" -> "箴言 9")
-            // 這樣才能讀取整章，而不只是單節
             if (cleanRef.includes(':')) {
                 cleanRef = cleanRef.split(':')[0];
             }
-
-            // 3. 切換模式並載入
             window.switchMode('bible');
             setTimeout(() => {
                 window.fetchBibleRef(cleanRef);
@@ -1016,26 +1127,24 @@
         window.performSearch = function() { window.fetchBibleRef(els.inlineSearch.value); }
         window.updateCopyButton = function() { const count = document.querySelectorAll('.verse-item.selected').length; els.copyBtn.innerHTML = count > 0 ? `<span class='text-[10px] font-bold'>${count}</span>` : `<svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>`; }
         window.copySelectedVerses = function() { const sel = document.querySelectorAll('.verse-item.selected'); if (sel.length === 0) return; const text = Array.from(sel).map(v => v.innerText.trim()).join('\n'); const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); els.copyBtn.innerHTML = "OK!"; setTimeout(() => { sel.forEach(v=>v.classList.remove('selected')); window.updateCopyButton(); }, 1000); }
-        window.backupData = function() { const data = {}; for(let i=0; i<localStorage.length; i++){ const k = localStorage.key(i); if(k.includes('note-')) data[k] = localStorage.getItem(k); } const blob = new Blob([JSON.stringify(data)], {type: 'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `manna-backup-${new Date().toISOString().split('T')[0]}.json`; a.click(); }
+        window.backupData = function() { const data = {}; for(let i=0; i<localStorage.length; i++){ const k = localStorage.key(i); if(k.includes('note-') || k.includes('-journal-')) data[k] = localStorage.getItem(k); } const blob = new Blob([JSON.stringify(data)], {type: 'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `manna-backup-${new Date().toISOString().split('T')[0]}.json`; a.click(); }
         window.restoreData = function(input) { const r = new FileReader(); r.onload = e => { const data = JSON.parse(e.target.result); Object.keys(data).forEach(k => localStorage.setItem(k, data[k])); location.reload(); }; r.readAsText(input.files[0]); }
         
         window.calculateStreak = function() { 
             let s = 0, d = new Date(); 
             while(true) { 
                 const k = d.toISOString().split('T')[0]; 
-                if (localStorage.getItem(`${k}-note-rhema`) || localStorage.getItem(`${k}-note-content`) || localStorage.getItem(`${k}-note-freewrite`) || localStorage.getItem(`${k}-journal-prayer-entries`)) { 
-                    s++; d.setDate(d.getDate()-1); 
-                } else break; 
+                let hasEntry = false;
+                if (localStorage.getItem(`${k}-note-rhema`) || localStorage.getItem(`${k}-note-content`) || localStorage.getItem(`${k}-note-freewrite`)) hasEntry = true;
+                ['prayer', 'gratitude', 'mood', 'freewrite'].forEach(type => {
+                    const list = localStorage.getItem(`${k}-journal-${type}-entries`);
+                    if (list && JSON.parse(list).length > 0) hasEntry = true;
+                });
+
+                if (hasEntry) { s++; d.setDate(d.getDate()-1); } else break; 
             } 
-            
-            // 安全性修正：檢查 DOM 元素是否存在
-            if (els.streakCount) {
-                els.streakCount.innerText = s; 
-            }
-            if (els.streakBadge) {
-                els.streakBadge.classList.toggle('hidden', s === 0); 
-                els.streakBadge.classList.add('inline-flex'); 
-            }
+            if (els.streakCount) { els.streakCount.innerText = s; }
+            if (els.streakBadge) { els.streakBadge.classList.toggle('hidden', s === 0); els.streakBadge.classList.add('inline-flex'); }
         }
 
         document.addEventListener('DOMContentLoaded', initApp);
