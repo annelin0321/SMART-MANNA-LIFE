@@ -783,6 +783,11 @@
             return entries;
         }
 
+        // New function to handle editing
+        window.editListEntry = function(type, id) {
+            window.showEntryForm(type, id);
+        }
+
         window.renderJournalList = function(type) {
             const listEl = document.getElementById(`list-${type}`);
             const entries = window.getJournalEntries(type);
