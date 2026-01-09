@@ -423,7 +423,7 @@
             <!-- 紫色：時光膠囊 (1 col) -->
             <div onclick="window.openTimeCapsuleModal()" class="real-brick-btn brick-capsule cursor-pointer group h-auto col-span-1">
                 <svg class="w-10 h-10 text-white opacity-90 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
-                    <path d="M12 2v20M2 12h20M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10 10 10 0 0 1-10-10 10 10 0 0 1 10-10z"></path>
+                    <path d="M12 2v20M2 12h20M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10 10 10 0 0 1 10-10z"></path>
                     <circle cx="12" cy="12" r="6"></circle>
                     <path d="M12 8v4l2 2"></path>
                 </svg>
@@ -474,6 +474,281 @@
         </footer>
     </div>
 
+    <!-- 2. 工作區視圖 -->
+    <main id="view-workspace" class="hidden flex-1 w-full max-w-7xl mx-auto flex flex-col h-full overflow-hidden bg-transparent">
+        <div id="workspace-tabs" class="flex border-b-4 border-[#ccc] shrink-0 bg-[#F4F6F8] z-20 px-4 pt-2 gap-1">
+            <button id="tab-reader" class="workspace-tab-btn active" onclick="window.switchWorkspaceTab('reader')">
+                <span class="text-xl mr-1 pixel-font">Read</span> <span id="tab-reader-text">閱讀經文</span>
+            </button>
+            <button id="tab-journal" class="workspace-tab-btn" onclick="window.switchWorkspaceTab('journal')">
+                <span class="text-xl mr-1 pixel-font">Write</span> <span id="tab-journal-text">靈修筆記</span>
+            </button>
+        </div>
+
+        <div class="flex-1 flex overflow-hidden relative p-0 md:p-4 gap-4">
+            <!-- Left: Reader -->
+            <section id="section-reader" class="w-full lg:w-1/2 flex flex-col brick-card rounded-none md:rounded-lg transition-all duration-300 absolute lg:relative inset-0 z-10 lg:z-auto shadow-none md:shadow-[0_6px_0_#E0E0E0,0_12px_10px_rgba(0,0,0,0.1)]">
+                <div id="devotion-tabs" class="hidden grid grid-cols-4 gap-2 p-4 bg-[#F9F9F9] border-b-2 border-gray-100 shrink-0"></div>
+                <div id="reader-universal-header" class="px-5 py-4 border-b-2 border-gray-100 flex justify-between items-center bg-white shrink-0">
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                         <button id="btn-header-back" onclick="window.goBackToMainBooks()" class="hidden shrink-0 w-8 h-8 rounded bg-[#333] text-white flex items-center justify-center text-xs hover:bg-black transition-colors shadow-[0_3px_0_#000] active:shadow-none active:translate-y-1">◀</button>
+                         <div class="min-w-0">
+                             <div class="flex items-center gap-2">
+                                <span id="header-subtitle" class="text-[12px] font-bold text-gray-400 uppercase tracking-widest block pixel-font">Scripture</span>
+                                <button id="btn-copy-progress" onclick="window.copyDevotionProgress()" class="hidden text-[10px] bg-[#333] text-white rounded px-2 py-0.5 hover:bg-black transition-colors leading-tight tracking-wider" title="複製今日進度">複製進度</button>
+                             </div>
+                             <h2 id="header-main-title" class="text-lg text-[#333] font-bold truncate">Bible Reading</h2>
+                         </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                         <form class="relative" id="search-box" onsubmit="event.preventDefault(); window.performSearch();">
+                             <input type="search" id="inline-search" placeholder="Search..." class="pl-3 pr-8 py-1.5 rounded bg-gray-50 text-xs w-28 focus:w-48 transition-all outline-none border-2 border-gray-200 focus:border-[#0055BF]">
+                             <button type="button" onclick="window.performSearch()" class="absolute right-2 top-2 z-10 text-gray-400"><svg class="w-4 h-4" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
+                         </form>
+                         <button id="btn-copy-verses" onclick="window.copySelectedVerses()" class="hidden w-9 h-9 flex items-center justify-center rounded bg-[#FFD500] text-[#333] border-none shadow-[0_3px_0_#ccaa00] active:shadow-none active:translate-y-1 transition-all">
+                            <svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                         </button>
+                    </div>
+                </div>
+                <div id="reader-content-wrapper" class="flex-1 overflow-y-auto relative bg-white">
+                    <div id="view-bible-books" class="hidden flex-col min-h-full p-6">
+                         <div class="flex gap-4 mb-6 shrink-0">
+                            <button onclick="window.renderMainBooks('old')" id="btn-old" class="brick-btn btn-yellow flex-1 py-3 text-sm">舊約 Old Testament</button>
+                            <button onclick="window.renderMainBooks('new')" id="btn-new" class="brick-btn flex-1 py-3 text-sm border-2 border-gray-100">新約 New Testament</button>
+                        </div>
+                        <div id="main-book-list" class="grid grid-cols-2 sm:grid-cols-4 gap-3 content-start pb-10"></div>
+                    </div>
+                    <div id="view-bible-chapters" class="hidden flex-col min-h-full p-6">
+                        <h3 id="main-chapter-title" class="text-3xl font-bold text-[#333] mb-8 border-b-4 border-[#FFD500] w-fit pb-1 px-2"></h3>
+                        <div id="main-chapter-grid" class="grid grid-cols-5 sm:grid-cols-6 gap-3 pb-10"></div>
+                    </div>
+                    <div id="view-bible-text" class="hidden min-h-full p-6 md:p-10 bible-text text-gray-800"></div>
+                </div>
+            </section>
+
+            <!-- Right: Journal -->
+            <section id="section-journal" class="w-full lg:w-1/2 flex flex-col brick-card rounded-none md:rounded-lg transition-all duration-300 absolute lg:relative inset-0 opacity-0 lg:opacity-100 pointer-events-none lg:pointer-events-auto z-0 lg:z-auto shadow-none md:shadow-[0_6px_0_#E0E0E0,0_12px_10px_rgba(0,0,0,0.1)]">
+                <div class="bg-gray-50 px-6 py-4 border-b-2 border-gray-100 flex gap-3 overflow-x-auto no-scrollbar items-center shrink-0">
+                    <button class="mood-sticker" onclick="window.selectMood(this, '☀️')">☀️</button>
+                    <button class="mood-sticker" onclick="window.selectMood(this, '☁️')">☁️</button>
+                    <button class="mood-sticker" onclick="window.selectMood(this, '🌧️')">🌧️</button>
+                    <button class="mood-sticker" onclick="window.selectMood(this, '🔥')">🔥</button>
+                    <button class="mood-sticker" onclick="window.selectMood(this, '🌱')">🌱</button>
+                    <input type="hidden" id="note-mood">
+                </div>
+                <div class="flex-1 overflow-y-auto p-8 space-y-10 pb-20 relative">
+                    
+                    <!-- 靈修筆記 -->
+                    <div id="journal-devotion-fields" class="space-y-8">
+                        <div>
+                            <label class="block text-sm font-bold text-[#333] mb-2 uppercase tracking-widest pixel-font bg-[#FFD500] w-fit px-2 rounded shadow-sm">📖 Reading</label>
+                            <input type="text" id="note-devotion-progress" readonly class="w-full p-3 text-sm text-[#333] font-bold" value="Loading...">
+                        </div>
+
+                        <!-- 動態載入的靈修內容 (新增區域 - 整合區塊) -->
+                        <div id="devotion-dynamic-content" class="bg-white p-6 rounded-lg border-2 border-[#eee] shadow-[0_4px_0_rgba(0,0,0,0.05)] space-y-6">
+                            <!-- Title -->
+                            <div>
+                                <div id="devotion-title-display" class="font-bold text-base text-[#333] leading-relaxed">Loading...</div>
+                            </div>
+                            <!-- Text -->
+                            <div>
+                                 <div id="devotion-text-display" class="text-base leading-relaxed text-[#444] whitespace-pre-wrap"></div>
+                            </div>
+                            <!-- Song -->
+                            <div>
+                                 <a id="devotion-song-link" href="#" target="_blank" class="group flex items-center gap-3 p-3 rounded-lg border-2 border-[#F4F6F8] hover:border-[#FFD500] hover:bg-[#FFFDE7] transition-all">
+                                    <div class="w-8 h-8 rounded-full bg-[#eee] group-hover:bg-[#FFD500] flex items-center justify-center text-xs transition-colors">🎧</div>
+                                    <span id="devotion-song-title" class="font-bold text-sm text-[#555] group-hover:text-[#333]">No Song Selected</span>
+                                 </a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#0055BF] w-fit px-2 rounded shadow-sm">✨ Rhema</label>
+                            <textarea id="note-rhema" placeholder="記下今天最觸動你的經文..." class="w-full min-h-[80px] resize-none p-3 text-lg leading-relaxed"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#008F39] w-fit px-2 rounded shadow-sm">📝 Reflection</label>
+                            <textarea id="note-reflection" placeholder="你的看見、體會，或是天父對你說的話..." class="w-full min-h-[150px] resize-none p-3 text-lg leading-relaxed"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#6D6E71] w-fit px-2 rounded shadow-sm">🌱 Action</label>
+                            <textarea id="note-application" placeholder="具體可以行出來的小練習..." class="w-full min-h-[80px] resize-none p-3 text-lg leading-relaxed"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#E3000B] w-fit px-2 rounded shadow-sm">💌 Response</label>
+                            <textarea id="note-prayer-devotion" placeholder="寫給神的回信..." class="w-full min-h-[100px] resize-none p-3 text-lg leading-relaxed"></textarea>
+                        </div>
+                        <div class="pt-4">
+                            <button onclick="window.saveSingleEntry('devotion')" class="brick-btn btn-blue w-full flex items-center justify-center gap-3">💾 儲存靈修筆記</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 隨便寫 (新功能：改為多篇模式) -->
+                    <div id="journal-freewrite-fields" class="hidden">
+                        <div id="list-freewrite" class="space-y-4 mb-8"></div>
+                        <div id="form-freewrite" class="space-y-8 hidden bg-white p-4 rounded-lg border-2 border-[#eee] mb-8">
+                            <h3 class="font-bold text-lg text-[#FE8A18]">✍️ 新增/編輯隨筆</h3>
+                            <div>
+                                <div class="mb-2 text-sm text-gray-500 font-bold flex items-center gap-2">
+                                     <span class="inline-block w-3 h-3 bg-[#FE8A18] rounded-full"></span>
+                                     Free Write / 隨意塗鴉
+                                </div>
+                                <!-- 橫線筆記本風格 -->
+                                <textarea id="note-freewrite" class="notebook-paper w-full min-h-[300px] leading-relaxed" placeholder="在這裡寫下任何心情、靈感或隨筆..."></textarea>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.saveListEntry('freewrite')" class="brick-btn btn-orange flex-1">儲存</button>
+                                <button onclick="window.hideEntryForm('freewrite')" class="brick-btn flex-1">取消</button>
+                            </div>
+                        </div>
+                        <button id="btn-add-freewrite" onclick="window.showEntryForm('freewrite')" class="brick-btn w-full py-4 text-[#FE8A18] border-2 border-[#FE8A18] hover:bg-[#FE8A18] hover:text-white transition-colors border-dashed flex items-center justify-center gap-2">
+                            <span class="text-2xl font-black">+</span> 新增一則隨筆
+                        </button>
+                    </div>
+
+                    <!-- 跟神聊聊 -->
+                    <div id="journal-prayer-fields" class="hidden">
+                        <div id="list-prayer" class="space-y-4 mb-8"></div>
+                        <div id="form-prayer" class="space-y-8 hidden bg-white p-4 rounded-lg border-2 border-[#eee] mb-8">
+                            <h3 class="font-bold text-lg text-[#008F39]">✍️ 新增/編輯禱告</h3>
+                            <div>
+                                <label class="block text-sm font-bold text-[#333] mb-2 uppercase tracking-widest pixel-font bg-[#FFD500] w-fit px-2 rounded shadow-sm">🎯 Wish</label>
+                                <textarea id="note-topic" placeholder="想要什麼？大膽跟神求..." class="w-full min-h-[60px] resize-none p-3 text-lg leading-relaxed"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#0055BF] w-fit px-2 rounded shadow-sm">💬 Murmur</label>
+                                <textarea id="note-content" placeholder="把心裡話都倒出來吧..." class="w-full min-h-[200px] resize-none p-3 text-lg leading-relaxed"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#008F39] w-fit px-2 rounded shadow-sm">👣 Tracking</label>
+                                <textarea id="note-prayer-tracking" placeholder="記錄禱告的成就、進度或應允..." class="w-full min-h-[150px] resize-none p-3 text-lg leading-relaxed"></textarea>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.saveListEntry('prayer')" class="brick-btn btn-green flex-1">儲存</button>
+                                <button onclick="window.hideEntryForm('prayer')" class="brick-btn flex-1">取消</button>
+                            </div>
+                        </div>
+                        <button id="btn-add-prayer" onclick="window.showEntryForm('prayer')" class="brick-btn w-full py-4 text-[#008F39] border-2 border-[#008F39] hover:bg-[#008F39] hover:text-white transition-colors border-dashed flex items-center justify-center gap-2">
+                            <span class="text-2xl font-black">+</span> 新增一則禱告
+                        </button>
+                    </div>
+
+                    <!-- 感恩日記 -->
+                    <div id="journal-gratitude-fields" class="hidden">
+                        <div id="list-gratitude" class="space-y-4 mb-8"></div>
+                        <div id="form-gratitude" class="space-y-8 hidden bg-white p-4 rounded-lg border-2 border-[#eee] mb-8">
+                            <h3 class="font-bold text-lg text-[#FFD500]">✍️ 新增/編輯感恩</h3>
+                            <div>
+                                <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#E3000B] w-fit px-2 rounded shadow-sm">💖 Gratitude</label>
+                                <textarea id="note-thanks" placeholder="今天發生了什麼好事？..." class="w-full min-h-[120px] resize-none p-3 text-lg leading-relaxed"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#008F39] w-fit px-2 rounded shadow-sm">✨ Grace</label>
+                                <textarea id="note-grace" placeholder="哪裡看見神的作為？..." class="w-full min-h-[120px] resize-none p-3 text-lg leading-relaxed"></textarea>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.saveListEntry('gratitude')" class="brick-btn btn-yellow flex-1">儲存</button>
+                                <button onclick="window.hideEntryForm('gratitude')" class="brick-btn flex-1">取消</button>
+                            </div>
+                        </div>
+                        <button id="btn-add-gratitude" onclick="window.showEntryForm('gratitude')" class="brick-btn w-full py-4 text-[#FFD500] border-2 border-[#FFD500] hover:bg-[#FFD500] hover:text-[#333] transition-colors border-dashed flex items-center justify-center gap-2">
+                            <span class="text-2xl font-black">+</span> 新增一則感恩
+                        </button>
+                    </div>
+
+                    <!-- 內心戲 -->
+                    <div id="journal-mood-fields" class="hidden">
+                        <div id="list-mood" class="space-y-4 mb-8"></div>
+                        <div id="form-mood" class="space-y-8 hidden bg-white p-4 rounded-lg border-2 border-[#eee] mb-8">
+                            <h3 class="font-bold text-lg text-[#E3000B]">✍️ 新增/編輯內心戲</h3>
+                            <div class="p-5 bg-[#FAFAFA] rounded-lg border-2 border-gray-200 border-t-4 border-gray-300">
+                                <label class="block text-base font-bold text-[#333] mb-3 uppercase pixel-font">🎬 Event</label>
+                                <textarea id="note-mood-event" placeholder="記錄事件與感受..." class="w-full bg-white border-2 border-[#ddd] rounded p-4 text-base outline-none resize-none h-28 focus:border-[#FFD500] leading-relaxed shadow-none"></textarea>
+                            </div>
+
+                            <!-- 全方位情緒詞彙庫 -->
+                            <div class="mt-4 mb-4">
+                                <details class="group relative">
+                                    <summary class="brick-btn btn-yellow w-full flex justify-between items-center cursor-pointer list-none select-none">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xl">📖</span>
+                                            <span class="tracking-widest">開啟情緒詞彙庫</span>
+                                        </div>
+                                        <span class="transition-transform group-open:rotate-180">▼</span>
+                                    </summary>
+                                    <div class="mt-3 p-4 bg-white border-2 border-[#eee] rounded-lg h-64 overflow-y-auto custom-scrollbar shadow-inner relative z-10">
+                                        <!-- 正向情緒 -->
+                                        <div class="mb-4">
+                                            <div class="emotion-group-title text-[#F57F17]">
+                                                <span>🌞</span> 正向 / 快樂 (Positive)
+                                            </div>
+                                            <div id="emotion-list-pos"></div>
+                                        </div>
+                                        
+                                        <!-- 中性情緒 -->
+                                        <div class="mb-4">
+                                            <div class="emotion-group-title text-[#616161]">
+                                                <span>😐</span> 中性 / 狀態 (Neutral)
+                                            </div>
+                                            <div id="emotion-list-neu"></div>
+                                        </div>
+                                        
+                                        <!-- 負面情緒 -->
+                                        <div>
+                                            <div class="emotion-group-title text-[#D32F2F]">
+                                                <span>🌧️</span> 負面 / 壓力 (Negative)
+                                            </div>
+                                            <div id="emotion-list-neg"></div>
+                                        </div>
+                                    </div>
+                                </details>
+                            </div>
+
+                            <div>
+                                <label class="block text-lg font-bold text-[#333] mb-2 pixel-font">🏷️ Emotions</label>
+                                <textarea id="note-mood-tags" placeholder="情緒標籤..." class="w-full min-h-[60px] resize-none p-3 text-lg"></textarea>
+                            </div>
+                            <div class="grid grid-cols-1 gap-8">
+                                <div>
+                                    <label class="block text-lg font-bold text-white mb-2 pixel-font bg-[#333] w-fit px-2 rounded">🤥 Lie</label>
+                                    <textarea id="note-mood-lie" placeholder="我相信了什麼謊言..." class="w-full min-h-[50px] resize-none p-3 text-lg"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-lg font-bold text-[#333] mb-2 pixel-font bg-[#FFD500] w-fit px-2 rounded border border-[#ccaa00]">👓 Truth</label>
+                                    <textarea id="note-mood-god-view" placeholder="神的眼光..." class="w-full min-h-[50px] resize-none p-3 text-lg"></textarea>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-lg font-bold text-white mb-2 pixel-font bg-[#0055BF] w-fit px-2 rounded">🙏 Prayer</label>
+                                <textarea id="note-mood-prayer" placeholder="交託與領受..." class="w-full min-h-[100px] resize-none p-3 text-lg leading-relaxed"></textarea>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.saveListEntry('mood')" class="brick-btn btn-red flex-1">儲存</button>
+                                <button onclick="window.hideEntryForm('mood')" class="brick-btn flex-1">取消</button>
+                            </div>
+                        </div>
+                        <button id="btn-add-mood" onclick="window.showEntryForm('mood')" class="brick-btn w-full py-4 text-[#E3000B] border-2 border-[#E3000B] hover:bg-[#E3000B] hover:text-white transition-colors border-dashed flex items-center justify-center gap-2">
+                            <span class="text-2xl font-black">+</span> 新增一則內心戲
+                        </button>
+                    </div>
+
+                    <!-- 底部儲存提示 -->
+                    <div class="mt-10 p-4 bg-[#FFFDE7] border-2 border-[#FFD500] rounded-lg text-center shadow-[0_4px_0_rgba(0,0,0,0.05)]">
+                        <p class="text-sm font-black text-[#F57F17] mb-3 flex items-center justify-center gap-2">
+                            <span class="text-lg">⚠️</span> 資料僅儲存於此瀏覽器
+                        </p>
+                        <button onclick="window.backupData()" class="brick-btn btn-yellow w-full py-3 text-xs flex items-center justify-center gap-2 mb-2">
+                            <span class="text-lg">💾</span> 點此下載備份檔案 (.json)
+                        </button>
+                        <p class="text-[10px] text-[#F9A825] font-bold">請定期備份，以免清除瀏覽器紀錄後資料遺失</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
     <!-- Delete Confirmation Modal -->
     <div id="delete-confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm hidden" onclick="if(event.target===this)window.closeDeleteModal()">
         <div class="bg-white w-full max-w-xs p-6 rounded-lg shadow-[0_12px_0_#ccc] m-4 border-2 border-gray-200" onclick="event.stopPropagation()">
@@ -516,9 +791,10 @@
             
             <div class="space-y-4">
                 <!-- 1. Date Input (Moved to Top) -->
-                <div class="w-full">
+                <!-- Added overflow-hidden wrapper -->
+                <div class="w-full relative overflow-hidden rounded-lg">
                     <label class="block text-sm font-bold text-[#A65AD4] mb-2 uppercase tracking-widest">Delivery Date</label>
-                    <input type="date" id="capsule-target-date" class="w-1/2 p-3 border-2 border-gray-200 rounded-lg focus:border-[#A65AD4] outline-none transition-colors">
+                    <input type="date" id="capsule-target-date" class="w-1/2 p-3 border-2 border-gray-200 rounded-lg focus:border-[#A65AD4] outline-none transition-colors box-border" style="width: 50%;">
                 </div>
                 
                 <!-- 2. Message Input -->
@@ -617,9 +893,9 @@
 
         // 情緒詞彙資料庫
         const emotionData = {
-            pos: ["快樂", "興奮", "滿足", "自信", "驕傲", "樂觀", "感激", "被愛", "安全", "放鬆", "期待", "熱情", "勇敢", "釋放", "愉悅", "敬畏", "親密", "充滿希望"],
-            neu: ["平靜", "專注", "好奇", "驚訝", "困惑", "猶豫", "沉思", "麻木", "疲憊", "忙碌", "冷靜", "複雜"],
-            neg: ["悲傷", "沮喪", "失望", "孤單", "絕望", "無助", "受傷", "遺憾", "內疚", "羞愧", "憤怒", "煩躁", "嫉妒", "厭惡", "恐懼", "焦慮", "緊張", "壓力", "驚恐", "不安"]
+            pos: ["快樂", "興奮", "滿足", "自信", "驕傲", "樂觀", "感激", "被愛", "安全", "放鬆", "期待", "熱情", "勇敢", "釋放", "愉悅", "敬畏", "親密", "充滿希望", "平靜", "自在", "感動", "溫暖", "充滿活力", "被接納", "被理解", "有價值", "感恩", "喜悅", "振奮", "踏實", "清爽", "甜蜜", "幸福", "受寵若驚", "有成就感", "受鼓舞", "被支持"],
+            neu: ["平靜", "專注", "好奇", "驚訝", "困惑", "猶豫", "沉思", "麻木", "疲憊", "忙碌", "冷靜", "複雜", "放空", "無聊", "淡定", "隨緣", "觀察中", "不確定", "矛盾", "清醒", "恍惚", "被動", "等待", "平淡", "無感", "意外", "想睡", "空白", "安靜"],
+            neg: ["悲傷", "沮喪", "失望", "孤單", "絕望", "無助", "受傷", "遺憾", "內疚", "羞愧", "憤怒", "煩躁", "嫉妒", "厭惡", "恐懼", "焦慮", "緊張", "壓力", "驚恐", "不安", "委屈", "後悔", "空虛", "迷惘", "心碎", "痛苦", "疲憊不堪", "崩潰", "懷疑", "自卑", "尷尬", "被背叛", "無力", "窒息", "憤恨", "疏離", "挫折", "驚嚇", "懊惱", "沈重", "被忽視", "無奈"]
         };
 
         async function initApp() {
@@ -865,16 +1141,22 @@
 
         window.switchMode = function(m) {
             currentMode = m;
-            els.viewHome.classList.toggle('hidden', m !== 'home');
-            els.viewWorkspace.classList.toggle('hidden', m === 'home');
-            els.mainHeader.classList.toggle('hidden', m === 'home');
+            if (els.viewHome) els.viewHome.classList.toggle('hidden', m !== 'home');
+            if (els.viewWorkspace) els.viewWorkspace.classList.toggle('hidden', m === 'home');
+            if (els.mainHeader) els.mainHeader.classList.toggle('hidden', m === 'home');
+            
             const isDevotion = m === 'devotion';
             const isPureJournal = ['journal-prayer','journal-gratitude','journal-mood','journal-freewrite'].includes(m);
             const isBible = m === 'bible';
 
-            document.getElementById('workspace-tabs').classList.toggle('hidden', !isDevotion);
-            document.getElementById('devotion-tabs').classList.toggle('hidden', !isDevotion);
-            document.getElementById('search-box').classList.toggle('invisible', !isBible); 
+            const tabEl = document.getElementById('workspace-tabs');
+            if (tabEl) tabEl.classList.toggle('hidden', !isDevotion);
+            
+            const devTabEl = document.getElementById('devotion-tabs');
+            if (devTabEl) devTabEl.classList.toggle('hidden', !isDevotion);
+            
+            const searchBoxEl = document.getElementById('search-box');
+            if (searchBoxEl) searchBoxEl.classList.toggle('invisible', !isBible); 
 
             ['journal-devotion-fields', 'journal-prayer-fields', 'journal-gratitude-fields', 'journal-mood-fields', 'journal-freewrite-fields']
                 .forEach(id => {
@@ -884,26 +1166,43 @@
 
             const readerSec = document.getElementById('section-reader');
             const journalSec = document.getElementById('section-journal');
-            readerSec.classList.remove('hidden', 'lg:w-1/2'); journalSec.classList.remove('hidden', 'lg:w-1/2');
-            readerSec.classList.add('w-full'); journalSec.classList.add('w-full');
-            els.backBtn.classList.add('hidden'); els.copyBtn.classList.add('hidden');
-            if (els.btnCopyProgress) els.btnCopyProgress.classList.toggle('hidden', !isDevotion);
+            if(readerSec) {
+                readerSec.classList.remove('hidden', 'lg:w-1/2'); 
+                readerSec.classList.add('w-full');
+            }
+            if(journalSec) {
+                journalSec.classList.remove('hidden', 'lg:w-1/2');
+                journalSec.classList.add('w-full');
+            }
+
+            if(els.backBtn) els.backBtn.classList.add('hidden'); 
+            if(els.copyBtn) els.copyBtn.classList.add('hidden');
+            if(els.btnCopyProgress) els.btnCopyProgress.classList.toggle('hidden', !isDevotion);
 
             if (isDevotion) {
-                readerSec.classList.remove('w-full'); journalSec.classList.remove('w-full');
-                readerSec.classList.add('lg:w-1/2'); journalSec.classList.add('lg:w-1/2');
-                document.getElementById('journal-devotion-fields').classList.remove('hidden');
-                els.headerTitle.innerText = "Daily Devotion"; els.readerTitle.innerText = "Daily Devotion"; els.readerSubtitle.innerText = "Reading Plan";
-                window.updateDevotionUI(); window.switchWorkspaceTab('reader'); 
+                if(readerSec) { readerSec.classList.remove('w-full'); readerSec.classList.add('lg:w-1/2'); }
+                if(journalSec) { journalSec.classList.remove('w-full'); journalSec.classList.add('lg:w-1/2'); }
+                const devFields = document.getElementById('journal-devotion-fields');
+                if(devFields) devFields.classList.remove('hidden');
+                
+                if(els.headerTitle) els.headerTitle.innerText = "Daily Devotion"; 
+                if(els.readerTitle) els.readerTitle.innerText = "Daily Devotion"; 
+                if(els.readerSubtitle) els.readerSubtitle.innerText = "Reading Plan";
+                window.updateDevotionUI(); 
+                window.switchWorkspaceTab('reader'); 
             } else if (isBible) {
-                journalSec.classList.add('hidden'); els.headerTitle.innerText = "Bible Reading"; els.readerTitle.innerText = "Bible Reading"; els.readerSubtitle.innerText = "Select Book";
+                if(journalSec) journalSec.classList.add('hidden'); 
+                if(els.headerTitle) els.headerTitle.innerText = "Bible Reading"; 
+                if(els.readerTitle) els.readerTitle.innerText = "Bible Reading"; 
+                if(els.readerSubtitle) els.readerSubtitle.innerText = "Select Book";
                 window.renderMainBooks('old'); window.goBackToMainBooks(); window.switchWorkspaceTab('reader'); 
             } else if (isPureJournal) {
-                readerSec.classList.add('hidden'); 
+                if(readerSec) readerSec.classList.add('hidden'); 
                 const map = {'journal-prayer':'Prayer Journal','journal-gratitude':'Gratitude','journal-mood':'Mood Diary', 'journal-freewrite': 'Free Write'};
                 const fieldMap = {'journal-prayer':'journal-prayer-fields','journal-gratitude':'journal-gratitude-fields','journal-mood':'journal-mood-fields', 'journal-freewrite':'journal-freewrite-fields'};
-                els.headerTitle.innerText = map[m];
-                document.getElementById(fieldMap[m]).classList.remove('hidden');
+                if(els.headerTitle) els.headerTitle.innerText = map[m];
+                const targetField = document.getElementById(fieldMap[m]);
+                if(targetField) targetField.classList.remove('hidden');
                 window.switchWorkspaceTab('journal'); 
             }
         }
@@ -1042,11 +1341,154 @@
         window.setAppIcon = function() { const canvas = document.createElement('canvas'); canvas.width = 192; canvas.height = 192; const ctx = canvas.getContext('2d'); const baseColor = '#FFD500'; const shadowColor = '#ccaa00'; const highlightColor = '#ffe666'; ctx.fillStyle = baseColor; ctx.fillRect(0, 0, 192, 192); ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(0,192); ctx.lineTo(0,0); ctx.lineTo(192,0); ctx.stroke(); ctx.strokeStyle = 'rgba(0,0,0,0.1)'; ctx.beginPath(); ctx.moveTo(0,192); ctx.lineTo(192,192); ctx.lineTo(192,0); ctx.stroke(); const gridSize = 3; const cellSize = 192 / gridSize; const studRadius = 22; for(let row=0; row<gridSize; row++) { for(let col=0; col<gridSize; col++) { const cx = cellSize/2 + col*cellSize; const cy = cellSize/2 + row*cellSize; ctx.beginPath(); ctx.arc(cx + 4, cy + 4, studRadius, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.1)'; ctx.fill(); ctx.beginPath(); ctx.arc(cx, cy + 2, studRadius, 0, Math.PI * 2); ctx.fillStyle = shadowColor; ctx.fill(); const grad = ctx.createLinearGradient(cx - studRadius, cy - studRadius, cx + studRadius, cy + studRadius); grad.addColorStop(0, highlightColor); grad.addColorStop(1, shadowColor); ctx.beginPath(); ctx.arc(cx, cy, studRadius, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill(); ctx.beginPath(); ctx.ellipse(cx - 8, cy - 8, 7, 4, -Math.PI / 4, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.fill(); ctx.beginPath(); ctx.arc(cx, cy, studRadius - 5, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(0,0,0,0.05)'; ctx.lineWidth = 1; ctx.stroke(); }} ctx.save(); ctx.translate(24, 24); ctx.scale(6, 6); ctx.lineWidth = 5.5 / 6; ctx.strokeStyle = '#333333'; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(4, 14); ctx.bezierCurveTo(4, 14, 4, 7, 12, 7); ctx.bezierCurveTo(20, 7, 20, 14, 20, 14); ctx.lineTo(20, 18); ctx.bezierCurveTo(20, 19.1, 19.1, 20, 18, 20); ctx.lineTo(6, 20); ctx.bezierCurveTo(4.9, 20, 4, 19.1, 4, 18); ctx.lineTo(4, 14); ctx.closePath(); ctx.shadowColor = "rgba(255,255,255,0.8)"; ctx.shadowBlur = 0; ctx.shadowOffsetX = 1.5; ctx.shadowOffsetY = 1.5; ctx.stroke(); ctx.shadowColor = "transparent"; ctx.stroke(); ctx.beginPath(); ctx.moveTo(4, 14); ctx.lineTo(20, 14); ctx.stroke(); ctx.beginPath(); ctx.moveTo(9, 11); ctx.bezierCurveTo(9, 11, 9.5, 10, 10.5, 10); ctx.bezierCurveTo(11.5, 10, 12, 11, 12, 11); ctx.stroke(); ctx.beginPath(); ctx.moveTo(13, 11); ctx.bezierCurveTo(13, 11, 13.5, 10, 14.5, 10); ctx.bezierCurveTo(15.5, 10, 16, 11, 16, 11); ctx.stroke(); ctx.restore(); const dataURL = canvas.toDataURL('image/png'); const existingIcons = document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]'); existingIcons.forEach(e => e.remove()); const linkIcon = document.createElement('link'); linkIcon.rel = 'icon'; linkIcon.type = 'image/png'; linkIcon.href = dataURL; document.head.appendChild(linkIcon); const linkApple = document.createElement('link'); linkApple.rel = 'apple-touch-icon'; linkApple.href = dataURL; document.head.appendChild(linkApple); }
         window.detectTableStructure = function() { if(!sqlDb) return; try { const tables = sqlDb.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"); if(tables[0] && tables[0].values.length > 0) { const names = tables[0].values.flat(); dbTable = names.includes('verses') ? 'verses' : (names.includes('bible') ? 'bible' : names[0]); } const cols = sqlDb.exec(`PRAGMA table_info(${dbTable})`); if(cols.length > 0) { const colNames = cols[0].values.map(r => r[1]); if(colNames.includes('content')) dbCols.text = 'content'; else if(colNames.includes('scripture')) dbCols.text = 'scripture'; else if(colNames.includes('text')) dbCols.text = 'text'; if(colNames.includes('book_name')) dbCols.book = 'book_name'; else if(colNames.includes('book')) dbCols.book = 'book'; if(colNames.includes('chapter_number')) dbCols.chapter = 'chapter_number'; else if(colNames.includes('chapter')) dbCols.chapter = 'chapter'; if(colNames.includes('verse_number')) dbCols.verse = 'verse_number'; else if(colNames.includes('verse')) dbCols.verse = 'verse'; } } catch(e) { console.error("Table detection failed", e); } }
         window.fetchBibleRef = async function(refInput) { const ref = refInput ? refInput.trim() : ""; if(!ref) return; els.viewBooks.classList.add('hidden'); els.viewChapters.classList.add('hidden'); els.viewText.classList.remove('hidden'); els.copyBtn.classList.remove('hidden'); els.backBtn.classList.remove('hidden'); const wrapper = document.getElementById('reader-content-wrapper'); if(wrapper) wrapper.scrollTop = 0; els.viewText.innerHTML = '<div class="flex justify-center py-10"><div class="loader"></div></div>'; const match = ref.match(/^([\u4e00-\u9fa5]+|[a-zA-Z]+)\s*(\d+)(?::(\d+)(?:-(\d+))?)?$/); const bookKey = match ? match[1] : null; const isBookRef = bookKey && (bookMap[bookKey] || bookMap[bookKey.replace("書","")]); if (sqlDbLoaded) { if (match && isBookRef) { const book = bookMap[bookKey] || bookKey; const chapter = parseInt(match[2]); const startV = match[3] ? parseInt(match[3]) : 1; const endV = match[4] ? parseInt(match[4]) : (match[3] ? parseInt(match[3]) : 200); try { const query = `SELECT ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.book} = ? AND ${dbCols.chapter} = ? AND ${dbCols.verse} >= ? AND ${dbCols.verse} <= ?`; const res = sqlDb.exec(query, [book, chapter, startV, endV]); if (res.length > 0) { els.readerTitle.innerText = `${book} ${chapter}`; els.readerSubtitle.innerText = "Scripture"; els.viewText.innerHTML = res[0].values.map(v => ` <div class="verse-item mb-4" onclick="this.classList.toggle('selected'); window.updateCopyButton()"> <span class="text-xs font-bold text-white bg-[#333] mr-2 px-1 rounded-sm select-none inline-block">${v[1]}</span> <span class="text-verse leading-loose">${v[2]}</span> </div> `).join(''); return; } else { els.viewText.innerHTML = "<p class='p-8 opacity-50 text-center text-sm'>此章節查無內容。</p>"; return; } } catch(e) { console.error(e); } } else { try { els.readerTitle.innerText = `搜尋: "${ref}"`; els.readerSubtitle.innerText = "Search Result"; const query = `SELECT ${dbCols.book}, ${dbCols.chapter}, ${dbCols.verse}, ${dbCols.text} FROM ${dbTable} WHERE ${dbCols.text} LIKE ? LIMIT 50`; const res = sqlDb.exec(query, [`%${ref}%`]); if (res.length > 0) { const results = res[0].values; els.viewText.innerHTML = results.map(v => { const highlightedTxt = v[3].replace(new RegExp(ref, 'g'), `<span class="bg-[#FFD500] text-[#333] px-1 font-bold rounded">${ref}</span>`); return ` <div class="verse-item mb-4 p-4 border-2 border-transparent hover:border-gray-200 transition-all cursor-pointer" onclick="this.classList.toggle('selected'); window.updateCopyButton()"> <div class="flex items-center gap-2 mb-2"> <span class="text-[10px] font-bold text-white bg-[#0055BF] px-2 py-1 tracking-wider rounded">${v[0]} ${v[1]}:${v[2]}</span> </div> <span class="text-verse text-[#333] leading-relaxed block">${highlightedTxt}</span> </div> `; }).join(''); return; } else { els.viewText.innerHTML = `<div class="flex flex-col items-center justify-center py-12"><span class="text-4xl mb-4">👾</span><p class="text-lg font-bold">找不到「${ref}」</p></div>`; return; } } catch(e) { console.error(e); } } } if (match && isBookRef) { const book = bookMap[bookKey] || bookKey; const chapter = parseInt(match[2]); const verseData = mockVerses[book]?.[chapter]; els.readerTitle.innerText = `${book} ${chapter}`; els.readerSubtitle.innerText = "Fallback Mode"; if (verseData) { els.viewText.innerHTML = ` <div class="p-3 bg-red-50 text-red-600 rounded mb-4 text-xs font-bold border border-red-200"> ⚠️ 遠端資料庫未連線，僅顯示試閱內容。 </div> ` + Object.keys(verseData).map(vNum => ` <div class="verse-item mb-4" onclick="this.classList.toggle('selected'); window.updateCopyButton()"> <span class="text-xs font-bold text-white bg-[#333] mr-2 px-1 rounded-sm select-none inline-block">${vNum}</span> <span class="text-verse leading-loose">${verseData[vNum]}</span> </div> `).join(''); } else { els.viewText.innerHTML = ` <div class="flex flex-col items-center justify-center py-12 text-center"> <span class="text-4xl mb-4">🔌</span> <p class="text-lg font-bold text-[#333]">資料庫連線中斷</p> <p class="text-sm text-gray-500 mt-2">無法讀取 ${book} 第 ${chapter} 章。<br>請檢查網路連線或稍後再試。</p> </div> `; } } else { els.viewText.innerHTML = ` <div class="flex flex-col items-center justify-center py-12 text-center"> <span class="text-4xl mb-4">⚠️</span> <p class="text-lg font-bold text-[#333]">無法執行搜尋</p> <p class="text-sm text-gray-500 mt-2">資料庫未連線，搜尋功能暫時無法使用。</p> </div> `; } }
-        window.updateDevotionUI = function() { const start = new Date(calendarDate.getFullYear(), 0, 0); const diff = calendarDate - start; const dayOfYear = Math.floor(diff / 86400000); let progressTexts = []; const container = document.getElementById('devotion-tabs'); container.innerHTML = planTracks.map((track, idx) => { const totalChapters = track.books.reduce((a,b)=>a+b.c, 0); const chapterIdx = Math.floor((dayOfYear % totalChapters)) || 1; let currentCount = 0, targetBook = track.books[0], targetChapter = 1; for(let b of track.books) { if (currentCount + b.c >= chapterIdx) { targetBook = b; targetChapter = chapterIdx - currentCount; break; } currentCount += b.c; } const ref = `${targetBook.abbr} ${targetChapter}`; progressTexts.push(ref); return ` <div class="devotion-track-card ${idx===0?'active':''}" onclick="window.fetchBibleRef('${ref}'); document.querySelectorAll('.devotion-track-card').forEach(c=>c.classList.remove('active')); this.classList.add('active');"> <span class="track-tag uppercase">${track.t}</span> <span class="track-ref font-mono">${ref}</span> </div> `; }).join(''); const progressField = document.getElementById('note-devotion-progress'); if(progressField) { progressField.value = progressTexts.join(' / '); } const firstRefEl = container.querySelector('.track-ref'); if(firstRefEl) { window.fetchBibleRef(firstRefEl.innerText); } }
-        window.switchWorkspaceTab = function(t) { const r = document.getElementById('section-reader'), j = document.getElementById('section-journal'); const tr = document.getElementById('tab-reader'), tj = document.getElementById('tab-journal'); if (t === 'reader') { r.classList.replace('opacity-0', 'opacity-100'); r.classList.replace('z-0', 'z-10'); r.style.pointerEvents = "auto"; j.classList.replace('opacity-100', 'opacity-0'); j.classList.replace('z-10', 'z-0'); j.style.pointerEvents = "none"; tr.classList.add('active'); tj.classList.remove('active'); } else { j.classList.replace('opacity-0', 'opacity-100'); j.classList.replace('z-0', 'z-10'); j.style.pointerEvents = "auto"; r.classList.replace('opacity-100', 'opacity-0'); r.classList.replace('z-10', 'z-0'); r.style.pointerEvents = "none"; tj.classList.add('active'); tr.classList.remove('active'); } }
-        window.renderMainBooks = function(t) { els.viewBooks.innerHTML = `<div class="flex gap-4 mb-6 shrink-0"><button onclick="window.renderMainBooks('old')" class="brick-btn btn-yellow flex-1 text-sm">舊約 Old Testament</button><button onclick="window.renderMainBooks('new')" class="brick-btn flex-1 text-sm border-2 border-gray-100">新約 New Testament</button></div>` + `<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 content-start pb-10">` + bibleBooks[t].map(b => `<button class="px-3 py-3 text-sm border-2 border-gray-100 rounded bg-white hover:bg-gray-50 text-left font-bold shadow-[0_3px_0_#ddd] active:translate-y-1 active:shadow-none transition-all" onclick='window.showMainChapters(${JSON.stringify(b)})'>${b.n}</button>`).join('') + `</div>`; }
-        window.showMainChapters = function(b) { els.viewBooks.classList.add('hidden'); els.viewChapters.classList.remove('hidden'); els.viewText.classList.add('hidden'); els.readerTitle.innerText = b.n; els.readerSubtitle.innerText = "Select Chapter"; els.backBtn.classList.remove('hidden'); els.copyBtn.classList.add('hidden'); document.getElementById('main-chapter-title').innerText = b.n; document.getElementById('main-chapter-grid').innerHTML = Array.from({length:b.c}, (_,i)=> ` <button class="aspect-square border-2 border-gray-100 rounded bg-white hover:bg-[#0055BF] hover:text-white flex items-center justify-center font-bold text-sm shadow-[0_3px_0_#ddd] active:translate-y-1 active:shadow-none transition-all" onclick="window.fetchBibleRef('${b.abbr}${i+1}')">${i+1}</button> `).join(''); }
-        window.goBackToMainBooks = function() { if (!els.viewText.classList.contains('hidden')) { els.viewText.classList.add('hidden'); els.viewChapters.classList.add('hidden'); els.viewBooks.classList.remove('hidden'); els.readerTitle.innerText = "Bible Reading"; els.readerSubtitle.innerText = "Select Book"; els.backBtn.classList.add('hidden'); els.copyBtn.classList.add('hidden'); } else { els.viewChapters.classList.add('hidden'); els.viewBooks.classList.remove('hidden'); els.readerTitle.innerText = "Bible Reading"; els.readerSubtitle.innerText = "Select Book"; els.backBtn.classList.add('hidden'); els.copyBtn.classList.add('hidden'); } }
+        
+        window.updateDevotionUI = function() { 
+            const start = new Date(calendarDate.getFullYear(), 0, 0); 
+            const diff = calendarDate - start; 
+            const dayOfYear = Math.floor(diff / 86400000); 
+            let progressTexts = []; 
+            const container = document.getElementById('devotion-tabs'); 
+            
+            // Fix: Check if container exists
+            if (!container) {
+                console.warn("Element 'devotion-tabs' not found.");
+                return;
+            }
+
+            container.innerHTML = planTracks.map((track, idx) => { 
+                const totalChapters = track.books.reduce((a,b)=>a+b.c, 0); 
+                const chapterIdx = Math.floor((dayOfYear % totalChapters)) || 1; 
+                let currentCount = 0, targetBook = track.books[0], targetChapter = 1; 
+                for(let b of track.books) { 
+                    if (currentCount + b.c >= chapterIdx) { 
+                        targetBook = b; 
+                        targetChapter = chapterIdx - currentCount; 
+                        break; 
+                    } 
+                    currentCount += b.c; 
+                } 
+                const ref = `${targetBook.abbr} ${targetChapter}`; 
+                progressTexts.push(ref); 
+                return ` <div class="devotion-track-card ${idx===0?'active':''}" onclick="window.fetchBibleRef('${ref}'); document.querySelectorAll('.devotion-track-card').forEach(c=>c.classList.remove('active')); this.classList.add('active');"> <span class="track-tag uppercase">${track.t}</span> <span class="track-ref font-mono">${ref}</span> </div> `; 
+            }).join(''); 
+            
+            const progressField = document.getElementById('note-devotion-progress'); 
+            if(progressField) { progressField.value = progressTexts.join(' / '); } 
+            
+            const firstRefEl = container.querySelector('.track-ref'); 
+            if(firstRefEl) { window.fetchBibleRef(firstRefEl.innerText); } 
+        }
+        
+        // FIX: Add safety checks to prevent null reference errors and ensure toggling
+        window.switchWorkspaceTab = function(t) {
+            const r = document.getElementById('section-reader');
+            const j = document.getElementById('section-journal');
+            const tr = document.getElementById('tab-reader');
+            const tj = document.getElementById('tab-journal');
+
+            // Force refetch if elements are missing
+            if (!r || !j || !tr || !tj) {
+                console.warn("Retrying to fetch workspace elements...");
+                // In a real scenario, we might want to wait or check why they are missing.
+                // For now, we return to avoid the crash.
+                return;
+            }
+
+            if (t === 'reader') {
+                // Ensure correct classes are added/removed (no replace dependency)
+                r.classList.remove('opacity-0', 'z-0');
+                r.classList.add('opacity-100', 'z-10');
+                r.style.pointerEvents = "auto";
+                
+                j.classList.remove('opacity-100', 'z-10');
+                j.classList.add('opacity-0', 'z-0');
+                j.style.pointerEvents = "none";
+                
+                tr.classList.add('active');
+                tj.classList.remove('active');
+            } else {
+                j.classList.remove('opacity-0', 'z-0');
+                j.classList.add('opacity-100', 'z-10');
+                j.style.pointerEvents = "auto";
+                
+                r.classList.remove('opacity-100', 'z-10');
+                r.classList.add('opacity-0', 'z-0');
+                r.style.pointerEvents = "none";
+                
+                tj.classList.add('active');
+                tr.classList.remove('active');
+            }
+        }
+        
+        // FIX: Update renderMainBooks to handle missing els
+        window.renderMainBooks = function(t) { 
+            // Fallback to fetch element if els.viewBooks is null (e.g. initial render)
+            let container = els.viewBooks || document.getElementById('view-bible-books');
+            
+            if (!container) {
+                // If still not found, try to fetch again and update global els
+                container = document.getElementById('view-bible-books');
+                if (container) els.viewBooks = container;
+                else {
+                    console.warn("Element 'view-bible-books' not found.");
+                    return;
+                }
+            }
+
+            container.innerHTML = `<div class="flex gap-4 mb-6 shrink-0"><button onclick="window.renderMainBooks('old')" class="brick-btn btn-yellow flex-1 text-sm">舊約 Old Testament</button><button onclick="window.renderMainBooks('new')" class="brick-btn flex-1 text-sm border-2 border-gray-100">新約 New Testament</button></div>` + `<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 content-start pb-10">` + bibleBooks[t].map(b => `<button class="px-3 py-3 text-sm border-2 border-gray-100 rounded bg-white hover:bg-gray-50 text-left font-bold shadow-[0_3px_0_#ddd] active:translate-y-1 active:shadow-none transition-all" onclick='window.showMainChapters(${JSON.stringify(b)})'>${b.n}</button>`).join('') + `</div>`; 
+        }
+        window.showMainChapters = function(b) { 
+             // Ensure elements are available
+             if (!els.viewBooks) els.viewBooks = document.getElementById('view-bible-books');
+             if (!els.viewChapters) els.viewChapters = document.getElementById('view-bible-chapters');
+             if (!els.viewText) els.viewText = document.getElementById('view-bible-text');
+             if (!els.readerTitle) els.readerTitle = document.getElementById('header-main-title');
+             if (!els.readerSubtitle) els.readerSubtitle = document.getElementById('header-subtitle');
+             if (!els.backBtn) els.backBtn = document.getElementById('btn-header-back');
+             if (!els.copyBtn) els.copyBtn = document.getElementById('btn-copy-verses');
+
+             if(els.viewBooks) els.viewBooks.classList.add('hidden'); 
+             if(els.viewChapters) els.viewChapters.classList.remove('hidden'); 
+             if(els.viewText) els.viewText.classList.add('hidden'); 
+             if(els.readerTitle) els.readerTitle.innerText = b.n; 
+             if(els.readerSubtitle) els.readerSubtitle.innerText = "Select Chapter"; 
+             if(els.backBtn) els.backBtn.classList.remove('hidden'); 
+             if(els.copyBtn) els.copyBtn.classList.add('hidden'); 
+             
+             const titleEl = document.getElementById('main-chapter-title');
+             if(titleEl) titleEl.innerText = b.n;
+             
+             const gridEl = document.getElementById('main-chapter-grid');
+             if(gridEl) gridEl.innerHTML = Array.from({length:b.c}, (_,i)=> ` <button class="aspect-square border-2 border-gray-100 rounded bg-white hover:bg-[#0055BF] hover:text-white flex items-center justify-center font-bold text-sm shadow-[0_3px_0_#ddd] active:translate-y-1 active:shadow-none transition-all" onclick="window.fetchBibleRef('${b.abbr}${i+1}')">${i+1}</button> `).join(''); 
+        }
+        window.goBackToMainBooks = function() { 
+            // Fix: Re-fetch elements if they are null
+            const vt = els.viewText || document.getElementById('view-bible-text');
+            const vc = els.viewChapters || document.getElementById('view-bible-chapters');
+            const vb = els.viewBooks || document.getElementById('view-bible-books');
+            const rt = els.readerTitle || document.getElementById('header-main-title');
+            const rs = els.readerSubtitle || document.getElementById('header-subtitle');
+            const bb = els.backBtn || document.getElementById('btn-header-back');
+            const cb = els.copyBtn || document.getElementById('btn-copy-verses');
+
+            if (!vt || !vc || !vb) return;
+
+            if (!vt.classList.contains('hidden')) { 
+                vt.classList.add('hidden'); 
+                vc.classList.add('hidden'); 
+                vb.classList.remove('hidden'); 
+                if(rt) rt.innerText = "Bible Reading"; 
+                if(rs) rs.innerText = "Select Book"; 
+                if(bb) bb.classList.add('hidden'); 
+                if(cb) cb.classList.add('hidden'); 
+            } else { 
+                vc.classList.add('hidden'); 
+                vb.classList.remove('hidden'); 
+                if(rt) rt.innerText = "Bible Reading"; 
+                if(rs) rs.innerText = "Select Book"; 
+                if(bb) bb.classList.add('hidden'); 
+            } 
+        }
         
         window.openMannaChapter = function() {
             const refText = document.getElementById('manna-ref').innerText; 
@@ -1064,6 +1506,17 @@
         window.openTimeCapsuleModal = function() {
             document.getElementById('time-capsule-modal').classList.remove('hidden');
             window.renderCapsuleList(); // Re-render list when opening
+            
+            // Set default date to today for the capsule target date
+            const dateInput = document.getElementById('capsule-target-date');
+            if (dateInput && !dateInput.value) {
+                // Use local time to get correct today's date
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                dateInput.value = `${year}-${month}-${day}`;
+            }
         }
 
         window.closeTimeCapsuleModal = function() {
