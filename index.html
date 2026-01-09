@@ -248,6 +248,24 @@
         
         .chip-neg { background-color: #FFEBEE; color: #D32F2F; border-color: #FFCDD2; }
         .chip-neg:hover { background-color: #FFCDD2; }
+
+        /* 專屬時光信箱積木樣式 */
+        .brick-mailbox-container {
+            background-color: #F3E5F5; /* Light purple base */
+            border: 2px solid #BA68C8; /* Purple border */
+            border-radius: 8px;
+            padding: 1rem;
+            position: relative;
+            box-shadow: 0 4px 0 #AB47BC; /* 3D Shadow */
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+        .brick-mailbox-container::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(rgba(186, 104, 200, 0.15) 20%, transparent 22%); /* Studs effect */
+            background-size: 16px 16px;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden selection:bg-[#FFD500] selection:text-black">
@@ -760,7 +778,7 @@
 
     <!-- Time Capsule Modal -->
     <div id="time-capsule-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm hidden" onclick="if(event.target===this)window.closeTimeCapsuleModal()">
-        <div class="bg-white w-full max-w-md p-6 rounded-lg shadow-[0_12px_0_rgba(0,0,0,0.1)] m-4 border-4 border-[#A65AD4] relative" onclick="event.stopPropagation()">
+        <div class="bg-white w-[90%] max-w-md p-5 md:p-6 rounded-lg shadow-[0_12px_0_rgba(0,0,0,0.1)] m-4 border-4 border-[#A65AD4] relative" onclick="event.stopPropagation()">
             <div class="absolute -top-4 -right-4 w-12 h-12 bg-[#A65AD4] rounded-full flex items-center justify-center shadow-lg text-white text-xl">💊</div>
             <h3 class="text-2xl font-bold mb-1 text-[#333] pixel-font">TIME CAPSULE</h3>
             <p class="text-xs text-gray-500 font-bold mb-6 uppercase tracking-widest">Send a message to the future</p>
@@ -778,13 +796,13 @@
                     <textarea id="capsule-message" class="w-full h-32 p-3 border-2 border-gray-200 rounded-lg focus:border-[#A65AD4] outline-none resize-none transition-colors" placeholder="寫給未來的自己..."></textarea>
                 </div>
 
-                <!-- 3. Mailbox Area (New) -->
-                <div class="border-t-2 border-gray-100 pt-4 mt-2">
-                    <label class="block text-sm font-bold text-[#A65AD4] mb-2 uppercase tracking-widest flex justify-between items-center">
+                <!-- 3. Mailbox Area (Brick Style) -->
+                <div class="brick-mailbox-container">
+                    <label class="block text-sm font-bold text-[#8a40b5] mb-2 uppercase tracking-widest flex justify-between items-center relative z-10">
                         <span>Time Mailbox</span>
-                        <span class="text-xs opacity-50 font-normal normal-case">Click to open arrived letters</span>
+                        <span class="text-xs opacity-70 font-normal normal-case">Click to open arrived letters</span>
                     </label>
-                    <div id="capsule-list" class="max-h-40 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+                    <div id="capsule-list" class="max-h-40 overflow-y-auto space-y-2 pr-1 custom-scrollbar relative z-10">
                         <!-- Items will be injected here -->
                     </div>
                 </div>
