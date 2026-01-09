@@ -815,6 +815,7 @@
             const l = document.getElementById(`list-${type}`);
             const b = document.getElementById(`btn-add-${type}`);
             
+            // Safe guard against null elements
             if(l) l.classList.add('hidden');
             if(b) b.classList.add('hidden');
             if(f) f.classList.remove('hidden');
@@ -834,6 +835,8 @@
             const f = document.getElementById(`form-${type}`);
             const l = document.getElementById(`list-${type}`);
             const b = document.getElementById(`btn-add-${type}`);
+            
+            // Safe guard against null elements
             if(f) f.classList.add('hidden');
             if(l) l.classList.remove('hidden');
             if(b) b.classList.remove('hidden');
@@ -875,7 +878,10 @@
             document.getElementById('search-box').classList.toggle('invisible', !isBible); 
 
             ['journal-devotion-fields', 'journal-prayer-fields', 'journal-gratitude-fields', 'journal-mood-fields', 'journal-freewrite-fields']
-                .forEach(id => document.getElementById(id).classList.add('hidden'));
+                .forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('hidden');
+                });
 
             const readerSec = document.getElementById('section-reader');
             const journalSec = document.getElementById('section-journal');
@@ -991,18 +997,15 @@
 
             // 2. 多篇模式
             ['prayer', 'gratitude', 'mood', 'freewrite'].forEach(type => {
-                window.hideEntryForm(type);
-                window.renderJournalList(type);
+                // Check if elements exist before calling these functions
+                if(document.getElementById(`form-${type}`)) {
+                    window.hideEntryForm(type);
+                    window.renderJournalList(type);
+                }
             });
             
-            // 如果沒有 DB 的 reading，這裡會執行預設邏輯 (在 updateDevotionUI 中)
-            // 但如果 DB 有 reading，我們希望保留它。
-            // 簡單解法：先執行預設，再由上面的 DB 邏輯覆蓋 (因為 handleDateChange 是順序執行的)
-            // 不對，updateDevotionUI 會重繪 DOM。
-            // 所以我們在 updateDevotionUI 之後再檢查一次 DB 覆蓋。
             if(currentMode === 'devotion') {
                 window.updateDevotionUI(); 
-                // Re-apply DB reading if exists (small hack to ensure DB wins)
                 if (todayDevotional && (todayDevotional.reading || todayDevotional.scripture)) {
                      const readingField = document.getElementById('note-devotion-progress');
                      if (readingField) readingField.value = todayDevotional.reading || todayDevotional.scripture;
