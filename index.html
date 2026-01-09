@@ -778,31 +778,32 @@
 
     <!-- Time Capsule Modal -->
     <div id="time-capsule-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm hidden" onclick="if(event.target===this)window.closeTimeCapsuleModal()">
-        <div class="bg-white w-[90%] max-w-md p-5 md:p-6 rounded-lg shadow-[0_12px_0_rgba(0,0,0,0.1)] m-4 border-4 border-[#A65AD4] relative" onclick="event.stopPropagation()">
-            <div class="absolute -top-4 -right-4 w-12 h-12 bg-[#A65AD4] rounded-full flex items-center justify-center shadow-lg text-white text-xl">💊</div>
-            <h3 class="text-2xl font-bold mb-1 text-[#333] pixel-font">TIME CAPSULE</h3>
+        <!-- Added max-h and overflow-y-auto to prevent vertical overflow on small screens -->
+        <div class="bg-white w-[90%] max-w-md p-5 md:p-6 rounded-lg shadow-[0_12px_0_rgba(0,0,0,0.1)] m-4 border-4 border-[#A65AD4] relative max-h-[90vh] overflow-y-auto custom-scrollbar" onclick="event.stopPropagation()">
+            <div class="absolute -top-4 -right-4 w-12 h-12 bg-[#A65AD4] rounded-full flex items-center justify-center shadow-lg text-white text-xl z-20">💊</div>
+            <h3 class="text-2xl font-bold mb-1 text-[#333] pixel-font mt-2">TIME CAPSULE</h3>
             <p class="text-xs text-gray-500 font-bold mb-6 uppercase tracking-widest">Send a message to the future</p>
             
             <div class="space-y-4">
                 <!-- 1. Date Input (Moved to Top) -->
-                <div>
+                <div class="w-full">
                     <label class="block text-sm font-bold text-[#A65AD4] mb-2 uppercase tracking-widest">Delivery Date</label>
-                    <input type="date" id="capsule-target-date" class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-[#A65AD4] outline-none transition-colors">
+                    <input type="date" id="capsule-target-date" class="w-full max-w-full p-3 border-2 border-gray-200 rounded-lg focus:border-[#A65AD4] outline-none transition-colors box-border">
                 </div>
                 
                 <!-- 2. Message Input -->
-                <div>
+                <div class="w-full">
                     <label class="block text-sm font-bold text-[#A65AD4] mb-2 uppercase tracking-widest">Message to Future</label>
-                    <textarea id="capsule-message" class="w-full h-32 p-3 border-2 border-gray-200 rounded-lg focus:border-[#A65AD4] outline-none resize-none transition-colors" placeholder="寫給未來的自己..."></textarea>
+                    <textarea id="capsule-message" class="w-full max-w-full h-32 p-3 border-2 border-gray-200 rounded-lg focus:border-[#A65AD4] outline-none resize-none transition-colors box-border" placeholder="寫給未來的自己..."></textarea>
                 </div>
 
                 <!-- 3. Mailbox Area (Brick Style) -->
-                <div class="brick-mailbox-container">
+                <div class="brick-mailbox-container w-full max-w-full">
                     <label class="block text-sm font-bold text-[#8a40b5] mb-2 uppercase tracking-widest flex justify-between items-center relative z-10">
                         <span>Time Mailbox</span>
-                        <span class="text-xs opacity-70 font-normal normal-case">Click to open arrived letters</span>
+                        <span class="text-xs opacity-70 font-normal normal-case">Click to open</span>
                     </label>
-                    <div id="capsule-list" class="max-h-40 overflow-y-auto space-y-2 pr-1 custom-scrollbar relative z-10">
+                    <div id="capsule-list" class="max-h-40 overflow-y-auto space-y-2 pr-1 custom-scrollbar relative z-10 w-full">
                         <!-- Items will be injected here -->
                     </div>
                 </div>
@@ -810,10 +811,10 @@
             
             <div class="mt-6 flex gap-3">
                 <button onclick="window.saveTimeCapsule()" class="brick-btn btn-purple flex-1 py-3 text-sm flex items-center justify-center gap-2">
-                    <span>🚀</span> 封存 (Seal)
+                    <span>🚀</span> 封存
                 </button>
                 <button onclick="window.closeTimeCapsuleModal()" class="brick-btn flex-1 py-3 text-sm border-2 border-gray-300">
-                    關閉 (Close)
+                    關閉
                 </button>
             </div>
         </div>
@@ -850,6 +851,14 @@
         let pendingDeleteId = null;
         let devotionalsData = [];
 
+        const mannaVerses = [
+            { t: "「敬畏耶和華是智慧的開端。」", r: "— 箴言 9:10" },
+            { t: "「耶和華是我的牧者，我必不致缺乏。」", r: "— 詩篇 23:1" },
+            { t: "「喜樂的心乃是良藥；憂傷的靈使骨枯乾。」", r: "— 箴言 17:22" },
+            { t: "「我靠著那加給我力量的，凡事都能做。」", r: "— 腓立比書 4:13" },
+            { t: "「凡勞苦擔重擔的人可以到我這裡來，我就使你們得安息。」", r: "— 馬太福音 11:28" }
+        ];
+
         const bibleBooks = {
             old: [{n:"創世記",abbr:"創",c:50},{n:"出埃及記",abbr:"出",c:40},{n:"利未記",abbr:"利",c:27},{n:"民數記",abbr:"民",c:36},{n:"申命記",abbr:"申",c:34},{n:"約書亞記",abbr:"書",c:24},{n:"士師記",abbr:"士",c:21},{n:"路得記",abbr:"得",c:4},{n:"撒母耳記上",abbr:"撒上",c:31},{n:"撒母耳記下",abbr:"撒下",c:24},{n:"列王紀上",abbr:"王上",c:22},{n:"列王紀下",abbr:"王下",c:25},{n:"歷代志上",abbr:"代上",c:29},{n:"歷代志下",abbr:"代下",c:36},{n:"以斯拉記",abbr:"拉",c:10},{n:"尼希米記",abbr:"尼",c:13},{n:"以斯帖記",abbr:"斯",c:10},{n:"約伯記",abbr:"伯",c:42},{n:"詩篇",abbr:"詩",c:150},{n:"箴言",abbr:"箴",c:31},{n:"傳道書",abbr:"傳",c:12},{n:"雅歌",abbr:"歌",c:8},{n:"以賽亞書",abbr:"賽",c:66},{n:"耶利米書",abbr:"耶",c:52},{n:"耶利米哀歌",abbr:"哀",c:5},{n:"以西結書",abbr:"結",c:48},{n:"但以理書",abbr:"但",c:12},{n:"何西阿書",abbr:"何",c:14},{n:"約珥書",abbr:"珥",c:3},{n:"阿摩司書",abbr:"摩",c:9},{n:"俄巴底亞書",abbr:"俄",c:1},{n:"約拿書",abbr:"拿",c:4},{n:"彌迦書",abbr:"彌",c:7},{n:"那鴻書",abbr:"鴻",c:3},{n:"哈巴谷書",abbr:"哈",c:3},{n:"西番雅書",abbr:"番",c:3},{n:"哈該書",abbr:"該",c:2},{n:"撒迦利亞書",abbr:"亞",c:14},{n:"瑪拉基書",abbr:"瑪",c:4}],
             new: [{n:"馬太福音",abbr:"太",c:28},{n:"馬可福音",abbr:"可",c:16},{n:"路加福音",abbr:"路",c:24},{n:"約翰福音",abbr:"約",c:21},{n:"使徒行傳",abbr:"徒",c:28},{n:"羅馬書",abbr:"羅",c:16},{n:"哥林多前書",abbr:"林前",c:16},{n:"哥林多後書",abbr:"林後",c:13},{n:"加拉太書",abbr:"加",c:6},{n:"以弗所書",abbr:"弗",c:6},{n:"腓立比書",abbr:"腓",c:4},{n:"歌羅西書",abbr:"西",c:4},{n:"帖撒羅尼迦前書",abbr:"帖前",c:5},{n:"帖撒羅尼迦後書",abbr:"帖後",c:3},{n:"提摩太前書",abbr:"提前",c:6},{n:"提摩太後書",abbr:"提後",c:4},{n:"提多書",abbr:"多",c:3},{n:"腓利門書",abbr:"門",c:1},{n:"希伯來書",abbr:"來",c:13},{n:"雅各書",abbr:"雅",c:5},{n:"彼得前書",abbr:"彼前",c:5},{n:"彼得後書",abbr:"彼後",c:3},{n:"約翰一書",abbr:"約一",c:5},{n:"約翰二書",abbr:"約二",c:1},{n:"約翰三書",abbr:"約三",c:1},{n:"猶大書",abbr:"猶",c:1},{n:"啟示錄",abbr:"啟",c:22}]
@@ -860,14 +869,6 @@
             {t: "新約", books: bibleBooks.new},
             {t: "詩篇", books: [{n:"詩篇",abbr:"詩",c:150}]},
             {t: "箴言", books: [{n:"箴言",abbr:"箴",c:31}]}
-        ];
-
-        const mannaVerses = [
-            { t: "「敬畏耶和華是智慧的開端。」", r: "— 箴言 9:10" },
-            { t: "「耶和華是我的牧者，我必不致缺乏。」", r: "— 詩篇 23:1" },
-            { t: "「喜樂的心乃是良藥；憂傷的靈使骨枯乾。」", r: "— 箴言 17:22" },
-            { t: "「我靠著那加給我力量的，凡事都能做。」", r: "— 腓立比書 4:13" },
-            { t: "「凡勞苦擔重擔的人可以到我這裡來，我就使你們得安息。」", r: "— 馬太福音 11:28" }
         ];
 
         const bookMap = {};
@@ -947,11 +948,13 @@
                     sqlDb = new SQL.Database(new Uint8Array(buffer));
                     sqlDbLoaded = true;
                     window.detectTableStructure();
-                    els.inlineSearch.placeholder = "🔍 搜尋經文...";
+                    // FIX: Add null check
+                    if (els.inlineSearch) els.inlineSearch.placeholder = "🔍 搜尋經文...";
                 } else { throw new Error("SQL.js not loaded"); }
             } catch(e) {
                 console.warn("DB Load Failed", e);
-                els.inlineSearch.placeholder = "⚠️ 連線失敗";
+                // FIX: Add null check
+                if (els.inlineSearch) els.inlineSearch.placeholder = "⚠️ 連線失敗";
             }
             
             // 3. Render Emotion Chart
@@ -1165,25 +1168,31 @@
             if(els.datePicker) els.datePicker.value = val;
             if(els.homeDatePicker) els.homeDatePicker.value = val;
             
-            const daySeed = val.split('-').reduce((a,b)=>a+parseInt(b), 0);
-            const m = mannaVerses[daySeed % mannaVerses.length];
-            document.getElementById('manna-text').innerText = m.t;
-            document.getElementById('manna-ref').innerText = m.r;
+            // --- 優先使用資料庫中的讀經與金句 (若有) ---
+            // 這裡的邏輯是：先取得當天的 devotion，如果有的話，就用它的 manna/reading 覆蓋預設值
+            
+            let todayDevotional = null;
+            if (Array.isArray(devotionalsData) && devotionalsData.length > 0) {
+                 const seed = parseInt(val.replace(/-/g, ''));
+                 const index = seed % devotionalsData.length;
+                 todayDevotional = devotionalsData[index];
+            }
+
+            // 更新今日嗎哪 (如果 DB 有)
+            if (todayDevotional && (todayDevotional.manna || todayDevotional.verse)) {
+                let dbManna = todayDevotional.manna || todayDevotional.verse;
+                document.getElementById('manna-text').innerText = dbManna;
+                document.getElementById('manna-ref').innerText = ""; 
+            } else {
+                // 回退到預設清單
+                const daySeed = val.split('-').reduce((a,b)=>a+parseInt(b), 0);
+                const m = mannaVerses[daySeed % mannaVerses.length];
+                document.getElementById('manna-text').innerText = m.t;
+                document.getElementById('manna-ref').innerText = m.r;
+            }
 
             // Update Devotional Data Fields
             if (els.devotionTitle && els.devotionText) {
-                let todayDevotional = null;
-                
-                // 改用隨機邏輯 (忽略日期，改用當日日期作為種子)
-                if (Array.isArray(devotionalsData) && devotionalsData.length > 0) {
-                    // Create a deterministic seed from the date string (YYYY-MM-DD)
-                    // Remove dashes to get a number like 20231027
-                    const seed = parseInt(val.replace(/-/g, ''));
-                    // Use modulo to pick an index
-                    const index = seed % devotionalsData.length;
-                    todayDevotional = devotionalsData[index];
-                }
-                
                 if (todayDevotional) {
                     // Title
                     els.devotionTitle.innerText = todayDevotional.title || todayDevotional.Title || "今日主題";
@@ -1193,7 +1202,6 @@
                     if (Array.isArray(content)) {
                         content = content.join('<br><br>');
                     }
-                    // Replace newlines with <br> if it's a plain string to ensure formatting
                     if (typeof content === 'string' && !content.includes('<') && content.includes('\n')) {
                          content = content.replace(/\n/g, '<br>');
                     }
@@ -1212,17 +1220,8 @@
                          els.devotionSongLink.href = "#";
                          els.devotionSongLink.classList.add('opacity-50', 'pointer-events-none');
                     }
-
-                    // --- 優先使用資料庫中的讀經與金句 ---
                     
-                    // 覆蓋今日嗎哪 (如果資料庫有 'manna' 或 'verse')
-                    let dbManna = todayDevotional.manna || todayDevotional.verse;
-                    if (dbManna) {
-                        document.getElementById('manna-text').innerText = dbManna;
-                        document.getElementById('manna-ref').innerText = ""; // 如果金句本身已包含出處，這裡清空；或視資料庫結構調整
-                    }
-
-                    // 覆蓋讀經進度 (如果資料庫有 'reading' 或 'scripture')
+                    // 覆蓋讀經進度 (如果 DB 有)
                     let dbReading = todayDevotional.reading || todayDevotional.scripture;
                     if (dbReading) {
                         const readingField = document.getElementById('note-devotion-progress');
@@ -1254,7 +1253,19 @@
                 window.renderJournalList(type);
             });
             
-            if(currentMode === 'devotion') window.updateDevotionUI();
+            // 如果沒有 DB 的 reading，這裡會執行預設邏輯 (在 updateDevotionUI 中)
+            // 但如果 DB 有 reading，我們希望保留它。
+            // 簡單解法：先執行預設，再由上面的 DB 邏輯覆蓋 (因為 handleDateChange 是順序執行的)
+            // 不對，updateDevotionUI 會重繪 DOM。
+            // 所以我們在 updateDevotionUI 之後再檢查一次 DB 覆蓋。
+            if(currentMode === 'devotion') {
+                window.updateDevotionUI(); 
+                // Re-apply DB reading if exists (small hack to ensure DB wins)
+                if (todayDevotional && (todayDevotional.reading || todayDevotional.scripture)) {
+                     const readingField = document.getElementById('note-devotion-progress');
+                     if (readingField) readingField.value = todayDevotional.reading || todayDevotional.scripture;
+                }
+            }
             window.renderCalendar();
         }
 
@@ -1376,15 +1387,15 @@
                 const onClick = isArrived ? `onclick="window.readCapsule(${c.id})"` : '';
 
                 return `
-                    <div class="flex items-center justify-between p-3 rounded-lg border-2 transition-all ${bgClass}" ${onClick}>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xl">${statusIcon}</span>
-                            <div class="flex flex-col">
-                                <span class="font-bold text-sm">To: ${c.targetDate}</span>
-                                <span class="text-[10px] opacity-70">From: ${c.createdDate}</span>
+                    <div class="flex items-center justify-between p-3 rounded-lg border-2 transition-all ${bgClass} w-full" ${onClick}>
+                        <div class="flex items-center gap-2 flex-1 min-w-0">
+                            <span class="text-xl flex-shrink-0">${statusIcon}</span>
+                            <div class="flex flex-col min-w-0 flex-1">
+                                <span class="font-bold text-sm truncate">To: ${c.targetDate}</span>
+                                <span class="text-[10px] opacity-70 truncate">From: ${c.createdDate}</span>
                             </div>
                         </div>
-                        <span class="text-[10px] font-bold uppercase tracking-wider">${isArrived ? 'READ' : 'LOCKED'}</span>
+                        <span class="text-[10px] font-bold uppercase tracking-wider flex-shrink-0 ml-2">${isArrived ? 'READ' : 'LOCKED'}</span>
                     </div>
                 `;
             }).join('');
