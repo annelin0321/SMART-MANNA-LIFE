@@ -227,7 +227,11 @@
         .loader { width: 40px; height: 40px; background-color: var(--lego-yellow); box-shadow: 0 4px 0 var(--lego-yellow-dark); border-radius: 4px; animation: bounce 0.6s infinite alternate; }
         @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
 
-        textarea:not(.notebook-paper), input[type="text"], input[type="date"], input[type="search"], input[type="email"] { background-color: #FAFAFA; border: 2px solid #ddd; border-top: 4px solid #ccc; border-radius: 6px; font-family: 'Noto Sans TC', sans-serif; transition: all 0.2s; }
+        textarea:not(.notebook-paper), input[type="text"], input[type="date"], input[type="search"], input[type="email"] { 
+            background-color: #FAFAFA; border: 2px solid #ddd; border-top: 4px solid #ccc; border-radius: 6px; font-family: 'Noto Sans TC', sans-serif; transition: all 0.2s; 
+            /* Ensure box-sizing is border-box to prevent overflow with w-full */
+            box-sizing: border-box;
+        }
         textarea:not(.notebook-paper):focus, input:focus { outline: none; background-color: white; border-color: var(--lego-blue); border-top-color: var(--lego-blue); }
         
         .badge { background: var(--lego-red); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 0 var(--lego-red-dark); }
@@ -262,8 +266,9 @@
         }
         .brick-mailbox-container::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background-image: radial-gradient(rgba(186, 104, 200, 0.15) 20%, transparent 22%); /* Studs effect */
-            background-size: 16px 16px;
+            background-image: radial-gradient(rgba(186, 104, 200, 0.3) 20%, transparent 22%); /* Studs effect increased visibility */
+            background-size: 20px 20px; /* Slightly larger studs */
+            background-position: 10px 10px;
             pointer-events: none;
         }
     </style>
@@ -469,281 +474,6 @@
         </footer>
     </div>
 
-    <!-- 2. 工作區視圖 -->
-    <main id="view-workspace" class="hidden flex-1 w-full max-w-7xl mx-auto flex flex-col h-full overflow-hidden bg-transparent">
-        <div id="workspace-tabs" class="flex border-b-4 border-[#ccc] shrink-0 bg-[#F4F6F8] z-20 px-4 pt-2 gap-1">
-            <button id="tab-reader" class="workspace-tab-btn active" onclick="window.switchWorkspaceTab('reader')">
-                <span class="text-xl mr-1 pixel-font">Read</span> <span id="tab-reader-text">閱讀經文</span>
-            </button>
-            <button id="tab-journal" class="workspace-tab-btn" onclick="window.switchWorkspaceTab('journal')">
-                <span class="text-xl mr-1 pixel-font">Write</span> <span id="tab-journal-text">靈修筆記</span>
-            </button>
-        </div>
-
-        <div class="flex-1 flex overflow-hidden relative p-0 md:p-4 gap-4">
-            <!-- Left: Reader -->
-            <section id="section-reader" class="w-full lg:w-1/2 flex flex-col brick-card rounded-none md:rounded-lg transition-all duration-300 absolute lg:relative inset-0 z-10 lg:z-auto shadow-none md:shadow-[0_6px_0_#E0E0E0,0_12px_10px_rgba(0,0,0,0.1)]">
-                <div id="devotion-tabs" class="hidden grid grid-cols-4 gap-2 p-4 bg-[#F9F9F9] border-b-2 border-gray-100 shrink-0"></div>
-                <div id="reader-universal-header" class="px-5 py-4 border-b-2 border-gray-100 flex justify-between items-center bg-white shrink-0">
-                    <div class="flex items-center gap-3 flex-1 min-w-0">
-                         <button id="btn-header-back" onclick="window.goBackToMainBooks()" class="hidden shrink-0 w-8 h-8 rounded bg-[#333] text-white flex items-center justify-center text-xs hover:bg-black transition-colors shadow-[0_3px_0_#000] active:shadow-none active:translate-y-1">◀</button>
-                         <div class="min-w-0">
-                             <div class="flex items-center gap-2">
-                                <span id="header-subtitle" class="text-[12px] font-bold text-gray-400 uppercase tracking-widest block pixel-font">Scripture</span>
-                                <button id="btn-copy-progress" onclick="window.copyDevotionProgress()" class="hidden text-[10px] bg-[#333] text-white rounded px-2 py-0.5 hover:bg-black transition-colors leading-tight tracking-wider" title="複製今日進度">複製進度</button>
-                             </div>
-                             <h2 id="header-main-title" class="text-lg text-[#333] font-bold truncate">Bible Reading</h2>
-                         </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                         <form class="relative" id="search-box" onsubmit="event.preventDefault(); window.performSearch();">
-                             <input type="search" id="inline-search" placeholder="Search..." class="pl-3 pr-8 py-1.5 rounded bg-gray-50 text-xs w-28 focus:w-48 transition-all outline-none border-2 border-gray-200 focus:border-[#0055BF]">
-                             <button type="button" onclick="window.performSearch()" class="absolute right-2 top-2 z-10 text-gray-400"><svg class="w-4 h-4" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
-                         </form>
-                         <button id="btn-copy-verses" onclick="window.copySelectedVerses()" class="hidden w-9 h-9 flex items-center justify-center rounded bg-[#FFD500] text-[#333] border-none shadow-[0_3px_0_#ccaa00] active:shadow-none active:translate-y-1 transition-all">
-                            <svg class="w-5 h-5" stroke="currentColor" fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                         </button>
-                    </div>
-                </div>
-                <div id="reader-content-wrapper" class="flex-1 overflow-y-auto relative bg-white">
-                    <div id="view-bible-books" class="hidden flex-col min-h-full p-6">
-                         <div class="flex gap-4 mb-6 shrink-0">
-                            <button onclick="window.renderMainBooks('old')" id="btn-old" class="brick-btn btn-yellow flex-1 py-3 text-sm">舊約 Old Testament</button>
-                            <button onclick="window.renderMainBooks('new')" id="btn-new" class="brick-btn flex-1 py-3 text-sm border-2 border-gray-100">新約 New Testament</button>
-                        </div>
-                        <div id="main-book-list" class="grid grid-cols-2 sm:grid-cols-4 gap-3 content-start pb-10"></div>
-                    </div>
-                    <div id="view-bible-chapters" class="hidden flex-col min-h-full p-6">
-                        <h3 id="main-chapter-title" class="text-3xl font-bold text-[#333] mb-8 border-b-4 border-[#FFD500] w-fit pb-1 px-2"></h3>
-                        <div id="main-chapter-grid" class="grid grid-cols-5 sm:grid-cols-6 gap-3 pb-10"></div>
-                    </div>
-                    <div id="view-bible-text" class="hidden min-h-full p-6 md:p-10 bible-text text-gray-800"></div>
-                </div>
-            </section>
-
-            <!-- Right: Journal -->
-            <section id="section-journal" class="w-full lg:w-1/2 flex flex-col brick-card rounded-none md:rounded-lg transition-all duration-300 absolute lg:relative inset-0 opacity-0 lg:opacity-100 pointer-events-none lg:pointer-events-auto z-0 lg:z-auto shadow-none md:shadow-[0_6px_0_#E0E0E0,0_12px_10px_rgba(0,0,0,0.1)]">
-                <div class="bg-gray-50 px-6 py-4 border-b-2 border-gray-100 flex gap-3 overflow-x-auto no-scrollbar items-center shrink-0">
-                    <button class="mood-sticker" onclick="window.selectMood(this, '☀️')">☀️</button>
-                    <button class="mood-sticker" onclick="window.selectMood(this, '☁️')">☁️</button>
-                    <button class="mood-sticker" onclick="window.selectMood(this, '🌧️')">🌧️</button>
-                    <button class="mood-sticker" onclick="window.selectMood(this, '🔥')">🔥</button>
-                    <button class="mood-sticker" onclick="window.selectMood(this, '🌱')">🌱</button>
-                    <input type="hidden" id="note-mood">
-                </div>
-                <div class="flex-1 overflow-y-auto p-8 space-y-10 pb-20 relative">
-                    
-                    <!-- 靈修筆記 -->
-                    <div id="journal-devotion-fields" class="space-y-8">
-                        <div>
-                            <label class="block text-sm font-bold text-[#333] mb-2 uppercase tracking-widest pixel-font bg-[#FFD500] w-fit px-2 rounded shadow-sm">📖 Reading</label>
-                            <input type="text" id="note-devotion-progress" readonly class="w-full p-3 text-sm text-[#333] font-bold" value="Loading...">
-                        </div>
-
-                        <!-- 動態載入的靈修內容 (新增區域 - 整合區塊) -->
-                        <div id="devotion-dynamic-content" class="bg-white p-6 rounded-lg border-2 border-[#eee] shadow-[0_4px_0_rgba(0,0,0,0.05)] space-y-6">
-                            <!-- Title -->
-                            <div>
-                                <div id="devotion-title-display" class="font-bold text-base text-[#333] leading-relaxed">Loading...</div>
-                            </div>
-                            <!-- Text -->
-                            <div>
-                                 <div id="devotion-text-display" class="text-base leading-relaxed text-[#444] whitespace-pre-wrap"></div>
-                            </div>
-                            <!-- Song -->
-                            <div>
-                                 <a id="devotion-song-link" href="#" target="_blank" class="group flex items-center gap-3 p-3 rounded-lg border-2 border-[#F4F6F8] hover:border-[#FFD500] hover:bg-[#FFFDE7] transition-all">
-                                    <div class="w-8 h-8 rounded-full bg-[#eee] group-hover:bg-[#FFD500] flex items-center justify-center text-xs transition-colors">🎧</div>
-                                    <span id="devotion-song-title" class="font-bold text-sm text-[#555] group-hover:text-[#333]">No Song Selected</span>
-                                 </a>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#0055BF] w-fit px-2 rounded shadow-sm">✨ Rhema</label>
-                            <textarea id="note-rhema" placeholder="記下今天最觸動你的經文..." class="w-full min-h-[80px] resize-none p-3 text-lg leading-relaxed"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#008F39] w-fit px-2 rounded shadow-sm">📝 Reflection</label>
-                            <textarea id="note-reflection" placeholder="你的看見、體會，或是天父對你說的話..." class="w-full min-h-[150px] resize-none p-3 text-lg leading-relaxed"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#6D6E71] w-fit px-2 rounded shadow-sm">🌱 Action</label>
-                            <textarea id="note-application" placeholder="具體可以行出來的小練習..." class="w-full min-h-[80px] resize-none p-3 text-lg leading-relaxed"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#E3000B] w-fit px-2 rounded shadow-sm">💌 Response</label>
-                            <textarea id="note-prayer-devotion" placeholder="寫給神的回信..." class="w-full min-h-[100px] resize-none p-3 text-lg leading-relaxed"></textarea>
-                        </div>
-                        <div class="pt-4">
-                            <button onclick="window.saveSingleEntry('devotion')" class="brick-btn btn-blue w-full flex items-center justify-center gap-3">💾 儲存靈修筆記</button>
-                        </div>
-                    </div>
-                    
-                    <!-- 隨便寫 (新功能：改為多篇模式) -->
-                    <div id="journal-freewrite-fields" class="hidden">
-                        <div id="list-freewrite" class="space-y-4 mb-8"></div>
-                        <div id="form-freewrite" class="space-y-8 hidden bg-white p-4 rounded-lg border-2 border-[#eee] mb-8">
-                            <h3 class="font-bold text-lg text-[#FE8A18]">✍️ 新增/編輯隨筆</h3>
-                            <div>
-                                <div class="mb-2 text-sm text-gray-500 font-bold flex items-center gap-2">
-                                     <span class="inline-block w-3 h-3 bg-[#FE8A18] rounded-full"></span>
-                                     Free Write / 隨意塗鴉
-                                </div>
-                                <!-- 橫線筆記本風格 -->
-                                <textarea id="note-freewrite" class="notebook-paper w-full min-h-[300px] leading-relaxed" placeholder="在這裡寫下任何心情、靈感或隨筆..."></textarea>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="window.saveListEntry('freewrite')" class="brick-btn btn-orange flex-1">儲存</button>
-                                <button onclick="window.hideEntryForm('freewrite')" class="brick-btn flex-1">取消</button>
-                            </div>
-                        </div>
-                        <button id="btn-add-freewrite" onclick="window.showEntryForm('freewrite')" class="brick-btn w-full py-4 text-[#FE8A18] border-2 border-[#FE8A18] hover:bg-[#FE8A18] hover:text-white transition-colors border-dashed flex items-center justify-center gap-2">
-                            <span class="text-2xl font-black">+</span> 新增一則隨筆
-                        </button>
-                    </div>
-
-                    <!-- 跟神聊聊 -->
-                    <div id="journal-prayer-fields" class="hidden">
-                        <div id="list-prayer" class="space-y-4 mb-8"></div>
-                        <div id="form-prayer" class="space-y-8 hidden bg-white p-4 rounded-lg border-2 border-[#eee] mb-8">
-                            <h3 class="font-bold text-lg text-[#008F39]">✍️ 新增/編輯禱告</h3>
-                            <div>
-                                <label class="block text-sm font-bold text-[#333] mb-2 uppercase tracking-widest pixel-font bg-[#FFD500] w-fit px-2 rounded shadow-sm">🎯 Wish</label>
-                                <textarea id="note-topic" placeholder="想要什麼？大膽跟神求..." class="w-full min-h-[60px] resize-none p-3 text-lg leading-relaxed"></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#0055BF] w-fit px-2 rounded shadow-sm">💬 Murmur</label>
-                                <textarea id="note-content" placeholder="把心裡話都倒出來吧..." class="w-full min-h-[200px] resize-none p-3 text-lg leading-relaxed"></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#008F39] w-fit px-2 rounded shadow-sm">👣 Tracking</label>
-                                <textarea id="note-prayer-tracking" placeholder="記錄禱告的成就、進度或應允..." class="w-full min-h-[150px] resize-none p-3 text-lg leading-relaxed"></textarea>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="window.saveListEntry('prayer')" class="brick-btn btn-green flex-1">儲存</button>
-                                <button onclick="window.hideEntryForm('prayer')" class="brick-btn flex-1">取消</button>
-                            </div>
-                        </div>
-                        <button id="btn-add-prayer" onclick="window.showEntryForm('prayer')" class="brick-btn w-full py-4 text-[#008F39] border-2 border-[#008F39] hover:bg-[#008F39] hover:text-white transition-colors border-dashed flex items-center justify-center gap-2">
-                            <span class="text-2xl font-black">+</span> 新增一則禱告
-                        </button>
-                    </div>
-
-                    <!-- 感恩日記 -->
-                    <div id="journal-gratitude-fields" class="hidden">
-                        <div id="list-gratitude" class="space-y-4 mb-8"></div>
-                        <div id="form-gratitude" class="space-y-8 hidden bg-white p-4 rounded-lg border-2 border-[#eee] mb-8">
-                            <h3 class="font-bold text-lg text-[#FFD500]">✍️ 新增/編輯感恩</h3>
-                            <div>
-                                <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#E3000B] w-fit px-2 rounded shadow-sm">💖 Gratitude</label>
-                                <textarea id="note-thanks" placeholder="今天發生了什麼好事？..." class="w-full min-h-[120px] resize-none p-3 text-lg leading-relaxed"></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-white mb-2 uppercase tracking-widest pixel-font bg-[#008F39] w-fit px-2 rounded shadow-sm">✨ Grace</label>
-                                <textarea id="note-grace" placeholder="哪裡看見神的作為？..." class="w-full min-h-[120px] resize-none p-3 text-lg leading-relaxed"></textarea>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="window.saveListEntry('gratitude')" class="brick-btn btn-yellow flex-1">儲存</button>
-                                <button onclick="window.hideEntryForm('gratitude')" class="brick-btn flex-1">取消</button>
-                            </div>
-                        </div>
-                        <button id="btn-add-gratitude" onclick="window.showEntryForm('gratitude')" class="brick-btn w-full py-4 text-[#FFD500] border-2 border-[#FFD500] hover:bg-[#FFD500] hover:text-[#333] transition-colors border-dashed flex items-center justify-center gap-2">
-                            <span class="text-2xl font-black">+</span> 新增一則感恩
-                        </button>
-                    </div>
-
-                    <!-- 內心戲 -->
-                    <div id="journal-mood-fields" class="hidden">
-                        <div id="list-mood" class="space-y-4 mb-8"></div>
-                        <div id="form-mood" class="space-y-8 hidden bg-white p-4 rounded-lg border-2 border-[#eee] mb-8">
-                            <h3 class="font-bold text-lg text-[#E3000B]">✍️ 新增/編輯內心戲</h3>
-                            <div class="p-5 bg-[#FAFAFA] rounded-lg border-2 border-gray-200 border-t-4 border-gray-300">
-                                <label class="block text-base font-bold text-[#333] mb-3 uppercase pixel-font">🎬 Event</label>
-                                <textarea id="note-mood-event" placeholder="記錄事件與感受..." class="w-full bg-white border-2 border-[#ddd] rounded p-4 text-base outline-none resize-none h-28 focus:border-[#FFD500] leading-relaxed shadow-none"></textarea>
-                            </div>
-
-                            <!-- 全方位情緒詞彙庫 -->
-                            <div class="mt-4 mb-4">
-                                <details class="group relative">
-                                    <summary class="brick-btn btn-yellow w-full flex justify-between items-center cursor-pointer list-none select-none">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-xl">📖</span>
-                                            <span class="tracking-widest">開啟情緒詞彙庫</span>
-                                        </div>
-                                        <span class="transition-transform group-open:rotate-180">▼</span>
-                                    </summary>
-                                    <div class="mt-3 p-4 bg-white border-2 border-[#eee] rounded-lg h-64 overflow-y-auto custom-scrollbar shadow-inner relative z-10">
-                                        <!-- 正向情緒 -->
-                                        <div class="mb-4">
-                                            <div class="emotion-group-title text-[#F57F17]">
-                                                <span>🌞</span> 正向 / 快樂 (Positive)
-                                            </div>
-                                            <div id="emotion-list-pos"></div>
-                                        </div>
-                                        
-                                        <!-- 中性情緒 -->
-                                        <div class="mb-4">
-                                            <div class="emotion-group-title text-[#616161]">
-                                                <span>😐</span> 中性 / 狀態 (Neutral)
-                                            </div>
-                                            <div id="emotion-list-neu"></div>
-                                        </div>
-                                        
-                                        <!-- 負面情緒 -->
-                                        <div>
-                                            <div class="emotion-group-title text-[#D32F2F]">
-                                                <span>🌧️</span> 負面 / 壓力 (Negative)
-                                            </div>
-                                            <div id="emotion-list-neg"></div>
-                                        </div>
-                                    </div>
-                                </details>
-                            </div>
-
-                            <div>
-                                <label class="block text-lg font-bold text-[#333] mb-2 pixel-font">🏷️ Emotions</label>
-                                <textarea id="note-mood-tags" placeholder="情緒標籤..." class="w-full min-h-[60px] resize-none p-3 text-lg"></textarea>
-                            </div>
-                            <div class="grid grid-cols-1 gap-8">
-                                <div>
-                                    <label class="block text-lg font-bold text-white mb-2 pixel-font bg-[#333] w-fit px-2 rounded">🤥 Lie</label>
-                                    <textarea id="note-mood-lie" placeholder="我相信了什麼謊言..." class="w-full min-h-[50px] resize-none p-3 text-lg"></textarea>
-                                </div>
-                                <div>
-                                    <label class="block text-lg font-bold text-[#333] mb-2 pixel-font bg-[#FFD500] w-fit px-2 rounded border border-[#ccaa00]">👓 Truth</label>
-                                    <textarea id="note-mood-god-view" placeholder="神的眼光..." class="w-full min-h-[50px] resize-none p-3 text-lg"></textarea>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-lg font-bold text-white mb-2 pixel-font bg-[#0055BF] w-fit px-2 rounded">🙏 Prayer</label>
-                                <textarea id="note-mood-prayer" placeholder="交託與領受..." class="w-full min-h-[100px] resize-none p-3 text-lg leading-relaxed"></textarea>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="window.saveListEntry('mood')" class="brick-btn btn-red flex-1">儲存</button>
-                                <button onclick="window.hideEntryForm('mood')" class="brick-btn flex-1">取消</button>
-                            </div>
-                        </div>
-                        <button id="btn-add-mood" onclick="window.showEntryForm('mood')" class="brick-btn w-full py-4 text-[#E3000B] border-2 border-[#E3000B] hover:bg-[#E3000B] hover:text-white transition-colors border-dashed flex items-center justify-center gap-2">
-                            <span class="text-2xl font-black">+</span> 新增一則內心戲
-                        </button>
-                    </div>
-
-                    <!-- 底部儲存提示 -->
-                    <div class="mt-10 p-4 bg-[#FFFDE7] border-2 border-[#FFD500] rounded-lg text-center shadow-[0_4px_0_rgba(0,0,0,0.05)]">
-                        <p class="text-sm font-black text-[#F57F17] mb-3 flex items-center justify-center gap-2">
-                            <span class="text-lg">⚠️</span> 資料僅儲存於此瀏覽器
-                        </p>
-                        <button onclick="window.backupData()" class="brick-btn btn-yellow w-full py-3 text-xs flex items-center justify-center gap-2 mb-2">
-                            <span class="text-lg">💾</span> 點此下載備份檔案 (.json)
-                        </button>
-                        <p class="text-[10px] text-[#F9A825] font-bold">請定期備份，以免清除瀏覽器紀錄後資料遺失</p>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </main>
-
     <!-- Delete Confirmation Modal -->
     <div id="delete-confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm hidden" onclick="if(event.target===this)window.closeDeleteModal()">
         <div class="bg-white w-full max-w-xs p-6 rounded-lg shadow-[0_12px_0_#ccc] m-4 border-2 border-gray-200" onclick="event.stopPropagation()">
@@ -786,9 +516,10 @@
             
             <div class="space-y-4">
                 <!-- 1. Date Input (Moved to Top) -->
-                <div class="w-full">
+                <!-- Added overflow-hidden wrapper -->
+                <div class="w-full relative overflow-hidden rounded-lg">
                     <label class="block text-sm font-bold text-[#A65AD4] mb-2 uppercase tracking-widest">Delivery Date</label>
-                    <input type="date" id="capsule-target-date" class="w-full max-w-full p-3 border-2 border-gray-200 rounded-lg focus:border-[#A65AD4] outline-none transition-colors box-border">
+                    <input type="date" id="capsule-target-date" class="w-full max-w-full p-3 border-2 border-gray-200 rounded-lg focus:border-[#A65AD4] outline-none transition-colors box-border" style="width: 100%;">
                 </div>
                 
                 <!-- 2. Message Input -->
@@ -798,7 +529,7 @@
                 </div>
 
                 <!-- 3. Mailbox Area (Brick Style) -->
-                <div class="brick-mailbox-container w-full max-w-full">
+                <div class="brick-mailbox-container w-full max-w-full box-border">
                     <label class="block text-sm font-bold text-[#8a40b5] mb-2 uppercase tracking-widest flex justify-between items-center relative z-10">
                         <span>Time Mailbox</span>
                         <span class="text-xs opacity-70 font-normal normal-case">Click to open</span>
@@ -1030,6 +761,7 @@
 
         window.renderJournalList = function(type) {
             const listEl = document.getElementById(`list-${type}`);
+            if(!listEl) return;
             const entries = window.getJournalEntries(type);
             listEl.innerHTML = '';
             if (entries.length === 0) {
@@ -1079,9 +811,14 @@
         }
 
         window.showEntryForm = function(type, entryId = null) {
-            document.getElementById(`list-${type}`).classList.add('hidden');
-            document.getElementById(`btn-add-${type}`).classList.add('hidden');
-            document.getElementById(`form-${type}`).classList.remove('hidden');
+            const f = document.getElementById(`form-${type}`);
+            const l = document.getElementById(`list-${type}`);
+            const b = document.getElementById(`btn-add-${type}`);
+            
+            if(l) l.classList.add('hidden');
+            if(b) b.classList.add('hidden');
+            if(f) f.classList.remove('hidden');
+            
             currentEditingId = entryId;
             const fields = journalFields[type];
             if (entryId) {
@@ -1094,9 +831,12 @@
         }
 
         window.hideEntryForm = function(type) {
-            document.getElementById(`form-${type}`).classList.add('hidden');
-            document.getElementById(`list-${type}`).classList.remove('hidden');
-            document.getElementById(`btn-add-${type}`).classList.remove('hidden');
+            const f = document.getElementById(`form-${type}`);
+            const l = document.getElementById(`list-${type}`);
+            const b = document.getElementById(`btn-add-${type}`);
+            if(f) f.classList.add('hidden');
+            if(l) l.classList.remove('hidden');
+            if(b) b.classList.remove('hidden');
             currentEditingId = null;
         }
 
@@ -1186,9 +926,11 @@
             } else {
                 // 回退到預設清單
                 const daySeed = val.split('-').reduce((a,b)=>a+parseInt(b), 0);
-                const m = mannaVerses[daySeed % mannaVerses.length];
-                document.getElementById('manna-text').innerText = m.t;
-                document.getElementById('manna-ref').innerText = m.r;
+                if (typeof mannaVerses !== 'undefined') {
+                    const m = mannaVerses[daySeed % mannaVerses.length];
+                    document.getElementById('manna-text').innerText = m.t;
+                    document.getElementById('manna-ref').innerText = m.r;
+                }
             }
 
             // Update Devotional Data Fields
