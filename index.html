@@ -275,25 +275,34 @@
         /* 關鍵修復：分頁顯示控制 (Mobile Tabs vs Desktop Split) */
         @media (max-width: 1023px) {
             .tab-pane {
-                position: absolute;
-                inset: 0;
-                transition: opacity 0.3s, transform 0.3s;
+                /* 隱藏預設狀態，但保持佈局 */
+                display: none; 
+                width: 100%;
                 opacity: 0;
-                z-index: 0;
-                pointer-events: none;
+                transition: opacity 0.3s ease;
+                /* 強制垂直排列，防止內容變成左右排 */
+                flex-direction: column !important;
+                pointer-events: none; /* 預設不接受點擊 */
             }
             .tab-pane.active {
+                display: flex; 
                 opacity: 1;
                 z-index: 10;
-                pointer-events: auto;
+                /* 再次確保是垂直排列 */
+                flex-direction: column !important;
+                pointer-events: auto; /* 啟動後可點擊 */
             }
         }
         @media (min-width: 1024px) {
             .tab-pane {
+                display: flex !important;
                 position: relative !important;
                 opacity: 1 !important;
                 z-index: auto !important;
                 pointer-events: auto !important;
+                width: 50% !important; /* 強制寬度 */
+                /* 電腦版也確保垂直排列 */
+                flex-direction: column !important;
             }
         }
     </style>
@@ -695,7 +704,7 @@
 
                             <!-- 全方位情緒詞彙庫 -->
                             <div class="mt-4 mb-4">
-                                <details class="group relative">
+                                <details class="group relative" ontoggle="if(this.open) document.getElementById('emotion-library-scroll').scrollTop = 0">
                                     <summary class="brick-btn btn-yellow w-full flex justify-between items-center cursor-pointer list-none select-none">
                                         <div class="flex items-center gap-2">
                                             <span class="text-xl">📖</span>
@@ -703,7 +712,7 @@
                                         </div>
                                         <span class="transition-transform group-open:rotate-180">▼</span>
                                     </summary>
-                                    <div class="mt-3 p-4 bg-white border-2 border-[#eee] rounded-lg h-64 overflow-y-auto custom-scrollbar shadow-inner relative z-10">
+                                    <div id="emotion-library-scroll" class="mt-3 p-4 bg-white border-2 border-[#eee] rounded-lg h-64 overflow-y-auto custom-scrollbar shadow-inner relative z-10">
                                         <!-- 正向情緒 -->
                                         <div class="mb-4">
                                             <div class="emotion-group-title text-[#F57F17]">
@@ -918,9 +927,9 @@
 
         // 專業情緒詞彙庫 (Revised)
         const emotionData = {
-            pos: ["快樂 (Happy)", "興奮 (Excited)", "喜悅 (Joyful)", "感激 (Grateful)", "滿足 (Satisfied)", "自信 (Confident)", "平靜 (Calm)", "放鬆 (Relaxed)", "充滿希望 (Hopeful)", "被愛 (Loved)", "安全 (Safe)", "自在 (At ease)", "熱情 (Enthusiastic)", "敬畏 (Awe)", "驕傲 (Proud)", "受鼓舞 (Inspired)", "欣慰 (Gratified)", "溫暖 (Warm)", "勇敢 (Brave)", "樂觀 (Optimistic)", "甜蜜 (Sweet)", "幸福 (Blissful)", "豁達 (Open-minded)", "欽佩 (Admiring)"],
-            neu: ["驚訝 (Surprised)", "困惑 (Confused)", "好奇 (Curious)", "猶豫 (Hesitant)", "沉思 (Pensive)", "警覺 (Alert)", "麻木 (Numb)", "疏離 (Alienated)", "矛盾 (Conflicted)", "錯愕 (Stunned)", "懷疑 (Skeptical)", "期待 (Anticipating)", "複雜 (Complex)", "尷尬 (Awkward)", "震驚 (Shocked)"],
-            neg: ["悲傷 (Sad)", "憤怒 (Angry)", "焦慮 (Anxious)", "恐懼 (Fearful)", "羞愧 (Ashamed)", "內疚 (Guilty)", "絕望 (Hopeless)", "孤單 (Lonely)", "無助 (Helpless)", "煩躁 (Irritable)", "厭惡 (Disgusted)", "嫉妒 (Jealous)", "委屈 (Wronged)", "挫折 (Frustrated)", "壓力 (Stressed)", "空虛 (Empty)", "後悔 (Regretful)", "迷惘 (Lost)", "不安 (Uneasy)", "受傷 (Hurt)", "驚恐 (Panicked)", "懊惱 (Annoyed/Regretful)", "哀痛 (Grieving)", "憤恨 (Resentful)", "輕蔑 (Contemptuous)"]
+            pos: ["喜悅 (Joy)", "感激 (Gratitude)", "寧靜 (Serenity)", "興趣 (Interest)", "希望 (Hope)", "自豪 (Pride)", "逗趣 (Amusement)", "激勵 (Inspiration)", "敬畏 (Awe)", "愛 (Love)", "自信 (Confidence)", "滿足 (Contentment)", "放鬆 (Relief)", "興奮 (Excitement)", "同情 (Compassion)", "欽佩 (Admiration)", "樂觀 (Optimism)", "被接納 (Accepted)"],
+            neu: ["驚訝 (Surprise)", "困惑 (Confusion)", "麻木 (Numbness)", "疏離 (Alienation)", "矛盾 (Ambivalence)", "猶豫 (Hesitation)", "警覺 (Alertness)", "疲憊 (Fatigue)", "無聊 (Boredom)", "沈思 (Pensive)", "冷靜 (Calm)", "恍惚 (Dazed)"],
+            neg: ["悲傷 (Sadness)", "憤怒 (Anger)", "恐懼 (Fear)", "焦慮 (Anxiety)", "羞愧 (Shame)", "內疚 (Guilt)", "厭惡 (Disgust)", "嫉妒 (Envy)", "孤獨 (Loneliness)", "絕望 (Despair)", "無助 (Helplessness)", "挫折 (Frustration)", "委屈 (Grievance)", "尷尬 (Embarrassment)", "後悔 (Regret)", "空虛 (Emptiness)", "壓力 (Stressed)", "痛苦 (Pain)"]
         };
 
         async function initApp() {
@@ -1037,7 +1046,8 @@
         };
 
         window.getJournalEntries = function(type) {
-            const dateKey = els.datePicker.value;
+            const dateInput = document.getElementById('date-picker'); // FIX: Get directly
+            const dateKey = dateInput ? dateInput.value : new Date().toISOString().split('T')[0];
             const listKey = `${dateKey}-journal-${type}-entries`;
             let entries = [];
             
@@ -1100,7 +1110,8 @@
         window.closeDeleteModal = function() { document.getElementById('delete-confirm-modal').classList.add('hidden'); pendingDeleteType = null; pendingDeleteId = null; }
         window.confirmDelete = function() {
             if (!pendingDeleteType || !pendingDeleteId) return;
-            const dateKey = els.datePicker.value;
+            const dateInput = document.getElementById('date-picker'); // FIX: Get directly
+            const dateKey = dateInput ? dateInput.value : new Date().toISOString().split('T')[0];
             const listKey = `${dateKey}-journal-${pendingDeleteType}-entries`;
             let entries = window.getJournalEntries(pendingDeleteType);
             const newEntries = entries.filter(e => e.id !== pendingDeleteId);
@@ -1144,7 +1155,8 @@
         }
 
         window.saveListEntry = function(type) {
-            const dateKey = els.datePicker.value;
+            const dateInput = document.getElementById('date-picker'); // FIX: Get directly
+            const dateKey = dateInput ? dateInput.value : new Date().toISOString().split('T')[0];
             const listKey = `${dateKey}-journal-${type}-entries`;
             let entries = window.getJournalEntries(type);
             const fields = journalFields[type];
@@ -1404,32 +1416,24 @@
             if(firstRefEl) { window.fetchBibleRef(firstRefEl.innerText); } 
         }
         
-        // FIX: Add safety checks to prevent null reference errors and ensure toggling
+        // FIX: Simple and Robust Tab Switching Logic
         window.switchWorkspaceTab = function(t) {
             const r = document.getElementById('section-reader');
             const j = document.getElementById('section-journal');
             const tr = document.getElementById('tab-reader');
             const tj = document.getElementById('tab-journal');
 
-            if (!r || !j || !tr || !tj) {
-                console.warn("Retrying to fetch workspace elements...");
-                return;
-            }
+            if (!r || !j || !tr || !tj) return;
 
+            // Just toggle the 'active' class. CSS Media Queries handle the rest.
             if (t === 'reader') {
                 r.classList.add('active');
-                r.classList.remove('inactive');
-                j.classList.add('inactive');
                 j.classList.remove('active');
-                
                 tr.classList.add('active');
                 tj.classList.remove('active');
             } else {
                 j.classList.add('active');
-                j.classList.remove('inactive');
-                r.classList.add('inactive');
                 r.classList.remove('active');
-                
                 tj.classList.add('active');
                 tr.classList.remove('active');
             }
